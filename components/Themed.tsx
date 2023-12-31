@@ -7,6 +7,8 @@ import { Text as DefaultText, useColorScheme, View as DefaultView } from 'react-
 
 import Colors from '../constants/Colors';
 
+// This file is used to create a theme for the app. It is not used anywhere in the app.
+
 type ThemeProps = {
   lightColor?: string;
   darkColor?: string;

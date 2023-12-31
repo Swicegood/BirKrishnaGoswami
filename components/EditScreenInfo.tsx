@@ -6,6 +6,7 @@ import { ExternalLink } from './ExternalLink';
 import { MonoText } from './StyledText';
 import { Text, View } from './Themed';
 
+// This is an example of a component that is not used anywhere in the app. It is only here to
 
 export default function EditScreenInfo({ path }: { path: string }) {
   return (

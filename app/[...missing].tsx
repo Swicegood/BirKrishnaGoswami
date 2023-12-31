@@ -3,6 +3,8 @@ import { StyleSheet } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 
+// This screen is displayed when the user navigates to a screen that doesn't exist.
+
 export default function NotFoundScreen() {
   return (
     <>

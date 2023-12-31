@@ -1,3 +1,5 @@
+
+// Metro is a tool that bundles JavaScript code. It takes in options, and returns a bundler function.
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require('expo/metro-config');
 

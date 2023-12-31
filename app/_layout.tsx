@@ -5,6 +5,9 @@ import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
+//This file is called _layout.tsx because it is not a React component, but a React Navigation layout.
+
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,

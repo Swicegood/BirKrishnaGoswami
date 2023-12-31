@@ -1,3 +1,5 @@
+// This file's responsibility is to configure TypeScript for your project.
+
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
