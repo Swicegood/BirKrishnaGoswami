@@ -6,41 +6,8 @@ import { useEffect } from 'react';
 import { Pressable, useColorScheme } from 'react-native';
 import Colors from '../constants/Colors';
 import { Drawer } from 'expo-router/drawer';
-import { Link, Tabs } from 'expo-router';
-function RootLayout() {
-  return (
-    <Drawer>
-      <Drawer.Screen
-        name="about" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'About',
-          title: 'overview',
-        }}
-      />
-      <Drawer.Screen
-        name="travel" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'Travel Schedule',
-          title: 'Travel Schedule',
-        }}
-      />
-      <Drawer.Screen
-        name="blog" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'Blog',
-          title: 'Gurudeva\'s Blog',
-        }}
-      />
-      <Drawer.Screen
-        name="downloads" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'Downloads',
-          title: 'Downloads',
-        }}
-      />
-    </Drawer>
-  );
-}
+
+
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
@@ -59,51 +26,17 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: 'index',
+  initialRouteName: '(drawer)',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function Layout() {
+export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,    
   })
-  return (
-    <Drawer>
-      <Drawer.Screen
-        name="about" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'About',
-          title: 'overview',
-        }}
-      />
-      <Drawer.Screen
-        name="travel" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'Travel Schedule',
-          title: 'Travel Schedule',
-        }}
-      />
-      <Drawer.Screen
-        name="blog" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'Blog',
-          title: 'Gurudeva\'s Blog',
-        }}
-      />
-      <Drawer.Screen
-        name="downloads" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'Downloads',
-          title: 'Downloads',
-        }}
-      />
-    </Drawer>
-  );
-  ;
-
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
@@ -121,7 +54,7 @@ export default function Layout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return <RootLayoutNav/>;
 }
 
 function RootLayoutNav() {
@@ -129,9 +62,8 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ title: 'About' }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+      <Stack>        
+        <Stack.Screen name="(drawer)" options={{ title: 'Main Page' }} />
       </Stack>
     </ThemeProvider>
   );
