@@ -14,15 +14,8 @@ import { Text, View } from '../../components/Themed';
 export default function TabOneScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton}>
-          {/* Replace with an icon component if available */}
-          <Text style={styles.menuText}>☰</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Main Page</Text>
-      </View>
-
-      <ScrollView style={styles.container}>
+ 
+     <ScrollView style={styles.container}>
 
       {/* Button Rows */}
       <View style={styles.buttonRow}>
@@ -124,6 +117,7 @@ const styles = StyleSheet.create<Styles>({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'coral',
+
   },
   menuButton: {
     position: 'absolute',

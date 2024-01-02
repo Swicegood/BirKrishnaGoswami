@@ -26,6 +26,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'About',
         title: 'overview',
+        headerShown: false,
       }}
     />
     <Drawer.Screen
@@ -53,7 +54,8 @@ export default function DrawerLayout() {
     name="index"
     options={{ 
         drawerLabel: 'Home',
-        drawerItemStyle: { height: 0 } }} 
+        drawerItemStyle: { height: 0 }, 
+        headerShown: false }} 
     />    
   </Drawer>
   );

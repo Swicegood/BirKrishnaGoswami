@@ -4,9 +4,7 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { Pressable, useColorScheme } from 'react-native';
-import Colors from '../constants/Colors';
-import { Drawer } from 'expo-router/drawer';
-
+import  CustomHeader  from '../components/CustomHeader';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -17,6 +15,7 @@ function TabBarIcon(props: {
 }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
+
 
 
 export {
@@ -63,7 +62,13 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>        
-        <Stack.Screen name="(drawer)" options={{ title: 'Main Page' }} />
+      <Stack.Screen 
+        name="(drawer)" 
+        options={{
+          title: '',
+          header: () => <CustomHeader/>,
+        }}
+      />
       </Stack>
     </ThemeProvider>
   );
