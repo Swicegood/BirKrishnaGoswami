@@ -2,7 +2,8 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
-
+import  CustomHeader  from '../../components/CustomHeader';
+import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';
 import Colors from '../../constants/Colors';
 
@@ -26,7 +27,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'About',
         title: 'overview',
-        headerShown: false,
+        header: () => <CustomBackHeader />,
       }}
     />
     <Drawer.Screen
@@ -34,6 +35,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'Travel Schedule',
         title: 'Travel Schedule',
+        header: () => <CustomBackHeader />,
       }}
     />
     <Drawer.Screen
@@ -41,6 +43,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'Blog',
         title: 'Gurudeva\'s Blog',
+        header: () => <CustomBackHeader />,
       }}
     />
     <Drawer.Screen
@@ -48,6 +51,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'Downloads',
         title: 'Downloads',
+        header: () => <CustomBackHeader />,
       }}
     />
     <Drawer.Screen 
@@ -55,7 +59,7 @@ export default function DrawerLayout() {
     options={{ 
         drawerLabel: 'Home',
         drawerItemStyle: { height: 0 }, 
-        headerShown: false }} 
+        header: () => <CustomHeader />, }} 
     />    
   </Drawer>
   );

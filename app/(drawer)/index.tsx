@@ -8,15 +8,32 @@ import {
   TextStyle,
   ImageStyle,
 } from 'react-native';
-
+import Slider from '@react-native-community/slider';
 import { Text, View } from '../../components/Themed';
+import { useState } from 'react';
+
 
 export default function TabOneScreen() {
+  const [value, setValue] = useState(0);
   return (
+    <>
     <SafeAreaView style={styles.safeArea}>
  
      <ScrollView style={styles.container}>
 
+      <View style={styles.container}>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={1}
+          minimumTrackTintColor="#FFFFFF"
+          maximumTrackTintColor="#000000"
+          onValueChange={setValue}
+          value={value}
+        />
+      </View>
+        {/* Header */}
+     
       {/* Button Rows */}
       <View style={styles.buttonRow}>
         {/* Button components */}
@@ -54,13 +71,14 @@ export default function TabOneScreen() {
         {/* More buttons */}
       </View>
     </ScrollView>
+    </SafeAreaView>
     {/* Footer */}
     <View style={styles.footer}>
       <FooterButton title="CHANTING" />
       {/* More footer buttons */}
     </View>
-
-   </SafeAreaView>
+    </>
+  
   );
 }
 
@@ -88,6 +106,7 @@ const FooterButton: React.FC<ButtonProps> = ({ title }) => (
 
 // Style definitions
 interface Styles {
+  slider: ViewStyle;
   safeArea: ViewStyle;
   container: ViewStyle;
   header: ViewStyle;
@@ -104,13 +123,17 @@ interface Styles {
 }
 
 const styles = StyleSheet.create<Styles>({
+  slider: {
+    width: 200, 
+    height: 40,
+  },
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFDF8',
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFDF8',
   },
   header: {
     height: 60,
@@ -151,16 +174,17 @@ const styles = StyleSheet.create<Styles>({
     textAlign: 'center',
   },
   footer: {
-    height: 60,
+    height: 80,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: 'coral',
+    backgroundColor: '#FCDCCB',
   },
   footerButton: {
     // Define your footer button styles here
   },
   footerText: {
-    color: '#fff',
+    color: 'brown',
+    fontWeight: 'bold',
   },
 });

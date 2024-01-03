@@ -4,7 +4,6 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { Pressable, useColorScheme } from 'react-native';
-import  CustomHeader  from '../components/CustomHeader';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -62,13 +61,7 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>        
-      <Stack.Screen 
-        name="(drawer)" 
-        options={{
-          title: '',
-          header: () => <CustomHeader/>,
-        }}
-      />
+      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

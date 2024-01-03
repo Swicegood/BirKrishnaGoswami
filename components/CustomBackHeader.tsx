@@ -7,17 +7,18 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 type DrawerParamList = {
   Home: undefined;
   // Add other routes here
+  index: undefined;
 };
 
-function CustomHeader() {
+function CustomBackHeader() {
   const navigation = useNavigation<DrawerNavigationProp<DrawerParamList, 'Home'>>();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.toggleDrawer()}>
-          <Text style={styles.menuText}>☰</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('index')}>
+         <Text style={styles.menuText}>&lt;</Text>
+      </TouchableOpacity>
         <Text style={styles.headerText}></Text>
       </View>
     </SafeAreaView>
@@ -52,4 +53,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomHeader;
+export default CustomBackHeader;
