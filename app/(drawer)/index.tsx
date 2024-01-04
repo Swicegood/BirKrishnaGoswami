@@ -7,32 +7,70 @@ import {
   ViewStyle,
   TextStyle,
   ImageStyle,
+  Dimensions
 } from 'react-native';
-import Slider from '@react-native-community/slider';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
 import { useState } from 'react';
 
+const ENTRIES = [
+  { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png') },
+  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
+  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
+  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
+  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
+  // Add more entries here
+];
 
-export default function TabOneScreen() {
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+function renderItem({ item, index }: { item: any, index: number }) {
+  return (
+    <View style={styles.slide}>
+      <Image source={item.image} style={styles.image} />
+    </View>
+  );
+}
+export default function TabOneScireen() {
   const [value, setValue] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(0); // Add this state variable
   return (
     <>
     <SafeAreaView style={styles.safeArea}>
- 
-     <ScrollView style={styles.container}>
 
-      <View style={styles.container}>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={1}
-          minimumTrackTintColor="#FFFFFF"
-          maximumTrackTintColor="#000000"
-          onValueChange={setValue}
-          value={value}
-        />
+    <View style={styles.carousel}>
+      <Carousel
+              data={ENTRIES}
+              renderItem={renderItem}
+              sliderWidth={Dimensions.get('window').width}
+              itemWidth={Dimensions.get('window').width}
+              autoplay={true}
+              autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
+              loop={true}
+              onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
+            />
+            <Pagination // Add this component
+              dotsLength={ENTRIES.length}
+              activeDotIndex={activeSlide}
+              containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
+              dotStyle={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 5,
+                  marginHorizontal: 0,
+                  backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
+              }}
+              inactiveDotStyle={{
+                  backgroundColor: 'gray' // Change this to the color you want for the inactive dots
+              }}
+              inactiveDotOpacity={0.4}
+              inactiveDotScale={0.6}
+            />
       </View>
-        {/* Header */}
+
+     <ScrollView style={styles.container}>
+      {/* Header */}
      
       {/* Button Rows */}
       <View style={styles.buttonRow}>
@@ -106,7 +144,10 @@ const FooterButton: React.FC<ButtonProps> = ({ title }) => (
 
 // Style definitions
 interface Styles {
-  slider: ViewStyle;
+  slide: ViewStyle;
+  carousel: ViewStyle;
+  title: TextStyle;
+  image: ImageStyle;
   safeArea: ViewStyle;
   container: ViewStyle;
   header: ViewStyle;
@@ -123,9 +164,24 @@ interface Styles {
 }
 
 const styles = StyleSheet.create<Styles>({
-  slider: {
-    width: 200, 
-    height: 40,
+  carousel: {
+    marginBottom: 0, // No bottom margin
+  },
+  slide: {
+    width: windowWidth,
+    height: windowHeight * 0.2, // Adjust this value as needed
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#9DD6EB',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  image: {
+    width: windowWidth, // Adjust this value as needed
+    height: windowHeight * 0.2, // Adjust this value as needed
+    resizeMode: 'cover',
   },
   safeArea: {
     flex: 1,
