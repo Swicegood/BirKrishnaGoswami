@@ -90,7 +90,7 @@ export default function TabOneScireen() {
 
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Button title="YATRAS" />
+        <Button title="TEMPLES" />
         <Button title="NEWS" />
         {/* More buttons */}
       </View>
@@ -112,8 +112,21 @@ export default function TabOneScireen() {
     </SafeAreaView>
     {/* Footer */}
     <View style={styles.footer}>
-      <FooterButton title="CHANTING" />
-      {/* More footer buttons */}
+      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
+        <Text style={styles.footerText} >1</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
+        <Text style={styles.footerText}>2</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
+        <Text style={styles.footerText}>3</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
+        <Text style={styles.footerText}>4</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
+        <Text style={styles.footerText}>5</Text>
+      </TouchableOpacity>
     </View>
     </>
   
@@ -225,7 +238,7 @@ const styles = StyleSheet.create<Styles>({
     marginBottom: 8, // Space between image and text
   },
   buttonText: {
-    color: '#000',
+    color: '#7e2b18',
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -237,10 +250,15 @@ const styles = StyleSheet.create<Styles>({
     backgroundColor: '#FCDCCB',
   },
   footerButton: {
-    // Define your footer button styles here
+    width: 36, // Adjust this value as needed
+    height: 36, // This is 50% of the footer height
+    borderRadius: 18, // This should be half of the button width/height
+    backgroundColor: '#b91805',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   footerText: {
-    color: 'brown',
+    color: 'white',
     fontWeight: 'bold',
   },
 });
