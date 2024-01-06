@@ -148,12 +148,7 @@ const Button: React.FC<ButtonProps> = ({ title }) => (
   </View>
 );
 
-// FooterButton component
-const FooterButton: React.FC<ButtonProps> = ({ title }) => (
-  <TouchableOpacity style={styles.footerButton}>
-    <Text style={styles.footerText}>{title}</Text>
-  </TouchableOpacity>
-);
+
 
 // Style definitions
 interface Styles {
