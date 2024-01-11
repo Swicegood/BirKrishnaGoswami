@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
+import { Link } from 'expo-router';
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png') },
@@ -75,37 +76,63 @@ export default function TabOneScireen() {
       {/* Button Rows */}
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Button title="LIVE" />
-        <Button title="AUDIO" />
+        <Button title="LIVE" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
+        <Link href="./audio" asChild>
+        <TouchableOpacity style={styles.buttonContainer}> 
+            <Image
+              source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
+              style={styles.buttonImage}
+            />
+            <Text style={styles.buttonText}>AUDIO</Text>
+          </TouchableOpacity>
+        </Link>
         {/* More buttons */}
       </View>
 
       {/* Additional Button Rows as needed */}
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Button title="PHOTOS" />
-        <Button title="DEITIES" />
+        <Button title="PHOTOS" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
+        <Button title="DEITIES" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
         {/* More buttons */}
       </View>
 
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Button title="TEMPLES" />
-        <Button title="NEWS" />
+        <Button title="TEMPLES" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
+        <Button title="NEWS" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
         {/* More buttons */}
       </View>
 
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Button title="SEARCH VIDEOS" />
-        <Button title="RECENT UPLOAD" />
+        <Button title="SEARCH VIDEOS" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
+        <Button title="RECENT UPLOAD" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
         {/* More buttons */}
       </View>
 
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Button title="QUOTES" />
-        <Button title="BOOKS" />
+        <Button title="QUOTES" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
+        <Button title="BOOKS" onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } />
         {/* More buttons */}
       </View>
     </ScrollView>
@@ -133,20 +160,23 @@ export default function TabOneScireen() {
   );
 }
 
-// Button component
 type ButtonProps = {
   title: string;
+  onPress: () => void;
 };
 
-const Button: React.FC<ButtonProps> = ({ title }) => (
-  <View style={styles.buttonContainer}>
+const Button = forwardRef((props: ButtonProps, ref: React.Ref<any>) => (
+  <TouchableOpacity style={styles.buttonContainer} > 
     <Image
       source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
       style={styles.buttonImage}
+      ref={ref}
     />
-    <Text style={styles.buttonText}>{title}</Text>
-  </View>
-);
+    <Text style={styles.buttonText}>{props.title}</Text>
+  </TouchableOpacity>
+));
+
+  
 
 
 
