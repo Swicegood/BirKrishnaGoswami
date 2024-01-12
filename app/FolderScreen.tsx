@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
 import { useNavigation, useRouter } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
+
+// Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
+const placeholderImage = require('../assets/images/placeholder_portrait.png');
+
+
+
+// Calculate the width of the screen
+const { width } = Dimensions.get('window');
+const itemWidth = (width - 32) / 2; // Assuming we want 16px padding on both sides
+
 
 interface File {
   category: string;
   title: string;
   url: string;
+  image: string;
 }
 
 function extractHierarchyFromUrl(url: string) {
@@ -46,10 +57,17 @@ function extractHierarchyFromUrl(url: string) {
   return categories;
 }
 
+
 const FolderScreen = () => {
   const [folders, setFolders] = useState<string[]>([]);
   const navigation = useNavigation();
   const router = useRouter();
+  // Data for the grid
+  const data = new Array(15).fill(null).map((_, index) => ({
+    key: String(index),
+    category: folders[index] || 'Loading...', // Replace with folders[index]
+    image: placeholderImage,
+  }));
 
   useEffect(() => {
     (async () => {
@@ -62,23 +80,70 @@ const FolderScreen = () => {
     })();
   }, []);
 
+  const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => (
+    <View style={styles.itemContainer}>
+      <TouchableOpacity onPress={() => handlePress(item.category)}>
+      <Image source={item.image} style={styles.image} resizeMode="cover" />
+      </TouchableOpacity>
+      <Text style={styles.itemText}>{item.category.replaceAll('_', ' ')}</Text>
+    </View>
+  );
+
   const handlePress = (folder: string) => {
     router.setParams( { name: 'FileScreen', folder })
   };
 
   return (
-    <View>
+
+    <SafeAreaView style={styles.safeArea}>
+
+      <View>
       <FlatList
-        data={folders}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)}>
-            <Text>{item}</Text>
-          </TouchableOpacity>
-        )}
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.key}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
+        contentContainerStyle={styles.contentContainer}
       />
     </View>
+    </SafeAreaView>
   );
 };
+
+
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
+  },
+  contentContainer: {
+    alignItems: 'center',
+  },
+  itemContainer: {
+    width: itemWidth,
+    marginBottom: 16, // Space between rows
+  },
+  image: {
+    width: '100%',
+    height: undefined,
+    aspectRatio: 1, // Your images are square
+    borderRadius: 10, // Optional: if you want rounded corners
+  },
+  itemText: {
+    marginTop: 8,
+    textAlign: 'center',
+  },
+});
 
 export default FolderScreen;
