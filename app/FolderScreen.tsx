@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-import { useNavigation, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
 
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
@@ -41,29 +41,32 @@ function extractHierarchyFromUrl(url: string) {
     currentLevel = currentLevel[part];
   }
 
-  // Function to recursively build a list of categories from the nested dictionary
-  function buildCategoryList(hierarchyDict: Record<string, any>, depth = 0) {
-    const categories: any[] = [];
-    for (const [key, subdict] of Object.entries(hierarchyDict)) {
-      const category = { name: key, subcategories: buildCategoryList(subdict, depth + 1) };
-      categories.push(category);
-    }
-    return depth > 0 ? categories : categories[0];  // Only return the top category
-  }
+  return hierarchy;
+}
 
-  // Get the list of categories with their subcategories
-  const categories = buildCategoryList(hierarchy);
+// Function to recursively build a list of categories from the nested dictionary
+function buildCategoryList(hierarchy: Record<string, any>, level: number): string[] {
+  let categories: string[] = [];
+
+  const traverse = (node: Record<string, any>, currentLevel: number) => {
+    for (const [key, value] of Object.entries(node)) {
+      if (currentLevel === level) {
+        categories.push(key);
+      }
+      traverse(value, currentLevel + 1);
+    }
+  };
+
+  traverse(hierarchy, 0);
 
   return categories;
 }
 
-
 const FolderScreen = () => {
   const [folders, setFolders] = useState<string[]>([]);
-  const navigation = useNavigation();
-  const router = useRouter();
+  const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);
   // Data for the grid
-  const data = new Array(15).fill(null).map((_, index) => ({
+  const data = new Array(folders.length).fill(null).map((_, index) => ({
     key: String(index),
     category: folders[index] || 'Loading...', // Replace with folders[index]
     image: placeholderImage,
@@ -71,10 +74,19 @@ const FolderScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const files: File[] = await getAllFiles();
-      console.log(files[40]);
-      const categories = files.map(file => extractHierarchyFromUrl(file).name);
-      console.log(categories[50]);
+      const files: File[] = (await getAllFiles()).map(url => ({ url }));
+   //  console.log(files);  // Check if 'files' array is empty
+      const hierarchy = files.map(file => {
+        const hierarchyFromUrl = extractHierarchyFromUrl(file.url);
+     //   console.log(file.url, hierarchyFromUrl);  // Check the URL and the returned hierarchy
+        return hierarchyFromUrl;
+      });
+      //console.log(hierarchy);  // Check the final 'hierarchy' array
+  //    const hierarchy = files.map(file => extractHierarchyFromUrl(file.url));
+      console.log("Hierarchy", hierarchy[40]);
+      setHierarchy(hierarchy);
+      const categories = buildCategoryList(hierarchy, 1);
+      console.log("Categories", categories);
       const uniqueCategories = Array.from(new Set(categories));
       setFolders(uniqueCategories);
     })();
@@ -82,16 +94,17 @@ const FolderScreen = () => {
 
   const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => (
     <View style={styles.itemContainer}>
-      <TouchableOpacity onPress={() => handlePress(item.category)}>
-      <Image source={item.image} style={styles.image} resizeMode="cover" />
+     <Link href={{ pathname: "SubFolderScreen",
+        params: { category: item.category, hierarchy: JSON.stringify(hierarchy) }}} asChild>
+      <TouchableOpacity>
+        <Image source={item.image} style={styles.image} resizeMode="cover" />
       </TouchableOpacity>
-      <Text style={styles.itemText}>{item.category.replaceAll('_', ' ')}</Text>
+      </Link>
+        <Text style={styles.itemText}>{item.category.replaceAll('_', ' ')}</Text>
     </View>
   );
 
-  const handlePress = (folder: string) => {
-    router.setParams( { name: 'FileScreen', folder })
-  };
+
 
   return (
 
