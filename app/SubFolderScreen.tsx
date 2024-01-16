@@ -1,6 +1,7 @@
-import React, { Children, useEffect, useState } from 'react';
+import React, { Children, useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
 import { Link, useLocalSearchParams} from 'expo-router';
+import FilesScreen from './FilesScreen';
 
 
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
@@ -17,13 +18,13 @@ interface SubCategory {
     key: string;
     title: string;
     image: any;
-    children: SubCategory[];
+    parents: any;
   }
 
   function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {
     let categories: string[] = [];
-  
-    const traverse = (node: Record<string, any>, currentParent: string) => {
+    console.log("buildCategoryList", hierarchy[-1], parent);
+    const traverse = (node: Record<string, any> | null, currentParent: string) => {
       if (currentParent === parent) {
         categories.push(...Object.keys(node));
       } else {
@@ -34,54 +35,84 @@ interface SubCategory {
     };
   
     traverse(hierarchy, '');
-  
     return categories;
   }
 
-const SubFolderScreen = () => {
-  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+ const SubFolderScreen = () => {
+    const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+    const [isFileScreen, setIsFileScreen] = useState(false);
+    // Get the category from the previous screen
+    const { category, hierarchy } = useLocalSearchParams<{ category: string; hierarchy: string }>();
+    const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
+    console.log("SubFolderScreen", category);
 
-  // Get the category from the previous screen
-  const { category, hierarchy } = useLocalSearchParams<{ category: string; hierarchy: string }>();
-  const deserializedHierarchy = JSON.parse(hierarchy);
-  console.log(deserializedHierarchy[40]);
-
-  useEffect(() => {
-    const subcategories = buildCategoryList(deserializedHierarchy, category).map((subcategory): SubCategory => ({
-      title: subcategory,
-      key: '',
-      image: placeholderImage,
-      children: [],      
-    }));
-  
-    const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {
-      if (unique.findIndex(item => item.title === subcategory.title) === -1) {
-        unique.push(subcategory);
-      }
-      return unique;
-    }, [] as SubCategory[]);
+    useEffect(() => {
+        let deserializedHierarchy: Record<string, any>;
+        try {
+        deserializedHierarchy = JSON.parse(hierarchy);
+        }
+        catch (error) {
+        // hierarchy is not a valid JSON string, render FilesScreen instead
+        console.log("Hieracrchy Failed");
+            setIsFileScreen(true); 
+            return;
+            }
+        if (deserializedHierarchy === null) {
+            console.log("Hierarchy is null");
+            setIsFileScreen(true);
+            return;
+        }
+      const subcategories = buildCategoryList(deserializedHierarchy, category).map((subcategory, index): SubCategory => ({
+        title: subcategory,
+        key: index.toString(), // Convert index to string if key is expected to be a string
+        image: placeholderImage,
+        parents: deserializedHierarchy[index], // Add logic for getting parents if needed
+      }));
+       console.log("SubFolderScreen", subcategories);
+       const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {
+        if (unique.findIndex(item => item.title === subcategory.title) === -1) {
+            unique.push(subcategory);
+        }
+        return unique;
+        }, [] as SubCategory[]);
   
     setSubCategories(uniqueSubcategories);
-  }, []);
+    setDeserializedHierarchy(deserializedHierarchy);
 
-  
-  const renderItem = ({ item }: { item:  SubCategory }) => (
+    
+  }, [category]);
+
+
+
+  if (isFileScreen) { // Check the flag here
+    console.log("FIlESCREEN");
+    return <FilesScreen />;
+  }
+
+
+  const renderItem = ({ item }: { item: SubCategory }) => (
     <View style={styles.itemContainer}>
-      <Link href={{ pathname: "SubFolderScreen",
-        params: { category: item.title, categories: hierarchy }
-        }} asChild>
-      <TouchableOpacity>
-        <Image source={item.image} style={styles.image} resizeMode="cover" />
-      </TouchableOpacity>
+      <Link
+        href={{
+          pathname: "SubFolderScreen",
+          params: {
+            category: item.title,
+            hierarchy: JSON.stringify(deserializedHierarchy) // Serialize the hierarchy here
+          }
+        }}
+        asChild
+      >
+        <TouchableOpacity>
+          <Image source={item.image} style={styles.image} resizeMode="cover" />
+        </TouchableOpacity>
       </Link>
-        <Text style={styles.itemText}>{item.title.replaceAll('_', ' ')}</Text>
+      <Text style={styles.itemText}>{item.title.replaceAll('_', ' ')}</Text>
     </View>
   );
 
 
 
   return (
-
     <SafeAreaView style={styles.safeArea}>
 
       <View>

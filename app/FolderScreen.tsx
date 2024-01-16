@@ -6,7 +6,7 @@ import { getAllFiles } from '../app/api/apiWrapper';
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
-
+export const HierarchyContext = React.createContext<Record<string, any> | null>(null);
 
 // Calculate the width of the screen
 const { width } = Dimensions.get('window');
@@ -27,7 +27,7 @@ function extractHierarchyFromUrl(url: string) {
   // Assume the domain and protocol are not part of the hierarchy
   // Skip 'http:', '', 'audio.iskcondesiretree.com', and the first two sections
   // Also ignore the last part as it is the actual file
-  const hierarchicalParts = parts.slice(5, -1);  // from the third to the second last
+  const hierarchicalParts = parts.slice(5, -1);  // from the third to the last
 
   // Build a nested dictionary from the hierarchical parts
   const hierarchy: Record<string, any> = {};
@@ -40,7 +40,7 @@ function extractHierarchyFromUrl(url: string) {
     }
     currentLevel = currentLevel[part];
   }
-
+  
   return hierarchy;
 }
 
@@ -64,7 +64,23 @@ function buildCategoryList(hierarchy: Record<string, any>, level: number): strin
 
 const FolderScreen = () => {
   const [folders, setFolders] = useState<string[]>([]);
-  const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);
+  const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);// Correct the spelling here
+  const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
+  
+
+  // function logAudioNodes(obj: Record<string, any>) {
+  //   for (const key in obj) {
+  //     if (key.includes('Audio')) {
+  //       console.log("Hierarchy", obj);
+  //       break;
+  //     }
+  //     if (typeof obj[key] === 'object') {
+  //       logAudioNodes(obj[key]);
+  //     }
+  //   }
+  // }
+  
+  // logAudioNodes(hierarchy);
   // Data for the grid
   const data = new Array(folders.length).fill(null).map((_, index) => ({
     key: String(index),
@@ -75,24 +91,21 @@ const FolderScreen = () => {
   useEffect(() => {
     (async () => {
       const files: File[] = (await getAllFiles()).map(url => ({ url }));
-   //  console.log(files);  // Check if 'files' array is empty
       const hierarchy = files.map(file => {
         const hierarchyFromUrl = extractHierarchyFromUrl(file.url);
-     //   console.log(file.url, hierarchyFromUrl);  // Check the URL and the returned hierarchy
         return hierarchyFromUrl;
       });
-      //console.log(hierarchy);  // Check the final 'hierarchy' array
-  //    const hierarchy = files.map(file => extractHierarchyFromUrl(file.url));
       console.log("Hierarchy", hierarchy[40]);
       setHierarchy(hierarchy);
+      setDeserializedHierarchy(hierarchy);
       const categories = buildCategoryList(hierarchy, 1);
-      console.log("Categories", categories);
       const uniqueCategories = Array.from(new Set(categories));
       setFolders(uniqueCategories);
     })();
   }, []);
 
   const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => (
+
     <View style={styles.itemContainer}>
      <Link href={{ pathname: "SubFolderScreen",
         params: { category: item.category, hierarchy: JSON.stringify(hierarchy) }}} asChild>
@@ -107,20 +120,20 @@ const FolderScreen = () => {
 
 
   return (
-
-    <SafeAreaView style={styles.safeArea}>
-
-      <View>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.key}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.contentContainer}
-      />
-    </View>
-    </SafeAreaView>
+    <HierarchyContext.Provider value={deserializedHierarchy}>
+      <SafeAreaView style={styles.safeArea}>
+        <View>
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.key}
+            numColumns={2}
+            columnWrapperStyle={styles.columnWrapper}
+            contentContainerStyle={styles.contentContainer}
+          />
+        </View>
+      </SafeAreaView>
+    </HierarchyContext.Provider>
   );
 };
 
