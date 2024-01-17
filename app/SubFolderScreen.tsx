@@ -1,6 +1,6 @@
 import React, { Children, useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-import { Link, useLocalSearchParams} from 'expo-router';
+import { Link, useLocalSearchParams, router} from 'expo-router';
 import FilesScreen from './FilesScreen';
 
 
@@ -44,7 +44,7 @@ interface SubCategory {
     // Get the category from the previous screen
     const { category, hierarchy } = useLocalSearchParams<{ category: string; hierarchy: string }>();
     const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
-    console.log("SubFolderScreen", category);
+    console.log("SubFolderScreenCat", category);
 
     useEffect(() => {
         let deserializedHierarchy: Record<string, any>;
@@ -68,7 +68,6 @@ interface SubCategory {
         image: placeholderImage,
         parents: deserializedHierarchy[index], // Add logic for getting parents if needed
       }));
-       console.log("SubFolderScreen", subcategories);
        const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {
         if (unique.findIndex(item => item.title === subcategory.title) === -1) {
             unique.push(subcategory);
@@ -78,16 +77,13 @@ interface SubCategory {
   
     setSubCategories(uniqueSubcategories);
     setDeserializedHierarchy(deserializedHierarchy);
-
-    
+    console.log("SubFolderScreenUniqSubCat", uniqueSubcategories);
+    if(uniqueSubcategories.length === 0) { // Check the flag here
+        console.log("FIlESCREEN", category);
+        router.push(`./FilesScreen?category=${category}`);
+      }
   }, [category]);
 
-
-
-  if (isFileScreen) { // Check the flag here
-    console.log("FIlESCREEN");
-    return <FilesScreen />;
-  }
 
 
   const renderItem = ({ item }: { item: SubCategory }) => (
