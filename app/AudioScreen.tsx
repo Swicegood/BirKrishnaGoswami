@@ -12,10 +12,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS } from "expo-av";
 import { getAllFiles, getRandomFile, getPreviousFile, getNextFile } from './api/apiWrapper';
 import { debounce } from 'lodash';
+import { useLocalSearchParams } from 'expo-router';
 
 const { width: screenWidth } = Dimensions.get("window");
 
-const BasicMusicPlayer = () => {
+const AudioScreen = () => {
+  const { file } = useLocalSearchParams();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState(null);
@@ -391,4 +393,4 @@ const styles = StyleSheet.create({
   
   });
   
-export default BasicMusicPlayer;
+export default AudioScreen;

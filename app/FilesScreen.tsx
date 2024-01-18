@@ -56,12 +56,13 @@ const FilesScreen = () => {
   };
 
   const renderItem = ({ item }: { item: File }) => (
-
     <View style={styles.container}>
-    <Link href={{ pathname: "AudioScreen", params : { url: item.url, title: item.title }}} asChild>    <TouchableOpacity onPress={onPress} style={styles.playButton}>
+    <Link href={{ pathname: "AudioScreen", params: { url: item.url } }} asChild>
+    <TouchableOpacity style={styles.playButton}>
       {/* Replace with your play icon */}
       <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
     </TouchableOpacity>
+    </Link>
     <View style={styles.textContainer}>
     <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>
      {item.title}
@@ -70,7 +71,6 @@ const FilesScreen = () => {
     </Text>
       <Text style={styles.dateText}>{item.date}</Text>
     </View>
-    </Link>
   </View>
   );
 
