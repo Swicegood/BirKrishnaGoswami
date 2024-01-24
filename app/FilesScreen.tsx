@@ -57,7 +57,7 @@ const FilesScreen = () => {
 
   const renderItem = ({ item }: { item: File }) => (
     <View style={styles.container}>
-    <Link href={{ pathname: "AudioScreen", params: { url: item.url } }} asChild>
+    <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
     <TouchableOpacity style={styles.playButton}>
       {/* Replace with your play icon */}
       <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />

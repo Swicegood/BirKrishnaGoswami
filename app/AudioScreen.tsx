@@ -1,35 +1,47 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
+  Image,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Animated,
   Dimensions,
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS } from "expo-av";
 import { getAllFiles, getRandomFile, getPreviousFile, getNextFile } from './api/apiWrapper';
 import { debounce } from 'lodash';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
+
 
 const { width: screenWidth } = Dimensions.get("window");
 
 const AudioScreen = () => {
-  const { file } = useLocalSearchParams();
+  const file = useLocalSearchParams<{ url: string, title: string }>();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState(null);
-  const [url, setUrl] = useState(null);
+  const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(true);  
-  const [songTitle, setSongTitle] = useState(null);
-  const scrollAnim = useRef(new Animated.Value(0)).current;
   const isLoadingNewFile = useRef(false);
   const [playState, setPlayState] = useState('idle');
   const [playNext, setPlayNext] = useState(false);
   const [isSoundLoading, setIsSoundLoading] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
+  const muteSound = async () => {
+    if (!sound) {
+      return;
+    }
+  
+    try {
+      setIsMuted(!isMuted);
+      await sound.setVolumeAsync(isMuted ? 1 : 0);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const seekBackward = async () => {
     if (sound) {
@@ -51,40 +63,24 @@ const AudioScreen = () => {
   };
 
 
-  const loadRandomFile = async () => {
+  const loadFile = async (fileUrl: string) => {
     try {
-      const files = await getAllFiles();
-      const randomFile = await getRandomFile();
-      setUrl(randomFile);
-      console.log('Random file:', randomFile);
-      const songTitle = randomFile.split('/').pop().replace(/\.mp3$/, '');
-      setSongTitle(songTitle);
-      setIsLoading(false);
+      if (playState === 'loading' || isSoundLoading) return;
+  
+      setPlayState('loading');
+      setIsSoundLoading(true);
+  
+      if (sound) {
+        await sound.unloadAsync();
+      }
+  
+      setUrl(fileUrl); // Set the url to the new fileUrl
     } catch (error) {
-      console.error('Error in loadRandomFile:', error);
-      // Do something with the error, e.g., show an error message
+      console.error(error);
+      // Handle the error as needed, e.g., set an error state or show a message to the user
     }
   };
-  
 
-  const loadFile = async (fileUrl) => {
-    if (playState === 'loading' || isSoundLoading) return;
-  
-    setPlayState('loading');
-    setIsSoundLoading(true);
-  
-    if (sound) {
-      await sound.unloadAsync();
-    }
-  
-    const songTitle = fileUrl.split('/').pop().replace(/\.mp3$/, '');
-    setSongTitle(songTitle);
-    setUrl(fileUrl); // Set the url to the new fileUrl
-  };
-  
-  const resetAnimation = () => {
-    scrollAnim.setValue(0);
-  };
 
   const debouncedLoadPreviousFile = useRef(debounce(async () => {
     if (isLoadingNewFile.current) return;
@@ -92,7 +88,6 @@ const AudioScreen = () => {
    
     const previousFile = await getPreviousFile();
     if (previousFile !== 0) {
-      resetAnimation();
       await loadFile(previousFile);
     }
 
@@ -103,8 +98,6 @@ const AudioScreen = () => {
   const debouncedLoadNextFile = useRef(debounce(async () => {
     if (isLoadingNewFile.current) return;
     isLoadingNewFile.current = true;
-
-    resetAnimation();
     const nextFile = await getNextFile();
     console.log("nextfile", nextFile)
     await loadFile(nextFile);
@@ -119,29 +112,11 @@ useEffect(() => {
     let songUrl = null;
     let lastPosition = 0;
 
-    try {
-      const lastSongUrl = await AsyncStorage.getItem('lastSongUrl');
-      const lastSongPosition = await AsyncStorage.getItem('lastSongPosition');
-      console.log('lastsong, lastsongposition :  ', lastSongUrl, lastSongPosition)
-
-      if (lastSongUrl) {
-        songUrl = lastSongUrl;
-        const songTitle = songUrl.split('/').pop().replace(/\.mp3$/, '');
-        setSongTitle(songTitle);
-      }
-
-      if (lastSongPosition) {
-        lastPosition = Number(lastSongPosition);
-      }
-    } catch (error) {
-      console.error('Failed to load the last song and position from AsyncStorage:', error);
-    }
+    songUrl = file.url;
 
     if (songUrl) {
       setUrl(songUrl);
-    } else {
-      loadRandomFile();
-    }
+    } 
   };
 
   loadLastSong();
@@ -220,6 +195,23 @@ useEffect(() => {
 
 }, [url]);
 
+useFocusEffect(
+  useCallback(() => {
+    // This function runs when the screen comes into focus.
+    // If you need to do something when the screen comes into focus, do it here.
+
+    return () => {
+      // This function runs when the screen goes out of focus.
+      // Unload the sound here.
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]) // Include `sound` in the dependency array if it could change over time.
+);
+
+// ...
+
 
 useEffect(() => {
   if (playNext) {
@@ -228,18 +220,6 @@ useEffect(() => {
   }
 }, [playNext]);
 
-useEffect(() => {
-  if (songTitle) {
-    Animated.loop(
-      Animated.timing(scrollAnim, {
-        toValue: -(screenWidth * 2), // Change toValue to -(screenWidth * 2)
-        duration: 15000, // Increase the duration to 15000ms (15 seconds)
-        useNativeDriver: true,
-        delay: 500,
-      })
-    ).start();
-  }
-}, [songTitle]);
 
 
 
@@ -266,18 +246,21 @@ useEffect(() => {
   
   return (
     <View style={styles.musicContainer}>
-      <Animated.Text
-        style={[styles.songTitle, { transform: [{ translateX: scrollAnim }] }]}
-      >
-        {songTitle}
-      </Animated.Text>
+        <Image
+        source={require('../assets/images/sample.png')} // Replace with your image path
+        style={styles.backgroundImage}
+      />
+      <View style={styles.overlay}>
+      <View style={styles.content}>
+      <View style={{ flex: 1 }} /> 
+      <Text style={styles.title}>{file.title.toUpperCase()}</Text>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
-          style={styles.prevButton}
-          onPress={debouncedLoadPreviousFile.current}
+          style={styles.muteButton}
+          onPress={muteSound}
           disabled={!sound}
         >
-          <Text style={styles.buttonText}>Prev</Text>
+          <Text style={styles.buttonText}>Mute</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.seekBackwardButton}
@@ -301,12 +284,14 @@ useEffect(() => {
           <Text style={styles.buttonText}>+30s</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.nextButton}
-          onPress={debouncedLoadNextFile.current}
+          style={styles.downloadButton}
+          onPress={togglePlayback}
           disabled={!sound}
         >
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>DL</Text>
         </TouchableOpacity>
+      </View>
+      </View>
       </View>
     </View>
   );
@@ -317,8 +302,27 @@ const styles = StyleSheet.create({
     musicContainer: {
       alignItems: "center",
       justifyContent: "center",
-      marginTop: 50, // Add some margin to separate the title and the button
+      marginTop: 0, // Add some margin to separate the title and the button
     },
+    backgroundImage: {
+        width: '100%',
+        height: '100%',
+      },
+      overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay for better text visibility
+      },
+      content: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      title: {
+        fontSize: 18,
+        color: '#FFFFFF',
+        marginBottom: 60,
+      },
     songTitle: {
       position: "absolute",
       fontSize: 24,
@@ -345,12 +349,13 @@ const styles = StyleSheet.create({
       color: "#FFFFFF",
     },
     buttonsContainer: {
+        bottom: 50,
         flexDirection: "row",
         justifyContent: "space-around",
         alignItems: "center",
         width: screenWidth,
     },
-    prevButton: {
+    muteButton: {
         backgroundColor: "#C68446",
         justifyContent: "center",
         alignItems: "center",
@@ -360,7 +365,7 @@ const styles = StyleSheet.create({
         height: 60,
         position: "relative",
     },
-    nextButton: {
+    downloadButton: {
         backgroundColor: "#C68446",
         justifyContent: "center",
         alignItems: "center",
