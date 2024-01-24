@@ -13,6 +13,7 @@ import { Audio, InterruptionModeIOS } from "expo-av";
 import { getAllFiles, getRandomFile, getPreviousFile, getNextFile } from './api/apiWrapper';
 import { debounce } from 'lodash';
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
+import Slider from '@react-native-community/slider';
 
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -29,6 +30,8 @@ const AudioScreen = () => {
   const [playNext, setPlayNext] = useState(false);
   const [isSoundLoading, setIsSoundLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const muteSound = async () => {
     if (!sound) {
@@ -63,94 +66,43 @@ const AudioScreen = () => {
   };
 
 
-  const loadFile = async (fileUrl: string) => {
-    try {
-      if (playState === 'loading' || isSoundLoading) return;
-  
-      setPlayState('loading');
-      setIsSoundLoading(true);
-  
-      if (sound) {
-        await sound.unloadAsync();
-      }
-  
-      setUrl(fileUrl); // Set the url to the new fileUrl
-    } catch (error) {
-      console.error(error);
-      // Handle the error as needed, e.g., set an error state or show a message to the user
-    }
-  };
-
-
-  const debouncedLoadPreviousFile = useRef(debounce(async () => {
-    if (isLoadingNewFile.current) return;
-    isLoadingNewFile.current = true;
-   
-    const previousFile = await getPreviousFile();
-    if (previousFile !== 0) {
-      await loadFile(previousFile);
-    }
-
-    isLoadingNewFile.current = false;
-  }, 1000));
-  
  
-  const debouncedLoadNextFile = useRef(debounce(async () => {
-    if (isLoadingNewFile.current) return;
-    isLoadingNewFile.current = true;
-    const nextFile = await getNextFile();
-    console.log("nextfile", nextFile)
-    await loadFile(nextFile);
-
-    isLoadingNewFile.current = false;
-  }, 1000));
-
 
 // Initial song loading
+// useEffect(() => {
+//   const loadLastSong = async () => {
+//     let songUrl = null;
+//     let lastPosition = 0;
+
+//     songUrl = file.url;
+
+//     if (songUrl) {
+//       setUrl(songUrl);
+//     } 
+//   };
+
+//   loadLastSong();
+// }, []);
+
 useEffect(() => {
-  const loadLastSong = async () => {
-    let songUrl = null;
-    let lastPosition = 0;
-
-    songUrl = file.url;
-
-    if (songUrl) {
-      setUrl(songUrl);
-    } 
-  };
-
-  loadLastSong();
+  const songUrl = file.url;
+  setUrl(file.url);
 }, []);
+
+
 
 // Song changing
 useEffect(() => {
   if (!url) {
     return;
   }
-
   const loadSound = async () => {
- 
+    
     setIsSoundLoading(true);
   
     let songUrl = url;
     let lastPosition = 0;
 
-    // Try to get the last song and position from AsyncStorage
-    try {
-      if (isFirstLoad) {
-        const lastSongPosition = await AsyncStorage.getItem('lastSongPosition');
-        if (lastSongPosition) {
-          lastPosition = Number(lastSongPosition);
-        }
-        setIsFirstLoad(false); // Set isFirstLoad to false after using it
-      }
-    } catch (error) {
-      console.error('Failed to load the last song and position from AsyncStorage:', error);
-    }
-
-    if (sound) {
-      await sound.unloadAsync();
-    }
 
     try {
       await Audio.setAudioModeAsync({
@@ -168,26 +120,17 @@ useEffect(() => {
     const { sound: newSound, status } = await Audio.Sound.createAsync(
       { uri: songUrl },
       { shouldPlay: true, staysActiveInBackground: true, positionMillis: lastPosition }
+      
     );
 
     setSound(newSound);
     setIsPlaying(true);
     setPlayState('playing');
+    setDuration(status.durationMillis);
     setIsLoading(false);
-  
-    newSound.setOnPlaybackStatusUpdate(async (playbackStatus) => {
-      if (playbackStatus.didJustFinish) {
-        setPlayNext(true);
-      }
-  
-      try {
-        await AsyncStorage.setItem('lastSongUrl', songUrl);
-        await AsyncStorage.setItem('lastSongPosition', playbackStatus.positionMillis.toString());
-      } catch (error) {
-        console.error('Failed to save the current song and position to AsyncStorage:', error);
-      }
-    });
-  
+    updateState  
+
+
     setIsSoundLoading(false);
   };
   
@@ -210,20 +153,33 @@ useFocusEffect(
   }, [sound]) // Include `sound` in the dependency array if it could change over time.
 );
 
-// ...
 
 
 useEffect(() => {
-  if (playNext) {
-    debouncedLoadNextFile.current();
-    setPlayNext(false);
+  if (sound) {
+    sound.setOnPlaybackStatusUpdate(updateState);
   }
-}, [playNext]);
+
+  return () => {
+    if (sound) {
+      sound.setOnPlaybackStatusUpdate(null);
+    }
+  };
+}, [sound]);
+
+const updateState = (status) => {
+  setPosition(status.positionMillis);
+  // ...
+};
 
 
+const formatTime = (milliseconds) => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
 
-
-
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
 
   
   const togglePlayback = async () => {
@@ -254,6 +210,23 @@ useEffect(() => {
       <View style={styles.content}>
       <View style={{ flex: 1 }} /> 
       <Text style={styles.title}>{file.title.toUpperCase()}</Text>
+        <Slider
+            style={styles.slider}
+            thumbTintColor="#FFFFFF" // Color of the knob
+            minimumTrackTintColor="#FFF" // Color of the used track
+            maximumTrackTintColor="#808080" // Color of the unused track
+            value={position}
+            maximumValue={duration}
+            onSlidingComplete={async (value) => {
+              if (sound) {
+                await sound.setPositionAsync(value);
+              }
+            }}
+          />
+        <View style={styles.timeContainer}>
+          <Text style={styles.title}>{formatTime(position)}</Text>
+          <Text style={styles.title}>{formatTime(duration)}</Text>
+        </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={styles.muteButton}
@@ -321,7 +294,13 @@ const styles = StyleSheet.create({
       title: {
         fontSize: 18,
         color: '#FFFFFF',
-        marginBottom: 60,
+        marginBottom: 30,
+      },
+      slider: {
+        width: screenWidth * 0.9, // Set the width as needed
+        height: 40, // Set the height as needed
+        thumbTouchSize: { height: 10, width: 10, backgroundColor: '#000000' },
+        marginBottom: 20, // Set the margin as needed
       },
     songTitle: {
       position: "absolute",
@@ -332,6 +311,12 @@ const styles = StyleSheet.create({
       zIndex: 1,
       top: -70, // Adjust the position to be above the button
       left: 0,
+    },
+      timeContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: screenWidth * 0.9, // Set the width to be the same as the slider's width
+      bottom: 30,
     },
     button: {
       backgroundColor: "#C68446",
