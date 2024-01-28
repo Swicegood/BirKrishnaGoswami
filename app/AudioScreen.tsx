@@ -14,6 +14,8 @@ import { getAllFiles, getRandomFile, getPreviousFile, getNextFile } from './api/
 import { debounce } from 'lodash';
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
 import Slider from '@react-native-community/slider';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import SvgUri from 'react-native-svg-uri';
 
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -65,24 +67,6 @@ const AudioScreen = () => {
     }
   };
 
-
- 
-
-// Initial song loading
-// useEffect(() => {
-//   const loadLastSong = async () => {
-//     let songUrl = null;
-//     let lastPosition = 0;
-
-//     songUrl = file.url;
-
-//     if (songUrl) {
-//       setUrl(songUrl);
-//     } 
-//   };
-
-//   loadLastSong();
-// }, []);
 
 useEffect(() => {
   const songUrl = file.url;
@@ -240,21 +224,21 @@ const formatTime = (milliseconds) => {
           onPress={seekBackward}
           disabled={!sound}
         >
-          <Text style={styles.buttonText}>-15s</Text>
+          <Icon name="replay" size={40} color="#FFF" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
           onPress={togglePlayback}
           disabled={!sound}
         >
-          <Text style={styles.buttonText}>{isPlaying ? "Pause" : "Play"}</Text>
+          <Icon name={isPlaying ? "pause" : "play-arrow"} size={40} color="#FFF" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.seekForwardButton}
           onPress={seekForward}
           disabled={!sound}
         >
-          <Text style={styles.buttonText}>+30s</Text>
+          <SvgUri width="40" height="40" source={require('../assets/fonts/forward_30_black_24dp.svg')} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.downloadButton}
@@ -319,13 +303,8 @@ const styles = StyleSheet.create({
       bottom: 30,
     },
     button: {
-      backgroundColor: "#C68446",
       justifyContent: "center",
       alignItems: "center",
-      padding: 10,
-      borderRadius: 50,
-      width: 80,
-      height: 80,
       position: "relative",
     },
     buttonText: {
@@ -361,23 +340,13 @@ const styles = StyleSheet.create({
         position: "relative",
     },
     seekBackwardButton: {
-      backgroundColor: "#C68446",
       justifyContent: "center",
       alignItems: "center",
-      padding: 5,
-      borderRadius: 50,
-      width: 60,
-      height: 60,
       position: "relative",
     },
     seekForwardButton: {
-      backgroundColor: "#C68446",
       justifyContent: "center",
       alignItems: "center",
-      padding: 5,
-      borderRadius: 50,
-      width: 60,
-      height: 60,
       position: "relative",
     },
   
