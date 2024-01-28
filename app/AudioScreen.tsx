@@ -16,6 +16,7 @@ import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ForwardIcon from '../components/ForwardIcon';
+import ReplayIcon from "../components/ReplayIcon";
 
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -217,14 +218,14 @@ const formatTime = (milliseconds) => {
           onPress={muteSound}
           disabled={!sound}
         >
-          <Text style={styles.buttonText}>Mute</Text>
+          <Icon name={isMuted ? "volume-off" : "volume-up"} size={40} color="#FFF" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.seekBackwardButton}
           onPress={seekBackward}
           disabled={!sound}
         >
-          <Icon name="replay" size={40} color="#FFF" />
+          <ReplayIcon />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
@@ -245,7 +246,7 @@ const formatTime = (milliseconds) => {
           onPress={togglePlayback}
           disabled={!sound}
         >
-          <Text style={styles.buttonText}>DL</Text>
+          <Icon name="get-app" size={40} color="#FFF" />
         </TouchableOpacity>
       </View>
       </View>
@@ -320,23 +321,13 @@ const styles = StyleSheet.create({
         width: screenWidth,
     },
     muteButton: {
-        backgroundColor: "#C68446",
         justifyContent: "center",
         alignItems: "center",
-        padding: 5,
-        borderRadius: 50,
-        width: 60,
-        height: 60,
         position: "relative",
     },
     downloadButton: {
-        backgroundColor: "#C68446",
         justifyContent: "center",
         alignItems: "center",
-        padding: 5,
-        borderRadius: 50,
-        width: 60,
-        height: 60,
         position: "relative",
     },
     seekBackwardButton: {
