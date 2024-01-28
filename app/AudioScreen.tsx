@@ -15,7 +15,7 @@ import { debounce } from 'lodash';
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import SvgUri from 'react-native-svg-uri';
+import ForwardIcon from '../components/ForwardIcon';
 
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -238,7 +238,7 @@ const formatTime = (milliseconds) => {
           onPress={seekForward}
           disabled={!sound}
         >
-          <SvgUri width="40" height="40" source={require('../assets/fonts/forward_30_black_24dp.svg')} />
+          <ForwardIcon />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.downloadButton}
