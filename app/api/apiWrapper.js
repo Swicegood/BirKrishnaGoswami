@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const fiiesListurl = "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_files.txt"
+const imageListurl = "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_images.txt"
 
 async function fetchFilesList(filesListUrl) {
   const proxyUrl = '';
@@ -28,8 +29,21 @@ async function cacheFiles(files) {
   await AsyncStorage.setItem('mp3Files', JSON.stringify(data));
 }
 
+async function cacheImageFiles(files) {
+  const expiration = files.length < 500
+    ? Date.now() - 1 // Set the cache as already expired
+    : Date.now() + 7 * 24 * 60 * 60 * 1000; // One week in the future
+
+  const data = {
+    files,
+    expiration,
+  };
+
+  await AsyncStorage.setItem('imageFiles', JSON.stringify(data));
+}
+
 async function loadCachedFiles() {
-  const rawData = await AsyncStorage.getItem('mp3Files');
+  const rawData = await AsyncStorage.getItem('imageFiles');
 
   if (rawData) {
     const data = JSON.parse(rawData);
@@ -44,10 +58,39 @@ async function loadCachedFiles() {
   return files;
 }
 
+async function loadCachedImageFiles() {
+  const rawData = await AsyncStorage.getItem('imageFiles');
+
+  if (rawData) {
+    const data = JSON.parse(rawData);
+    if (Date.now() < data.expiration) {
+      return data.files;
+    }
+  }
+
+  // Fetch the list of files and cache them
+  const files = await fetchFilesList(fiiesListurl);
+  await cacheImageFiles(files);
+  return files;
+}
+
+
+
 async function getAllFiles() {
   try
   {
   const files = await loadCachedFiles();
+  return files;
+  } catch (error) {
+    console.error('Error in  getAllFiles:', error);
+  }
+}
+
+
+async function getAllImageFiles() {
+  try
+  {
+  const files = await loadCachedImageFiles();
   return files;
   } catch (error) {
     console.error('Error in  getAllFiles:', error);
@@ -157,4 +200,4 @@ async function getNextFile() {
 }
 }
 
-export { getAllFiles, getRandomFile, getPreviousFile, getNextFile };
+export { getAllFiles, getRandomFile, getPreviousFile, getNextFile, getAllImageFiles };
