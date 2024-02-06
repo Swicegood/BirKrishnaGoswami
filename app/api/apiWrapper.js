@@ -1,7 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
+import { Image } from 'react-native';
+
 
 const fiiesListurl = "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_files.txt"
 const imageListurl = "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_images.txt"
+const deityListurl = "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_deities.txt"
+
 
 async function fetchFilesList(filesListUrl) {
   const proxyUrl = '';
@@ -69,7 +74,7 @@ async function loadCachedImageFiles() {
   }
 
   // Fetch the list of files and cache them
-  const files = await fetchFilesList(fiiesListurl);
+  const files = await fetchFilesList(imageListurl);
   await cacheImageFiles(files);
   return files;
 }
@@ -200,4 +205,51 @@ async function getNextFile() {
 }
 }
 
-export { getAllFiles, getRandomFile, getPreviousFile, getNextFile, getAllImageFiles };
+
+// Function to cache deity files
+async function cacheDeityFiles(deities) {
+  try {
+    await AsyncStorage.setItem('deities', JSON.stringify(deities));
+  } catch (error) {
+    console.error('Error caching deity files:', error);
+  }
+}
+
+// Function to load cached deity files
+async function loadCachedDeityFiles() {
+  try {
+    const deities = await AsyncStorage.getItem('deities');
+    return deities ? JSON.parse(deities) : [];
+  } catch (error) {
+    console.error('Error loading cached deity files:', error);
+    return [];
+  }
+}
+
+// Function to get all deity files
+async function getAllDeityFiles() {
+  let deities = await loadCachedDeityFiles();
+
+  if (deities.length === 0) {
+    const response = await fetch(deityListUrl);
+    deities = await response.json();
+
+    const imagePromises = deities.map((deity) =>
+      new Promise((resolve, reject) => {
+        Image.getSize(
+          deity.imageUrl,
+          (width, height) => resolve({ ...deity, imageDimensions: { width, height } }),
+          reject
+        );
+      })
+    );
+
+    deities = await Promise.all(imagePromises);
+    await cacheDeityFiles(deities);
+  }
+
+  return deities;
+}
+
+
+export { getAllFiles, getRandomFile, getPreviousFile, getNextFile, getAllImageFiles, getAllDeityFiles };
