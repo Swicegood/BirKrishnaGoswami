@@ -227,29 +227,46 @@ async function loadCachedDeityFiles() {
 }
 
 // Function to get all deity files
+// Function to fetch deity image dimensions
+function fetchDeityImageDimensions(deity) {
+  return new Promise((resolve, reject) => {
+    Image.getSize(
+      deity.imageUrl,
+      (width, height) => resolve({ ...deity, imageDimensions: { width, height } }),
+      (error) => {
+        console.error(`Failed to get size of image at ${deity.imageUrl}:`, error);
+        resolve(deity);  // Resolve with the original deity object without dimensions
+      }
+    );
+  });
+}
+
 async function getAllDeityFiles() {
   let deities = await loadCachedDeityFiles();
 
   if (deities.length === 0) {
-    const response = await fetch(deityListUrl);
-    deities = await response.json();
+    const response = await fetch(deityListurl);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-    const imagePromises = deities.map((deity) =>
-      new Promise((resolve, reject) => {
-        Image.getSize(
-          deity.imageUrl,
-          (width, height) => resolve({ ...deity, imageDimensions: { width, height } }),
-          reject
-        );
-      })
-    );
+    const data = await response.text();
 
-    deities = await Promise.all(imagePromises);
+    // Process the text data according to its format
+    // For example, if the data is a list of URLs separated by newlines:
+    deities = data.split('\n');
+
+    // Remove deities whose imageUrl does not contain "1024"
+    deities = deities.filter((deity) => deity.includes('1024'));
+
+    //const imagePromises = deities.map(fetchDeityImageDimensions);
+
+    //deities = await Promise.all(imagePromises);
     await cacheDeityFiles(deities);
   }
 
   return deities;
 }
-
 
 export { getAllFiles, getRandomFile, getPreviousFile, getNextFile, getAllImageFiles, getAllDeityFiles };

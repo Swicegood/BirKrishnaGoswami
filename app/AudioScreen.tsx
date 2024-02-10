@@ -85,8 +85,8 @@ useEffect(() => {
     
     setIsSoundLoading(true);
   
-    let songUrl = url;
-    let lastPosition = 0;
+    const songUrl = url;
+    const lastPosition = 0;
 
 
     try {

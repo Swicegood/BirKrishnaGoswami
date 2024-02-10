@@ -3,10 +3,10 @@ import { FlatList, Image, TouchableOpacity, Text } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 
 const GalleryComponent = () => {
-  let { imageChunk } = useLocalSearchParams<{ imageChunk: string }>();
+  const { imageChunk } = useLocalSearchParams<{ imageChunk: string }>();
   
   // Split the string into an array of strings
-  let images = imageChunk.split(',');
+  const images = imageChunk.split(',');
 
   console.log("images4", images[4]); 
 

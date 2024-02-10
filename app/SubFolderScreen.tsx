@@ -22,7 +22,7 @@ interface SubCategory {
   }
 
   function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {
-    let categories: string[] = [];
+    const categories: string[] = [];
     console.log("buildCategoryList", hierarchy[-1], parent);
     const traverse = (node: Record<string, any> | null, currentParent: string) => {
       if (currentParent === parent) {

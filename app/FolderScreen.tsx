@@ -46,7 +46,7 @@ function extractHierarchyFromUrl(url: string) {
 
 // Function to recursively build a list of categories from the nested dictionary
 function buildCategoryList(hierarchy: Record<string, any>, level: number): string[] {
-  let categories: string[] = [];
+  const categories: string[] = [];
 
   const traverse = (node: Record<string, any>, currentLevel: number) => {
     for (const [key, value] of Object.entries(node)) {

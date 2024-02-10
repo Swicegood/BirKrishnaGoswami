@@ -5,15 +5,15 @@ import React, { useEffect, useState } from 'react';
 import { Image, Text } from 'react-native';
 
 const PhotosScreen = () => {
-  let { imagesSlice } = useLocalSearchParams<{ imagesSlice: string }>();
+  const { imagesSlice } = useLocalSearchParams<{ imagesSlice: string }>();
   const [images, setImages] = useState([]);
 
   useEffect(() => {
     // Split the string into an array of strings
-    let imageUrls = imagesSlice.split(',');
+    const imageUrls = imagesSlice.split(',');
 
     // Fetch dimensions for all images
-    let imagePromises = imageUrls.map((url) =>
+    const imagePromises = imageUrls.map((url) =>
     new Promise((resolve, reject) => {
       Image.getSize(
         url,
