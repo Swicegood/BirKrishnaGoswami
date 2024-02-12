@@ -35,3 +35,25 @@ exports.getYouTubePlaylists = functions.https.onRequest(async (req, res) => {
     res.status(500).send('Failed to fetch data from YouTube');
   }
 });
+
+
+exports.getYouTubeVideos = functions.https.onRequest(async (req, res) => {
+  const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
+  const playlistId = req.body.data.playlistId; // Extract channelId from the body of the request
+
+  try {
+    const response = await axios.get(`https://www.googleapis.com/youtube/v3/playlistItems`, {
+      params: {
+        part: 'snippet,contentDetails',
+        playlistId: playlistId,
+        maxResults: 50, // Adjust based on your needs
+        key: API_KEY,
+      },
+    });
+
+    res.send({data: response.data});
+  } catch (error) {
+    console.error("Error fetching data: ", error);
+    res.status(500).send('Failed to fetch data from YouTube');
+  }
+});

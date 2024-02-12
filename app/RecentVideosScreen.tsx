@@ -113,7 +113,7 @@ useEffect(() => {
   // ];
 
   const renderItem = ({ item }) => (
-    <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} />
+    <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
   );
 
   return (
