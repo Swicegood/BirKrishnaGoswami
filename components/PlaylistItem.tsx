@@ -8,7 +8,8 @@ const PlaylistItem = ({ title, lastModified, thumbnail }) => {
       <Image style={styles.image} source={{ uri: thumbnail }} />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.lastModified}>{lastModified}</Text>
+        <Text style={styles.lastModified}>Last Modified: {lastModified.split("T")[0]}</Text>
+        <Text style={styles.lastModified}>{lastModified.split("T")[1]}</Text>
       </View>
     </View>
   );
@@ -35,7 +36,6 @@ const styles = StyleSheet.create({
   },
   lastModified: {
     fontSize: 12,
-    color: 'gray',
   },
 });
 
