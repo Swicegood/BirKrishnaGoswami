@@ -131,9 +131,15 @@ export default function TabOneScireen() {
         <Button title="SEARCH VIDEOS" onPress={function (): void {
               throw new Error('Function not implemented.');
             } } />
-        <Button title="RECENT UPLOAD" onPress={function (): void {
-              throw new Error('Function not implemented.');
-            } } />
+          <Link href="./RecentVideosScreen" asChild>
+            <TouchableOpacity style={styles.buttonContainer}> 
+                <Image
+                  source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
+                  style={styles.buttonImage}
+                />
+                <Text style={styles.buttonText}>RECENT UPLOADS</Text>
+              </TouchableOpacity>
+        </Link>
         {/* More buttons */}
       </View>
 

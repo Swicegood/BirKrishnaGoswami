@@ -8,10 +8,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS } from "expo-av";
-import { getAllFiles, getRandomFile, getPreviousFile, getNextFile } from './api/apiWrapper';
-import { debounce } from 'lodash';
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
