@@ -22,6 +22,7 @@ exports.getYouTubePlaylists = functions.https.onRequest(async (req, res) => {
   try {
     const response = await axios.get(`https://www.googleapis.com/youtube/v3/playlists`, {
       params: {
+        part: 'snippet,contentDetails',
         channelId: channelId,
         maxResults: 50, // Adjust based on your needs
         key: API_KEY,

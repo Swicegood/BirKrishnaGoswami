@@ -1,2 +1,3 @@
-node_modules/../functions/.runtimeconfig.json
-../birkrishnagoswami-b7360-e517485f6a06.json
+node_modules/
+.runtimeconfig.json
+birkrishnagoswami-b7360-e517485f6a06.json

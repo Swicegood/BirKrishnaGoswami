@@ -4,9 +4,9 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
-import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import PlaylistItem from '../components/PlaylistItem'; // Import the PlaylistItem component
+import React, { useEffect, useState } from 'react';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -49,54 +49,72 @@ interface FirebaseFunctionError {
 
 const RecentVideoScreen = () => {
 
+const [playlists, setPlaylists] = useState([]);
 
 const functions = getFunctions(getApp());
 connectFunctionsEmulator(functions, "127.0.0.1", 5001);
-const getYouTubePlaylists = httpsCallable<GetYouTubePlaylistsRequest, GetYouTubePlaylistsResponse>(functions, 'getYouTubePlaylists');
 
-// Use the interface for the request
-const request: GetYouTubePlaylistsRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
 
-// getYouTubePlaylists(request)
-//   .then((result: { data: GetYouTubePlaylistsResponse }) => {
-//     // Use the interface for the response
-//     const response: GetYouTubePlaylistsResponse = result.data;
-//     console.log("YouTube", response);
-//     //const playlists = response;
-//   })
-//   .catch((error: FirebaseFunctionError) => {
-//     console.error("Error calling the function: ", error.message);
-//   });
+useEffect(() => {
+  const fetchPlaylists = async () => {
+    const getYouTubePlaylists = httpsCallable<GetYouTubePlaylistsRequest, GetYouTubePlaylistsResponse>(functions, 'getYouTubePlaylists');
 
-  const playlists = [
-    {
-      id: '1',
-      title: 'Playlist 1',
-      lastModified: 'Last modified: 2021-01-01',
-      thumbnail: 'https://www.youtube.com/watch?v=3JZ_D3ELwOQ',
-    },
-    {
-      id: '2',
-      title: 'Playlist 2',
-      lastModified: 'Last modified: 2021-01-02',
-      thumbnail: 'https://placekitten.com/200/200',
-    },
-    {
-      id: '3',
-      title: 'Playlist 3',
-      lastModified: 'Last modified: 2021-01-03',
-      thumbnail: 'https://placekitten.com/200/200',
-    },
-    {
-      id: '4',
-      title: 'Playlist 4',
-      lastModified: 'Last modified: 2021-01-04',
-      thumbnail: 'https://placekitten.com/200/200',
-    },
-  ];
+    // Use the interface for the request
+    const request: GetYouTubePlaylistsRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
+
+    getYouTubePlaylists(request)
+      .then((result: { data: GetYouTubePlaylistsResponse }) => {
+        // Use the interface for the response
+        const response: GetYouTubePlaylistsResponse = result.data;
+        console.log("YouTube", response.items);
+        const playlists = response.items; // Change this line
+        playlists.forEach(playlist => {
+          const title = playlist.snippet.title;
+          const thumbnailUrl = playlist.snippet.thumbnails.default.url; // or 'medium' or 'high'
+          const dateModified = playlist.contentDetails.publishedAt;
+          const id = playlist.id;
+          setPlaylists(playlists => [...playlists, { id, title, thumbnailUrl, dateModified }]);
+        });
+      })
+      .catch((error: FirebaseFunctionError) => {
+        console.error("Error calling the function: ", error.message);
+      });
+  };
+
+  fetchPlaylists();
+}, []);
+
+
+// Add a comma here
+  // const playlists = [
+  //   {
+  //     id: '1',
+  //     title: 'Playlist 1',
+  //     lastModified: 'Last modified: 2021-01-01',
+  //     thumbnail: 'https://www.youtube.com/watch?v=3JZ_D3ELwOQ',
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Playlist 2',
+  //     lastModified: 'Last modified: 2021-01-02',
+  //     thumbnail: 'https://placekitten.com/200/200',
+  //   },
+  //   {
+  //     id: '3',
+  //     title: 'Playlist 3',
+  //     lastModified: 'Last modified: 2021-01-03',
+  //     thumbnail: 'https://placekitten.com/200/200',
+  //   },
+  //   {
+  //     id: '4',
+  //     title: 'Playlist 4',
+  //     lastModified: 'Last modified: 2021-01-04',
+  //     thumbnail: 'https://placekitten.com/200/200',
+  //   },
+  // ];
 
   const renderItem = ({ item }) => (
-    <PlaylistItem title={item.title} lastModified={item.lastModified} thumbnail={item.thumbnail} />
+    <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} />
   );
 
   return (
