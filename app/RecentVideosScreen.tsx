@@ -66,12 +66,11 @@ useEffect(() => {
       .then((result: { data: GetYouTubePlaylistsResponse }) => {
         // Use the interface for the response
         const response: GetYouTubePlaylistsResponse = result.data;
-        console.log("YouTube", response.items);
         const playlists = response.items; // Change this line
         playlists.forEach(playlist => {
           const title = playlist.snippet.title;
           const thumbnailUrl = playlist.snippet.thumbnails.default.url; // or 'medium' or 'high'
-          const dateModified = playlist.contentDetails.publishedAt;
+          const dateModified = playlist.snippet.publishedAt;
           const id = playlist.id;
           setPlaylists(playlists => [...playlists, { id, title, thumbnailUrl, dateModified }]);
         });
