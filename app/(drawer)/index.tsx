@@ -128,9 +128,15 @@ export default function TabOneScireen() {
 
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Button title="SEARCH VIDEOS" onPress={function (): void {
-              throw new Error('Function not implemented.');
-            } } />
+        <Link href="./SearchYoutubeScreen" asChild>
+            <TouchableOpacity style={styles.buttonContainer}> 
+                <Image
+                  source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
+                  style={styles.buttonImage}
+                />
+                <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
+              </TouchableOpacity>
+        </Link>
           <Link href="./RecentVideosScreen" asChild>
             <TouchableOpacity style={styles.buttonContainer}> 
                 <Image
