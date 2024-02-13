@@ -70,7 +70,7 @@ exports.getSearchYouTubeVideos = functions.https.onRequest(async (req, res) => {
         q: searchTerm,
         channelId: channelId,
         maxResults: 50, // Adjust based on your needs
-        // order: 'date', // Adjust based on your needs
+        order: 'date', // Adjust based on your needs
         // type: 'video',
         key: API_KEY,
       },
