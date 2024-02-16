@@ -58,7 +58,7 @@ interface FirebaseFunctionError {
         const getLiveVideo = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getLiveVideo');
   
         // Use the interface for the request
-        const request: GetYouTubeVideosRequest = { channelId: 'UCioh9Wq_z825232pIKsGZyA' };
+        const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
         try {
           const result = await getLiveVideo(request);
           // Use the interface for the response
@@ -77,7 +77,7 @@ interface FirebaseFunctionError {
       fetchVideos();
     }, []);
   
-    if (error) {
+    if (error || !video) {
       return (
         <View>
         <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get('window').width , height: 200 }} />
