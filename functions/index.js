@@ -82,3 +82,37 @@ exports.getSearchYouTubeVideos = functions.https.onRequest(async (req, res) => {
     res.status(500).send('Failed to fetch data from YouTube');
   }
 });
+
+
+exports.getLiveVideo = functions.https.onRequest(async (req, res) => {
+  const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
+  const channelId = req.body.data.channelId; // Extract channelId from the body of the request
+
+  try {
+    const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+      params: {
+        part: 'snippet',
+        channelId: channelId, // Use channelId here
+        eventType: 'live',
+        type: 'video',
+        key: API_KEY,
+      }
+    })
+    .then(response => {
+      console.log("Response: ", response.data);
+      const liveVideos = response.data.items;
+      if (liveVideos.length > 0) {
+        const liveVideoId = liveVideos[0].id.videoId;
+        console.log(`Live video ID: ${liveVideoId}`);
+        // Embed this video ID in an iframe
+        res.send({data: liveVideoId});
+      } else {
+        console.log("No live streams found.");
+      }
+    })
+  } catch (error) {
+    console.error("Error fetching data: ", error);
+    res.status(500).send('Failed to fetch data from YouTube');
+  }
+});
+

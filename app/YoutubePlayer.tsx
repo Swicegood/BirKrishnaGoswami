@@ -15,7 +15,7 @@ const VideoPlayerItem = () => {
     <View style={styles.textContainer}>
       <YoutubePlayer
         height={300} // Adjust based on your needs
-        play={false} // If you want the video to start playing as soon as it loads, set this to true
+        play={true} // If you want the video to start playing as soon as it loads, set this to true
         videoId={id}
       />
     </View>

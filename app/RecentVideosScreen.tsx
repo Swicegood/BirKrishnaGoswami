@@ -84,34 +84,6 @@ useEffect(() => {
 }, []);
 
 
-// Add a comma here
-  // const playlists = [
-  //   {
-  //     id: '1',
-  //     title: 'Playlist 1',
-  //     lastModified: 'Last modified: 2021-01-01',
-  //     thumbnail: 'https://www.youtube.com/watch?v=3JZ_D3ELwOQ',
-  //   },
-  //   {
-  //     id: '2',
-  //     title: 'Playlist 2',
-  //     lastModified: 'Last modified: 2021-01-02',
-  //     thumbnail: 'https://placekitten.com/200/200',
-  //   },
-  //   {
-  //     id: '3',
-  //     title: 'Playlist 3',
-  //     lastModified: 'Last modified: 2021-01-03',
-  //     thumbnail: 'https://placekitten.com/200/200',
-  //   },
-  //   {
-  //     id: '4',
-  //     title: 'Playlist 4',
-  //     lastModified: 'Last modified: 2021-01-04',
-  //     thumbnail: 'https://placekitten.com/200/200',
-  //   },
-  // ];
-
   const renderItem = ({ item }) => (
     <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
   );
