@@ -54,7 +54,6 @@ interface FirebaseFunctionError {
     const [searchTerm, setSearchTerm] = useState(''); // State to hold the search term
   
     const functions = getFunctions(getApp());
-    connectFunctionsEmulator(functions, "localhost", 5001);
   
     // Function to fetch videos based on search term
     const fetchVideos = async () => {

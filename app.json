@@ -3,7 +3,7 @@
     "name": "Bir Krishna Goswami",
     "slug": "bir-krishna-goswami",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
@@ -16,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "requireFullScreen": true
     },
     "android": {
       "adaptiveIcon": {

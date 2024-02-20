@@ -51,7 +51,6 @@ interface FirebaseFunctionError {
     const [video, setVideo] = useState<GetYouTubeVideosResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const functions = getFunctions(getApp());
-    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
   
     useEffect(() => {
       const fetchVideos = async () => {
