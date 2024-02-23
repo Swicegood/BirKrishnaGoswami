@@ -74,13 +74,14 @@ interface FirebaseFunctionError {
             const id = video.id.videoId;
             setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
           });
-        })
+        })      
         .catch((error: FirebaseFunctionError) => {
           console.error("Error calling the function: ", error.message);
         });
     };
   
     useEffect(() => {
+      setVideos([]); // Clear the videos state
         const fetchVideos = async () => {
           const getSearchYouTubeVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getSearchYouTubeVideos');
       

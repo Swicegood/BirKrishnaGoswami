@@ -18,6 +18,7 @@ const VideoPlayerItem = () => {
 
   useEffect(() => {
     getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
+    getVideoWidth().then(setVideoWidth); // set the initial width when the component mounts
 
     ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
 

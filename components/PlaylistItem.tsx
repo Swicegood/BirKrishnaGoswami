@@ -1,10 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState} from 'react';
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { Link } from 'expo-router'
 
+const screenwidth = Dimensions.get('window').width;
+const screenheight = Dimensions.get('window').height;
+
 const PlaylistItem = ({ title, lastModified, thumbnail, id }) => {
+  const [itemWidth, setItemWidth] = useState(screenwidth / 2); // replace 0 with your initial width value
+
+  useEffect(() => {
+    // Any code here will run when the component mounts
+
+    return () => {
+      // Any code here will run when the component unmounts
+      setItemWidth(screenwidth / 2);
+    };
+  }, []);
+
+  const styles = StyleSheet.create({
+    item: {
+      flexDirection: 'row',
+      padding: 10,
+      alignItems: 'center',
+    },
+    image: {
+      width: itemWidth,
+      height: screenheight / 8,
+      borderRadius: 5,
+      marginRight: 10,
+    },
+    textContainer: {
+      justifyContent: 'center',
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    lastModified: {
+      fontSize: 12,
+    },
+  });
+
   return (
-    
     <View style={styles.item}>
       {/* You would replace require with your dynamic image based on the playlist */}
       <Link href={{pathname:'./PlaylistScreen', params: {id: id}}}> {/* This is the link to the PlaylistScreen */}
@@ -18,29 +55,5 @@ const PlaylistItem = ({ title, lastModified, thumbnail, id }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  item: {
-    flexDirection: 'row',
-    padding: 10,
-    alignItems: 'center',
-  },
-  image: {
-    width: Dimensions.get('window').width / 2,
-    height: Dimensions.get('window').height / 8,
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  textContainer: {
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  lastModified: {
-    fontSize: 12,
-  },
-});
 
 export default PlaylistItem;

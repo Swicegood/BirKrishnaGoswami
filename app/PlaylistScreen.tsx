@@ -53,10 +53,10 @@ const { id } = useLocalSearchParams(); // Get the playlist ID from the URL
 const [playlists, setVideos] = useState([]);
 
 const functions = getFunctions(getApp());
-connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 
 
 useEffect(() => {
+  setVideos([]); // Clear the videos stateß
   const fetchVideos = async () => {
     const getYouTubeVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubeVideos');
 

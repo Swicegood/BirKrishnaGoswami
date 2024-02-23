@@ -2,9 +2,9 @@
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
 import { initializeApp, getApp } from 'firebase/app';
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
 import PlaylistItem from '../components/PlaylistItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
 
@@ -48,15 +48,15 @@ interface FirebaseFunctionError {
   
 
 const RecentVideoScreen = () => {
-
 const [playlists, setPlaylists] = useState([]);
-
 const functions = getFunctions(getApp());
+
 
 
 useEffect(() => {
   const fetchPlaylists = async () => {
     const getYouTubePlaylists = httpsCallable<GetYouTubePlaylistsRequest, GetYouTubePlaylistsResponse>(functions, 'getYouTubePlaylists');
+
 
     // Use the interface for the request
     const request: GetYouTubePlaylistsRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };

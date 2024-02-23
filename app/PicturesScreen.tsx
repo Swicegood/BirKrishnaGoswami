@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
 import { getAllImageFiles } from './api/apiWrapper';
+import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 
 
 // Function to split array into chunks
@@ -43,7 +44,7 @@ const GalleryComponent = () => {
       renderItem={({ item, index }) => (
         <Link href={ {pathname: "./GalleryScreen", params: {imageChunk: item}} }asChild>
         <TouchableOpacity>
-          <Image source={{uri: item[0]}} style={{ width: screenWidth / 2, height: 200}} />
+          <Image defaultSource={placeholderImage} source={{uri: item[0]}} style={{ width: screenWidth / 2, height: 200}} />
         </TouchableOpacity>
         </Link>
       )}
