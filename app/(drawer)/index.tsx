@@ -126,9 +126,15 @@ export default function TabOneScireen() {
         <Button title="TEMPLES" onPress={function (): void {
               throw new Error('Function not implemented.');
             } } />
-        <Button title="NEWS" onPress={function (): void {
-              throw new Error('Function not implemented.');
-            } } />
+         <Link href="./BlogScreen" asChild>
+        <TouchableOpacity style={styles.buttonContainer}> 
+            <Image
+              source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
+              style={styles.buttonImage}
+            />
+            <Text style={styles.buttonText}>BLOG</Text>
+          </TouchableOpacity>
+        </Link>
         {/* More buttons */}
       </View>
 

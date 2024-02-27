@@ -1,11 +1,9 @@
 
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
 import  CustomHeader  from '../../components/CustomHeader';
 import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';
-import Colors from '../../constants/Colors';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -39,10 +37,10 @@ export default function DrawerLayout() {
       }}
     />
     <Drawer.Screen
-      name="blog" // This is the name of the page and must match the url from root
+      name="news" // This is the name of the page and must match the url from root
       options={{
-        drawerLabel: 'Blog',
-        title: 'Gurudeva\'s Blog',
+        drawerLabel: 'News',
+        title: 'News About Gurudeva',
         header: () => <CustomBackHeader />,
       }}
     />

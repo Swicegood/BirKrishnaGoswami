@@ -1,14 +1,13 @@
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '../../components/EditScreenInfo';
-import { Text, View } from '../../components/Themed';
+import { Text, View } from '../components/Themed';
 
-export default function TabBlogScreen() {
+export default function BlogScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Blog</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/blog.tsx" />
+      
     </View>
   );
 }
