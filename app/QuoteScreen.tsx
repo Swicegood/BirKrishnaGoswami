@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
-
+import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 function formatDate(dateString) {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dateParts = dateString.split('/');
@@ -16,25 +15,87 @@ function formatDate(dateString) {
 const QuoteScreen = () => {
   const [quote, setQuote] = useState('');
   const [date, setDate] = useState('');
+  const [currentDoc, setCurrentDoc] = useState(null);
+
 
   useEffect(() => {
     const fetchQuote = async () => {
       const db = getFirestore();
-      const q = query(collection(db, 'thought-of-the-days'), where('date', '==', '02/25/24')); // Replace with dynamic date if needed
+      const q = query(collection(db, 'thought-of-the-days'), orderBy('date', 'desc'), limit(1));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         // Assuming doc.data() returns an object with text, date, and category
         setQuote(doc.data().totd);
         setDate(doc.data().date);
+      
+        // Store the current document in the state variable
+        setCurrentDoc(doc);
       });
     };
 
     fetchQuote();
   }, []);
 
-  const handleNextQuote = () => {
-    // Logic to fetch and display the next quote with date one day earlier
+  const handleNextQuote = async () => {
+    const db = getFirestore();
+    if (currentDoc) {
+      const currentTimestamp = currentDoc.data().processed;
+      console.log("currentTimestamp", currentTimestamp);
+      const nextQuery = query(
+        collection(db, 'thought-of-the-days'), 
+        where('processed', '<', currentTimestamp), 
+        orderBy('processed', 'desc'), 
+        limit(1)
+      );
+      const nextQuerySnapshot = await getDocs(nextQuery);
+  
+      if (!nextQuerySnapshot.empty) {
+        const doc = nextQuerySnapshot.docs[0];
+        const date = currentDoc.data().date;
+        console.log("currentDate", date);
+  
+        // Convert the date to "MM/DD/YYYY" format
+        const dateParts = date.split('/');
+        const fullYearDate = `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
+  
+        // Subtract one day from the current date
+        const fullDateParts = fullYearDate.split('/');
+        const previousDate = new Date(+fullDateParts[2], +fullDateParts[0] - 1, +fullDateParts[1]);
+        previousDate.setDate(previousDate.getDate() - 1);
+  
+        // Format the new date to "MM/DD/YY"
+        const previousDateString = `${String(previousDate.getMonth() + 1).padStart(2, '0')}/${String(previousDate.getDate()).padStart(2, '0')}/${String(previousDate.getFullYear()).slice(-2)}`;
+        console.log("previous date", previousDateString);
+        // Fetch the quote for the new date
+
+        let querySnapshot = await getDocs(query(
+          collection(db, 'thought-of-the-days'), 
+          where('date', '==', previousDateString), 
+          orderBy('processed', 'desc')
+        ));
+
+        if (querySnapshot.empty) {
+          // If no documents were found for the previous date, query for the next most recent "processed" timestamp
+          querySnapshot = await getDocs(query(
+            collection(db, 'thought-of-the-days'), 
+            where('processed', '<', currentTimestamp), 
+            orderBy('processed', 'desc'), 
+            limit(1)
+          ));
+        }
+        querySnapshot.forEach((doc) => {
+          // Assuming doc.data() returns an object with text, date, and category
+          setQuote(doc.data().totd);
+          setDate(doc.data().date);
+
+        console.log("currentDoc", doc.data().processed);
+        });
+
+        setCurrentDoc(querySnapshot.docs[0]);
+      }
+    }
   };
+
 
   return (
     <ScrollView style={styles.container}>
