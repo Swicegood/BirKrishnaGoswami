@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 function formatDate(dateString) {
+  if (!dateString || dateString.split('/').length !== 3) {
+    return '';
+  }
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dateParts = dateString.split('/');
   const date = new Date(`20${dateParts[2]}`, dateParts[0] - 1, dateParts[1]);
