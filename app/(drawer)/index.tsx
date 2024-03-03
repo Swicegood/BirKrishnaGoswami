@@ -187,12 +187,16 @@ export default function TabOneScireen() {
     </SafeAreaView>
     {/* Footer */}
     <View style={styles.footer}>
-      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
-        <Text style={styles.footerText} >1</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
-        <Text style={styles.footerText}>2</Text>
-      </TouchableOpacity>
+      <Link href="./ChantingScreen" asChild>
+        <TouchableOpacity style={styles.footerButton}> 
+            <Text style={styles.footerText}>CHANTING</Text>
+        </TouchableOpacity>
+      </Link>
+      <Link href="./(drawer)/BioScreen" asChild>
+        <TouchableOpacity style={styles.footerButton}> 
+            <Text style={styles.footerText}>ABOUT</Text>
+        </TouchableOpacity>
+      </Link>
       <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
         <Text style={styles.footerText}>3</Text>
       </TouchableOpacity>

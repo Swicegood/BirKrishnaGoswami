@@ -21,7 +21,7 @@ export default function DrawerLayout() {
   return (
     <Drawer>
     <Drawer.Screen
-      name="about" // This is the name of the page and must match the url from root
+      name="BioScreen" // This is the name of the page and must match the url from root
       options={{
         drawerLabel: 'About',
         title: 'overview',
