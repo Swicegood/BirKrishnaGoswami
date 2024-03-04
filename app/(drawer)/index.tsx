@@ -202,14 +202,16 @@ export default function TabOneScireen() {
             <Text style={styles.footerText}>ABOUT</Text>
         </TouchableOpacity>
       </Link>
+      <Link href="./LiveScreen" asChild>
+        <TouchableOpacity style={styles.footerButton}> 
+            <Text style={styles.footerText}>LIVE</Text>
+        </TouchableOpacity>
+      </Link>
       <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
-        <Text style={styles.footerText}>3</Text>
+        <Text style={styles.footerText}>DONATION</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
-        <Text style={styles.footerText}>4</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
-        <Text style={styles.footerText}>5</Text>
+        <Text style={styles.footerText}>WhatsApp</Text>
       </TouchableOpacity>
     </View>
     </>
