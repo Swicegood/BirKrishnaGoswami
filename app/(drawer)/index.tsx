@@ -178,11 +178,16 @@ export default function TabOneScireen() {
                 <Text style={styles.buttonText}>QUOTES</Text>
               </TouchableOpacity>
         </Link>
-        <Button title="BOOKS" onPress={function (): void {
-              throw new Error('Function not implemented.');
-            } } />
-        {/* More buttons */}
-      </View>
+        <Link href="./BooksScreen" asChild>
+            <TouchableOpacity style={styles.buttonContainer}> 
+                <Image
+                  source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
+                  style={styles.buttonImage}
+                />
+                <Text style={styles.buttonText}>BOOKS</Text>
+              </TouchableOpacity>
+        </Link>
+        </View>
     </ScrollView>
     </SafeAreaView>
     {/* Footer */}
