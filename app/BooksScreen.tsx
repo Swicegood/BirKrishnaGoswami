@@ -30,7 +30,7 @@ const BooksScreen: React.FC = () => {
             <Text style={styles.cardText}>PURCHASE GURUVDEVA'S BOOKS</Text>
           </TouchableOpacity>
           </Link>
-          <Link href="./FolderScreen" asChild>
+          <Link href="./EbooksScreen" asChild>
             <TouchableOpacity style={styles.card}>
                 <Image
                 source={require('../assets/images/placeholder_355_200.png')}
