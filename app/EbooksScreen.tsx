@@ -82,21 +82,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Center children horizontally
     justifyContent: 'center', // Center children vertically
   },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  button: {
-    backgroundColor: '#ED4D4E',
-    color: '#fff',
-    borderRadius: 8,
-    textAlign: 'center',
-    paddingVertical: 20,
-    marginTop: 10,
-    width: itemWidth-16,
-    alignItems: 'center',
-  },
+  
   columnWrapper: {
     justifyContent: 'space-between',
   },

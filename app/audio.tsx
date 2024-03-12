@@ -22,14 +22,16 @@ const AudioScreen: React.FC = () => {
           <Text style={styles.headerText}>Audio Lectures</Text>
         </View>
         <View style={styles.content}>
-          <TouchableOpacity style={styles.card} onPress={navigateToYearwise}>
-            <Image
-              source={require('../assets/images/placeholder_355_200.png')}
-              resizeMode="cover"
-              style={styles.cardImage}
-            />
-            <Text style={styles.cardText}>BY-YEAR</Text>
-          </TouchableOpacity>
+          <Link href="./YearScreen" asChild>
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require('../assets/images/placeholder_355_200.png')}
+                resizeMode="cover"
+                style={styles.cardImage}
+              />
+              <Text style={styles.cardText}>BY-YEAR</Text>
+            </TouchableOpacity>
+          </Link>
           <Link href="./FolderScreen" asChild>
             <TouchableOpacity style={styles.card}>
                 <Image

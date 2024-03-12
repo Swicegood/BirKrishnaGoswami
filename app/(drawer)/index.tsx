@@ -7,12 +7,14 @@ import {
   ViewStyle,
   TextStyle,
   ImageStyle,
-  Dimensions
+  Dimensions,
+  Linking
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useEffect } from 'react';
 import { Link } from 'expo-router';
+import { collection, getFirestore, query, getDocs } from "firebase/firestore";
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png') },
@@ -36,6 +38,23 @@ function renderItem({ item, index }: { item: any, index: number }) {
 export default function TabOneScireen() {
   const [value, setValue] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0); // Add this state variable
+  const [whatsAppUrl, setWhatsAppUrl] = useState('https://chat.whatsapp.com/FaPXfrT3qBLBSxd04TZr9X');
+
+
+  useEffect(() => {
+    const fetchWhatsAppUrl = async () => {
+      const db = getFirestore();
+      const q = query(collection(db, 'whatsapp'));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        // doc.data() returns an object with title, blurb, imageurl, and purchaseurl
+        setWhatsAppUrl(doc.data().url);
+      });
+    }
+  
+    fetchWhatsAppUrl();
+  }, []);
+
   return (
     <>
     <SafeAreaView style={styles.safeArea}>
@@ -207,10 +226,12 @@ export default function TabOneScireen() {
             <Text style={styles.footerText}>LIVE</Text>
         </TouchableOpacity>
       </Link>
-      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
-        <Text style={styles.footerText}>DONATION</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => { /* Handle button press */ }}>
+      <Link href="./DonationScreen" asChild>
+        <TouchableOpacity style={styles.footerButton}> 
+            <Text style={styles.footerText}>DONATION</Text>
+        </TouchableOpacity>
+      </Link>
+      <TouchableOpacity style={styles.footerButton} onPress={() => { Linking.openURL(whatsAppUrl) /* Handle button press */ }}>
         <Text style={styles.footerText}>WhatsApp</Text>
       </TouchableOpacity>
     </View>
@@ -344,5 +365,6 @@ const styles = StyleSheet.create<Styles>({
   footerText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 10,
   },
 });
