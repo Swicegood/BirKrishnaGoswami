@@ -29,7 +29,7 @@ export default function DrawerLayout() {
       }}
     />
     <Drawer.Screen
-      name="travel" // This is the name of the page and must match the url from root
+      name="TravelScreen" // This is the name of the page and must match the url from root
       options={{
         drawerLabel: 'Travel Schedule',
         title: 'Travel Schedule',
