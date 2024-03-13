@@ -48,7 +48,7 @@ const GalleryComponent = () => {
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item, index }) => (
         <Link href={ {pathname: "./GalleryScreen", params: {imageChunk: item}} }asChild>
-        <TouchableOpacity style={{ padding: 20, borderRadius: 10 }}>
+        <TouchableOpacity , borderRadius: 10 }}>
           <Image defaultSource={placeholderImage} source={{uri: item.url}} style={{ width: (screenWidth / 2) - 40, height: 170, borderRadius: 10 }} />  
           <Text style={styles.text} >{item.location}</Text>
           <Text style={[styles.text, { flexShrink: 1 }]}>{item.description}</Text>

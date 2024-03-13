@@ -44,65 +44,57 @@ const BlogScreen = () => {
     fetchBlogEntry();
   }, []);
 
-  const handleNextBlogEntry = async () => {
+  const handleNextText = async () => {
     const db = getFirestore();
     if (currentDoc) {
-      const currentTimestamp = currentDoc.data().processed;
+      const currentTimestamp = currentDoc.data().date;
       console.log("currentTimestamp", currentTimestamp);
       const nextQuery = query(
         collection(db, 'blog'), 
-        where('processed', '<', currentTimestamp), 
-        orderBy('processed', 'desc'), 
+        where('date', '<', currentTimestamp), 
+        orderBy('date', 'desc'), 
         limit(1)
       );
       const nextQuerySnapshot = await getDocs(nextQuery);
   
-      if (!nextQuerySnapshot.empty) {
-        const date = currentDoc.data().date;
-        console.log("currentDate", date);
+      nextQuerySnapshot.forEach((doc) => {
+        // Assuming doc.data() returns an object with text, date, and title
+        setText(doc.data().text);
+        setDate(doc.data().date);
+        setTitle(doc.data().title);
+        console.log("currentDoc", doc.data().date);
+      });
   
-        // Convert the date to "MM/DD/YYYY" format
-        const dateParts = date.split('/');
-        const fullYearDate = `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
-  
-        // Subtract one day from the current date
-        const fullDateParts = fullYearDate.split('/');
-        const previousDate = new Date(+fullDateParts[2], +fullDateParts[0] - 1, +fullDateParts[1]);
-        previousDate.setDate(previousDate.getDate() - 1);
-  
-        // Format the new date to "MM/DD/YY"
-        const previousDateString = `${String(previousDate.getMonth() + 1).padStart(2, '0')}/${String(previousDate.getDate()).padStart(2, '0')}/${String(previousDate.getFullYear()).slice(-2)}`;
-        console.log("previous date", previousDateString);
-        // Fetch the BlogEntry for the new date
-
-        let querySnapshot = await getDocs(query(
-          collection(db, 'blog'), 
-          where('date', '==', previousDateString), 
-          orderBy('processed', 'desc')
-        ));
-
-        if (querySnapshot.empty) {
-          // If no documents were found for the previous date, query for the next most recent "processed" timestamp
-          querySnapshot = await getDocs(query(
-            collection(db, 'blog'), 
-            where('processed', '<', currentTimestamp), 
-            orderBy('processed', 'desc'), 
-            limit(1)
-          ));
-        }
-        querySnapshot.forEach((doc) => {
-          // Assuming doc.data() returns an object with text, date, and category
-          setText(doc.data().text);
-          setDate(doc.data().date);
-          setTitle(doc.data().title);
-        console.log("currentDoc", doc.data().processed);
-        });
-
-        setCurrentDoc(querySnapshot.docs[0]);
-      }
+      setCurrentDoc(nextQuerySnapshot.docs[0]);
     }
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
+
+const handlePreviousText = async () => {
+  const db = getFirestore();
+  if (currentDoc) {
+    const currentTimestamp = currentDoc.data().date;
+    console.log("currentTimestamp", currentTimestamp);
+    const nextQuery = query(
+      collection(db, 'blog'), 
+      where('date', '>', currentTimestamp), 
+      orderBy('date', 'asc'), 
+      limit(1)
+    );
+    const nextQuerySnapshot = await getDocs(nextQuery);
+
+    nextQuerySnapshot.forEach((doc) => {
+      // Assuming doc.data() returns an object with text, date, and title
+      setText(doc.data().text);
+      setDate(doc.data().date);
+      setTitle(doc.data().title);
+      console.log("currentDoc", doc.data().date);
+    });
+
+    setCurrentDoc(nextQuerySnapshot.docs[0]);
+  }
+  scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+};
 
 
   return (
@@ -113,8 +105,11 @@ const BlogScreen = () => {
         <Text style={styles.title}>{title.toUpperCase()}</Text>
         <Text style={styles.blogEntryText}>{text}</Text>
       </View>
-      <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-      <TouchableOpacity style={styles.nextButton} onPress={handleNextBlogEntry}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
+      <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
+        <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
         <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
       </TouchableOpacity>
       </View>
