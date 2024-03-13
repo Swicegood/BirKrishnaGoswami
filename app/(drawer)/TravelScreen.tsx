@@ -19,6 +19,9 @@ const TravelScreen = () => {
   const [text, setText] = useState('');
   const [date, setDate] = useState('');
   const [currentDoc, setCurrentDoc] = useState(null);
+  const [atFirstDoc, setAtFirstDoc] = useState(false);
+  const [atLastDoc, setAtLastDoc] = useState(false);
+
 
 
   useEffect(() => {
@@ -42,12 +45,12 @@ const TravelScreen = () => {
   const handleNextText = async () => {
     const db = getFirestore();
     if (currentDoc) {
-      const currentTimestamp = currentDoc.data().processed;
-      console.log("currentTimestamp", currentTimestamp);
+      const currentDate = currentDoc.data().date;
+      console.log("currentDate", currentDate);
       const nextQuery = query(
         collection(db, 'travel-schedule'), 
-        where('processed', '<', currentTimestamp), 
-        orderBy('processed', 'desc'), 
+        where('date', '<', currentDate), 
+        orderBy('date', 'desc'), 
         limit(1)
       );
       const nextQuerySnapshot = await getDocs(nextQuery);
@@ -56,31 +59,74 @@ const TravelScreen = () => {
         // Assuming doc.data() returns an object with text, date, and category
         setText(doc.data().text);
         setDate(doc.data().date);
-
-      console.log("currentDoc", doc.data().processed);
+        console.log("currentDoc", doc.data().date);
       });
-
-      setCurrentDoc(nextQuerySnapshot.docs[0]);
+  
+      if (nextQuerySnapshot.docs[0]) {
+        setCurrentDoc(nextQuerySnapshot.docs[0]);
+      }
+  
+      if (nextQuerySnapshot.empty) {
+        setAtLastDoc(true);
+      } else {
+        setAtLastDoc(false);
       }
     }
+  };
   
-
-
-  return (
-    <ScrollView style={styles.container}>
-
-      <Image source={require('../../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
-      <View style={styles.content}>
-        <Text style={styles.date}>{formatDate(date)}</Text>
-        <Text style={styles.textText}>{text}</Text>
-      </View>
-      <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-      <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-        <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
-      </TouchableOpacity>
-      </View>
-    </ScrollView>
-  );
+    const handlePreviousText = async () => {
+      const db = getFirestore();
+      if (currentDoc) {
+        const currentTimestamp = currentDoc.data().processed;
+        console.log("currentTimestamp", currentTimestamp);
+        const prevQuery = query(
+          collection(db, 'travel-schedule'), 
+          where('processed', '>', currentTimestamp), 
+          orderBy('processed', 'asc'), 
+          limit(1)
+        );
+        const prevQuerySnapshot = await getDocs(prevQuery);
+    
+        prevQuerySnapshot.forEach((doc) => {
+          // Assuming doc.data() returns an object with text, date, and title
+          setText(doc.data().text);
+          setDate(doc.data().date);
+          console.log("currentDoc", doc.data().processed);
+        });
+    
+        if (prevQuerySnapshot.docs[0]) {
+          setCurrentDoc(prevQuerySnapshot.docs[0]);
+        }
+    
+        if (prevQuerySnapshot.empty) {
+          setAtFirstDoc(true);
+        } else {
+          setAtFirstDoc(false);
+        }
+      }
+    };
+    
+    return (
+      <ScrollView style={styles.container}>
+        <Image source={require('../../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+        <View style={styles.content}>
+          <Text style={styles.date}>{formatDate(date)}</Text>
+          <Text style={styles.textText}>{text}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
+        {!atFirstDoc && (
+          <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
+            <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
+          </TouchableOpacity>
+        )}
+        {!atLastDoc && (
+          <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
+            <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
+          </TouchableOpacity>
+        )}
+        </View>
+      </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({

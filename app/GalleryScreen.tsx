@@ -19,7 +19,7 @@ const GalleryComponent = () => {
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item, index }) => (
         <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: images}}} asChild>
-          <TouchableOpacity>
+          <TouchableOpacity style={{ padding: 2}}>
             <Image defaultSource={placeholderImage} source={{uri: item}} style={{ width: 100, height: 100 }} />
           </TouchableOpacity>
         </Link>
