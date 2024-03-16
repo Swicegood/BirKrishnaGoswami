@@ -140,5 +140,3 @@ exports.handleYouTubeNotification = functions.https.onRequest((req, res) => {
         res.status(500).send('Error sending notification');
       });
 });
-
-API_KEY2="AIzaSyD-1lT1Z3z3Z3z3Z3z3Z3z3Z3z3Z3z3Z3"
