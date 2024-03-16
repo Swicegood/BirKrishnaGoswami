@@ -114,3 +114,29 @@ exports.getLiveVideo = functions.https.onRequest(async (req, res) => {
   }
 });
 
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+exports.handleYouTubeNotification = functions.https.onRequest((req, res) => {
+  // Parse YouTube notification from req.body
+  // Extract needed information
+
+  // Prepare and send a push notification through FCM
+  const message = {
+    notification: {
+      title: 'New Video Posted',
+      body: 'A new video has been posted on the channel you subscribed to.',
+    },
+    topic: 'subscribedUsers', // Assuming you've set up a topic for subscribers
+  };
+
+  admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+        res.status(200).send('Notification sent');
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+        res.status(500).send('Error sending notification');
+      });
+});
