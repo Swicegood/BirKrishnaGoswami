@@ -66,11 +66,11 @@ exports.getSearchYouTubeVideos = functions.https.onRequest(async (req, res) => {
     const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
       params: {
         part: 'snippet',
-        q: searchTerm,
+        q: searchTerm.toLowerCase(),
         channelId: channelId,
-        maxResults: 50, // Adjust based on your needs
-        order: 'date', // Adjust based on your needs
-        // type: 'video',
+        maxResults: 50, // Maximum allowed by the API
+        order: 'relevance', // Order by relevance instead of date
+        type: 'video', // Uncommented to only get videos
         key: API_KEY,
       },
     });
