@@ -117,26 +117,66 @@ exports.getLiveVideo = functions.https.onRequest(async (req, res) => {
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.handleYouTubeNotification = functions.https.onRequest((req, res) => {
-  // Parse YouTube notification from req.body
-  // Extract needed information
+exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) => {
+  // Check if this is a subscription verification request
+  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.challenge']) {
+    // Respond with the hub.challenge value to verify the subscription
+    const challenge = req.query['hub.challenge'];
+    console.log('Verifying subscription');
+    res.status(200).send(challenge);
+  } else {
+    // Handle other notifications (e.g., video upload notifications)
+    console.log('Received a notification');
+    // Process the notification here
 
-  // Prepare and send a push notification through FCM
-  const message = {
-    notification: {
-      title: 'New Video Posted',
-      body: 'A new video has been posted on the channel you subscribed to.',
-    },
-    topic: 'subscribedUsers', // Assuming you've set up a topic for subscribers
-  };
+    // Respond to indicate successful receipt of the notification
+    res.status(200).send('OK');
 
-  admin.messaging().send(message)
-      .then((response) => {
-        console.log('Successfully sent message:', response);
-        res.status(200).send('Notification sent');
-      })
-      .catch((error) => {
-        console.log('Error sending message:', error);
-        res.status(500).send('Error sending notification');
-      });
+
+    // Parse the request body to obtain the video ID  and other intersting info from the notification from YouTube
+    const videoId = req.body.videoId;
+    const videoTitle = req.body.videoTitle;
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    console.log(`New video: ${videoTitle} at ${videoUrl}`);
+
+
+    const userTokens = await getUserTokens();
+
+    // Send a message to each user token.
+    const {Expo} = require('expo-server-sdk');
+
+    // Create a new Expo SDK client
+    const expo = new Expo();
+
+    userTokens.forEach(async (token) => {
+      if (!Expo.isExpoPushToken(token)) {
+        console.error(`Push token ${token} is not a valid Expo push token`);
+        return;
+      }
+
+      const message = {
+        to: token,
+        sound: 'default',
+        title: 'New Video Posted',
+        body: `A new video has been posted on BKGoswami YouTube entitled ${videoTitle}.`,
+        data: {link: videoUrl},
+      };
+
+      try {
+        const ticket = await expo.sendPushNotificationsAsync([message]);
+        console.log(ticket);
+      } catch (error) {
+        console.error(`Failed to send push notification: ${error}`);
+      }
+    });
+  }
+  /**
+  * Fetches the user tokens from the database.
+  * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
+  */
+  async function getUserTokens() {
+    // Fetch tokens from your database. This is just a good placeholder.
+    // Replace this with your actual code to fetch tokens.
+    return ['ExponentPushToken[-RFVv5Cyl8v14P9aAE_2uh]'];
+  }
 });
