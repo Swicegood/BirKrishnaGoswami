@@ -15,6 +15,8 @@ import { Text, View } from '../../components/Themed';
 import { useState, forwardRef, useEffect } from 'react';
 import { Link } from 'expo-router';
 import { collection, getFirestore, query, getDocs } from "firebase/firestore";
+import NotificationHandler from '../api/notifications';
+
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png') },
@@ -39,6 +41,7 @@ export default function TabOneScireen() {
   const [value, setValue] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0); // Add this state variable
   const [whatsAppUrl, setWhatsAppUrl] = useState('https://chat.whatsapp.com/FaPXfrT3qBLBSxd04TZr9X');
+  const expoPushToken = NotificationHandler();
 
 
   useEffect(() => {
