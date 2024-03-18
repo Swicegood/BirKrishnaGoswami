@@ -7,6 +7,7 @@ import { getAnalytics } from "firebase/analytics";
 import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
 import PlaylistItem from '../components/PlaylistItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router'
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -51,37 +52,44 @@ const RecentVideoScreen = () => {
 const [playlists, setPlaylists] = useState([]);
 const functions = getFunctions(getApp());
 
+const fetchPlaylists = async () => {
+  const getYouTubePlaylists = httpsCallable<GetYouTubePlaylistsRequest, GetYouTubePlaylistsResponse>(functions, 'getYouTubePlaylists');
+  // Use the interface for the request
+  const request: GetYouTubePlaylistsRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
 
+  getYouTubePlaylists(request)
+    .then((result: { data: GetYouTubePlaylistsResponse }) => {
+      // Use the interface for the response
+      const response: GetYouTubePlaylistsResponse = result.data;
+      const playlists = response.items; // Change this line
+      playlists.forEach(playlist => {
+        const title = playlist.snippet.title;
+        const thumbnailUrl = playlist.snippet.thumbnails.default.url; // or 'medium' or 'high'
+        const dateModified = playlist.snippet.publishedAt;
+        const id = playlist.id;
+        setPlaylists(playlists => [...playlists, { id, title, thumbnailUrl, dateModified }]);
+      });
+    })
+    .catch((error: FirebaseFunctionError) => {
+      console.error("Error calling the function: ", error.message);
+    });
+};
 
 useEffect(() => {
-  const fetchPlaylists = async () => {
-    const getYouTubePlaylists = httpsCallable<GetYouTubePlaylistsRequest, GetYouTubePlaylistsResponse>(functions, 'getYouTubePlaylists');
-
-
-    // Use the interface for the request
-    const request: GetYouTubePlaylistsRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
-
-    getYouTubePlaylists(request)
-      .then((result: { data: GetYouTubePlaylistsResponse }) => {
-        // Use the interface for the response
-        const response: GetYouTubePlaylistsResponse = result.data;
-        const playlists = response.items; // Change this line
-        playlists.forEach(playlist => {
-          const title = playlist.snippet.title;
-          const thumbnailUrl = playlist.snippet.thumbnails.default.url; // or 'medium' or 'high'
-          const dateModified = playlist.snippet.publishedAt;
-          const id = playlist.id;
-          setPlaylists(playlists => [...playlists, { id, title, thumbnailUrl, dateModified }]);
-        });
-      })
-      .catch((error: FirebaseFunctionError) => {
-        console.error("Error calling the function: ", error.message);
-      });
-  };
-
-  fetchPlaylists();
+  if (playlists.length === 0) {
+    fetchPlaylists();
+  }
 }, []);
 
+useFocusEffect(
+  React.useCallback(() => {
+    // Reset the playlists state when the screen comes into focus
+    setPlaylists([]);
+
+    // Fetch the playlists
+    fetchPlaylists();
+  }, [])
+);
 
   const renderItem = ({ item }) => (
     <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
