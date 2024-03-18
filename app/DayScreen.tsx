@@ -13,7 +13,7 @@ const DayScreen = () => {
     }
     const parsedData = JSON.parse(dataString);
     const dataWithTitles = parsedData.map((url: string) => {
-      const title = url.split('/').pop() || ''; // Extract basename from URL
+      const title = url?.split('/').pop() || ''; // Extract basename from URL
       return { url, title, month, year};
     });
     setData(dataWithTitles);

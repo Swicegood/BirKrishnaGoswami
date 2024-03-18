@@ -24,6 +24,7 @@ exports.getYouTubePlaylists = functions.https.onRequest(async (req, res) => {
         part: 'snippet,contentDetails',
         channelId: channelId,
         maxResults: 50, // Adjust based on your needs
+        order: 'date', // Order by date
         key: API_KEY,
       },
     });
