@@ -5,9 +5,8 @@ import { initializeApp, getApp } from 'firebase/app';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
 import VideoItem from '../components/VideoItem'; // Import the PlaylistItem component
-import { useLocalSearchParams, Link } from 'expo-router'; 
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TextInput, Button } from 'react-native';
+import { View, FlatList, StyleSheet, TextInput, Button, Text } from 'react-native';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -52,7 +51,7 @@ interface FirebaseFunctionError {
   const SearchYoutubeVideosScreen = () => {
     const [videos, setVideos] = useState([]);
     const [searchTerm, setSearchTerm] = useState(''); // State to hold the search term
-  
+    const [hasSearched, setHasSearched] = useState(false);
     const functions = getFunctions(getApp());
   
     // Function to fetch videos based on search term
@@ -61,23 +60,24 @@ interface FirebaseFunctionError {
       const getSearchYouTubeVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getSearchYouTubeVideos');
       const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg', searchTerm }; // Use state for searchTerm
 
-        getSearchYouTubeVideos(request)
-        .then((result: { data: GetYouTubeVideosResponse }) => {
-          // Use the interface for the response
-          const response: GetYouTubeVideosResponse = result.data;
-          const videos = response.items; // Change this line
-          console.log("videos", videos[4]);
-          videos.forEach(video => {
-            const title = video.snippet.title;
-            const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'
-            const dateModified = video.snippet.publishTime;
-            const id = video.id.videoId;
-            setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
-          });
-        })      
-        .catch((error: FirebaseFunctionError) => {
-          console.error("Error calling the function: ", error.message);
+      getSearchYouTubeVideos(request)
+      .then((result: { data: GetYouTubeVideosResponse }) => {
+        // Use the interface for the response
+        const response: GetYouTubeVideosResponse = result.data;
+        const videos = response.items; // Change this line
+        console.log("videos", videos[4]);
+        videos.forEach(video => {
+          const title = video.snippet.title;
+          const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'
+          const dateModified = video.snippet.publishTime;
+          const id = video.id.videoId;
+          setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
         });
+      })      
+      .catch((error: FirebaseFunctionError) => {
+        console.error("Error calling the function: ", error.message);
+      });
+      setHasSearched(true);
     };
   
     useEffect(() => {
@@ -122,11 +122,12 @@ interface FirebaseFunctionError {
           title="Search"
           onPress={fetchVideos} // Fetch videos on button press
         />
-        <FlatList
-          data={videos}
-          renderItem={({ item }) => <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />} // Pass video item props to VideoItem
-          keyExtractor={item => item.id}
-        />
+       <FlatList
+        data={videos}
+        renderItem={({ item }) => <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />} // Pass video item props to VideoItem
+        keyExtractor={item => item.id}
+        ListEmptyComponent={hasSearched ? <Text style={styles.text}>No videos found</Text> : null}
+      />
       </View>
     );
   };
@@ -141,6 +142,11 @@ interface FirebaseFunctionError {
       padding: 10,
       borderColor: 'gray',
       borderWidth: 1,
+    },
+    text: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
     },
   });
   
