@@ -103,6 +103,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  button: {
+    backgroundColor: '#ED4D4E',
+    color: '#fff',
+    borderRadius: 8,
+    textAlign: 'center',
+    paddingVertical: 20,
+    marginTop: 10,
+    width: itemWidth-16,
+    alignItems: 'center',
+  },
 });
 
 export default PurchaseScreen;
