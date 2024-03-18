@@ -191,7 +191,7 @@ const formatTime = (milliseconds) => {
       <View style={styles.overlay}>
       <View style={styles.content}>
       <View style={{ flex: 1 }} /> 
-      <Text style={styles.title}>{file.title.toUpperCase()}</Text>
+      <Text style={styles.title}>{file.title.toUpperCase().replace('_',' ')}</Text>
         <Slider
             style={styles.slider}
             thumbTintColor="#FFFFFF" // Color of the knob
