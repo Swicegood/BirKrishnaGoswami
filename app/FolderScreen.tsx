@@ -68,20 +68,7 @@ const FolderScreen = () => {
   const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
   
 
-  // function logAudioNodes(obj: Record<string, any>) {
-  //   for (const key in obj) {
-  //     if (key.includes('Audio')) {
-  //       console.log("Hierarchy", obj);
-  //       break;
-  //     }
-  //     if (typeof obj[key] === 'object') {
-  //       logAudioNodes(obj[key]);
-  //     }
-  //   }
-  // }
-  
-  // logAudioNodes(hierarchy);
-  // Data for the grid
+
   const data = new Array(folders.length).fill(null).map((_, index) => ({
     key: String(index),
     category: folders[index] || 'Loading...', // Replace with folders[index]
