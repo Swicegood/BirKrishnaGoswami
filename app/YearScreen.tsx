@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'expo-router';
 import firebase from 'firebase/app';
 import { collection, getFirestore, query, orderBy, getDocs } from "firebase/firestore";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const YearScreen = () => {
   const [data, setData] = useState({});
-  
+  const [isLoading, setIsLoading] = useState(true);
   const db = getFirestore();  
 
 
@@ -32,7 +32,7 @@ useEffect(() => {
       return acc;
     }, {});
     setData(data);
-
+    setIsLoading(false);
     Object.keys(data).forEach(year => {
       console.log("Year: ", year, "Length: ", Object.keys(data[year]).length);
     });
@@ -40,6 +40,14 @@ useEffect(() => {
   fetchData();
 }, []);
   
+  if (isLoading) {
+    return (
+      <View style={styles.musicContainer}>
+        <ActivityIndicator size="large" color="#C68446" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView>
     <View>
