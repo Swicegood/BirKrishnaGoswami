@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
+  ActivityIndicator, Image, Dimensions } from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -21,6 +22,7 @@ const TravelScreen = () => {
   const [currentDoc, setCurrentDoc] = useState(null);
   const [atFirstDoc, setAtFirstDoc] = useState(false);
   const [atLastDoc, setAtLastDoc] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
 
 
@@ -37,6 +39,7 @@ const TravelScreen = () => {
         // Store the current document in the state variable
         setCurrentDoc(doc);
       });
+      setIsLoading(false);
     };
 
     fetchText();
@@ -106,6 +109,10 @@ const TravelScreen = () => {
       }
     };
     
+    if (isLoading) {
+      return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
     return (
       <ScrollView style={styles.container}>
         <Image source={require('../../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />

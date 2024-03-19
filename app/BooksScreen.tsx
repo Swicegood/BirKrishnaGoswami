@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image,
+   SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
 
 const windowWidth = Dimensions.get('window').width;
@@ -14,6 +15,8 @@ const BooksScreen: React.FC = () => {
   const navigateToBookwise = () => {
     // Navigation logic to 'Bookwise' screen
   };
+
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
