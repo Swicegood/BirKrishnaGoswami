@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Platform, ActivityIndicator } from 'react-native';
 import * as ScreenOrientation from 'expo-screen-orientation';import YoutubePlayer from 'react-native-youtube-iframe';
 import { useLocalSearchParams } from 'expo-router';
+import { isLoading } from 'expo-font';
 
 const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 
@@ -15,6 +16,7 @@ const VideoPlayerItem = () => {
   const { id } = useLocalSearchParams<VideoItemProps>();
   const [videoHeight, setVideoHeight] = useState(Dimensions.get('window').width * 9 / 16); // initialize with a number
   const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
@@ -61,15 +63,18 @@ const VideoPlayerItem = () => {
   }
 
 
+
   return (
     <View style={styles.textContainer}>
       <View style={styles.centeredContent}>
-        <YoutubePlayer
-          height={videoHeight} // Await the getVideoHeight() function to get the actual height value
-          width={videoWidth}
-          play={true}
-          videoId={id}
-        />
+      <YoutubePlayer
+        height={videoHeight} // Await the getVideoHeight() function to get the actual height value
+        width={videoWidth}
+        play={true}
+        videoId={id}
+        onReady={() => setIsLoading(false)}
+      />
+      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
       </View>
     </View>
   );
