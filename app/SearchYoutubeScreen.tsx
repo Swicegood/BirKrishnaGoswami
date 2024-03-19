@@ -2,11 +2,11 @@
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
 import { initializeApp, getApp } from 'firebase/app';
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
 import VideoItem from '../components/VideoItem'; // Import the PlaylistItem component
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TextInput, Button, Text } from 'react-native';
+import { View, FlatList, StyleSheet, TextInput, Button, Text, ActivityIndicator } from 'react-native';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -53,9 +53,11 @@ interface FirebaseFunctionError {
     const [searchTerm, setSearchTerm] = useState(''); // State to hold the search term
     const [hasSearched, setHasSearched] = useState(false);
     const functions = getFunctions(getApp());
+    const [isLoading, setIsLoading] = useState(true);
   
     // Function to fetch videos based on search term
     const fetchVideos = async () => {
+      setIsLoading(true);
       setVideos([]); // Clear the videos state
       const getSearchYouTubeVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getSearchYouTubeVideos');
       const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg', searchTerm }; // Use state for searchTerm
@@ -72,6 +74,7 @@ interface FirebaseFunctionError {
           const dateModified = video.snippet.publishTime;
           const id = video.id.videoId;
           setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
+          setIsLoading(false);
         });
       })      
       .catch((error: FirebaseFunctionError) => {
@@ -100,6 +103,7 @@ interface FirebaseFunctionError {
                 const dateModified = video.snippet.publishTime;
                 const id = video.id.videoId;
                 setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
+                setIsLoading(false);
               });
             })
             .catch((error: FirebaseFunctionError) => {
@@ -110,6 +114,10 @@ interface FirebaseFunctionError {
         fetchVideos();
       }, []); // Empty dependency array means this effect runs once on mount
   
+    if (isLoading){
+      return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
     return (
       <View style={styles.container}>
         <TextInput

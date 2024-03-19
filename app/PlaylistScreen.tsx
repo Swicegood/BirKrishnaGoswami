@@ -4,7 +4,7 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import VideoItem from '../components/VideoItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, Link } from 'expo-router'; 
@@ -51,7 +51,7 @@ interface FirebaseFunctionError {
 const PlaylistScreen = () => {
 const { id } = useLocalSearchParams(); // Get the playlist ID from the URL
 const [playlists, setVideos] = useState([]);
-
+const [isLoading, setIsLoading] = useState(true);
 const functions = getFunctions(getApp());
 
 
@@ -75,6 +75,7 @@ useEffect(() => {
           const dateModified = video.contentDetails.videoPublishedAt;
           const id = video.contentDetails.videoId;
           setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
+          setIsLoading(false);
         });
       })
       .catch((error: FirebaseFunctionError) => {
@@ -88,6 +89,10 @@ useEffect(() => {
   const renderItem = ({ item }) => (
     <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
   );
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <View style={styles.container}>
