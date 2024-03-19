@@ -4,7 +4,7 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
-import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, FlatList, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import PlaylistItem from '../components/PlaylistItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from 'expo-router'
@@ -51,6 +51,7 @@ interface FirebaseFunctionError {
 const RecentVideoScreen = () => {
 const [playlists, setPlaylists] = useState([]);
 const functions = getFunctions(getApp());
+const [isLoading, setIsLoading] = useState(true);
 
 const fetchPlaylists = async () => {
   const getYouTubePlaylists = httpsCallable<GetYouTubePlaylistsRequest, GetYouTubePlaylistsResponse>(functions, 'getYouTubePlaylists');
@@ -68,6 +69,7 @@ const fetchPlaylists = async () => {
         const dateModified = playlist.snippet.publishedAt;
         const id = playlist.id;
         setPlaylists(playlists => [...playlists, { id, title, thumbnailUrl, dateModified }]);
+        setIsLoading(false);
       });
     })
     .catch((error: FirebaseFunctionError) => {
@@ -78,12 +80,14 @@ const fetchPlaylists = async () => {
 useEffect(() => {
   if (playlists.length === 0) {
     fetchPlaylists();
+    setIsLoading(false);
   }
 }, []);
 
 useFocusEffect(
   React.useCallback(() => {
     // Reset the playlists state when the screen comes into focus
+    setIsLoading(true);
     setPlaylists([]);
 
     // Fetch the playlists
@@ -94,6 +98,14 @@ useFocusEffect(
   const renderItem = ({ item }) => (
     <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
   );
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

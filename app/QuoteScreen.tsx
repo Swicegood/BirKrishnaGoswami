@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
+   Image, Dimensions, ActivityIndicator } from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -8,7 +9,6 @@ function formatDate(dateString) {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dateParts = dateString.split('/');
   const date = new Date(`20${dateParts[2]}`, dateParts[0] - 1, dateParts[1]);
-
   const month = months[date.getMonth()];
   const day = String(date.getDate()).padStart(2, '0');
 
@@ -19,7 +19,7 @@ const QuoteScreen = () => {
   const [quote, setQuote] = useState('');
   const [date, setDate] = useState('');
   const [currentDoc, setCurrentDoc] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchQuote = async () => {
@@ -34,6 +34,7 @@ const QuoteScreen = () => {
         // Store the current document in the state variable
         setCurrentDoc(doc);
       });
+      setIsLoading(false);
     };
 
     fetchQuote();
@@ -95,10 +96,14 @@ const QuoteScreen = () => {
         });
 
         setCurrentDoc(querySnapshot.docs[0]);
+        setIsLoading(false);
       }
     }
   };
 
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <ScrollView style={styles.container}>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { FlatList, SafeAreaView, Dimensions, ActivityIndicator } from 'react-native';
 import { Link } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
 
@@ -66,7 +67,7 @@ const FolderScreen = () => {
   const [folders, setFolders] = useState<string[]>([]);
   const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);// Correct the spelling here
   const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
-  
+  const [isLoading, setIsLoading] = useState(true);
 
 
   const data = new Array(folders.length).fill(null).map((_, index) => ({
@@ -88,6 +89,7 @@ const FolderScreen = () => {
       const categories = buildCategoryList(hierarchy, 1);
       const uniqueCategories = Array.from(new Set(categories));
       setFolders(uniqueCategories);
+      setIsLoading(false);
     })();
   }, []);
 
@@ -104,7 +106,9 @@ const FolderScreen = () => {
     </View>
   );
 
-
+if (isLoading){
+  return <ActivityIndicator size="large" color="#0000ff" />;
+}
 
   return (
     <HierarchyContext.Provider value={deserializedHierarchy}>
