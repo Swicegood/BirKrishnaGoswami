@@ -1,7 +1,9 @@
-import React, { Children, useEffect, useState, useContext } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-import { Link, useLocalSearchParams, router} from 'expo-router';
-import FilesScreen from './FilesScreen';
+import { Link, useLocalSearchParams, useFocusEffect, router} from 'expo-router';
+import { useNavigationState } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
@@ -23,7 +25,7 @@ interface SubCategory {
 
   function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {
     const categories: string[] = [];
-    console.log("buildCategoryList", hierarchy[-1], parent);
+    console.log("buildCategoryList", hierarchy[0], parent);
     const traverse = (node: Record<string, any> | null, currentParent: string) => {
       if (currentParent === parent) {
         categories.push(...Object.keys(node));
@@ -41,49 +43,105 @@ interface SubCategory {
  const SubFolderScreen = () => {
     const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
     const [isFileScreen, setIsFileScreen] = useState(false);
+    const [parent, setParent] = useState<string | null>(null); // Add parent state
+    const previousRoute = useNavigationState(state => state.routes[state.index]?.name);
+    const justVisitedFilesScreen = useRef(false);
+    const [hierarchy, setHierarchy] = useState<string | null>(null);
+    const { hierarchy: localHierarchy, category } = useLocalSearchParams<{ category: string; hierarchy: string }>();
     // Get the category from the previous screen
-    const { category, hierarchy } = useLocalSearchParams<{ category: string; hierarchy: string }>();
     const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
-    console.log("SubFolderScreenCat", category);
-
-    useEffect(() => {
+    
+ 
+    useFocusEffect(
+      useCallback(() => {
         let deserializedHierarchy: Record<string, any>;
         try {
-        deserializedHierarchy = JSON.parse(hierarchy);
+          if (hierarchy === null) {
+          deserializedHierarchy = JSON.parse(localHierarchy);
+          } else {
+            deserializedHierarchy = JSON.parse(hierarchy);
+          }
+        } catch (error) {
+          // hierarchy is not a valid JSON string, render FilesScreen instead
+          console.log("Hierarchy Failed");
+          setIsFileScreen(true); 
+          return;
         }
-        catch (error) {
-        // hierarchy is not a valid JSON string, render FilesScreen instead
-        console.log("Hieracrchy Failed");
-            setIsFileScreen(true); 
-            return;
-            }
         if (deserializedHierarchy === null) {
-            console.log("Hierarchy is null");
-            setIsFileScreen(true);
-            return;
+          console.log("Hierarchy is null");
+          setIsFileScreen(true);
+          return;
         }
-      const subcategories = buildCategoryList(deserializedHierarchy, category).map((subcategory, index): SubCategory => ({
-        title: subcategory,
-        key: index.toString(), // Convert index to string if key is expected to be a string
-        image: placeholderImage,
-        parents: deserializedHierarchy[index], // Add logic for getting parents if needed
-      }));
-       const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {
-        if (unique.findIndex(item => item.title === subcategory.title) === -1) {
-            unique.push(subcategory);
-        }
-        return unique;
-        }, [] as SubCategory[]);
-  
-    setSubCategories(uniqueSubcategories);
-    setDeserializedHierarchy(deserializedHierarchy);
-    console.log("SubFolderScreenUniqSubCat", uniqueSubcategories);
-    if(uniqueSubcategories.length === 0) { // Check the flag here
-        console.log("FIlESCREEN", category);
-        router.push(`./FilesScreen?category=${category}`);
-      }
-  }, [category]);
+        let subcategories: SubCategory[] = [];
 
+        console.log("parent", parent);
+
+        if (parent !== null) {
+          subcategories = buildCategoryList(deserializedHierarchy, parent).map((subcategory, index): SubCategory => ({
+            title: subcategory,
+            key: index.toString(), // Convert index to string if key is expected to be a string
+            image: placeholderImage,
+            parents: deserializedHierarchy[index], // Add logic for getting parents if needed
+          }));
+        } else {
+          subcategories = buildCategoryList(deserializedHierarchy, category).map((subcategory, index): SubCategory => ({
+            title: subcategory,
+            key: index.toString(), // Convert index to string if key is expected to be a string
+            image: placeholderImage,
+            parents: deserializedHierarchy[index], // Add logic for getting parents if needed
+          }));
+        }
+        const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {
+          if (unique.findIndex(item => item.title === subcategory.title) === -1) {
+            unique.push(subcategory);
+          }
+          return unique;
+        }, [] as SubCategory[]);
+    
+        setSubCategories(uniqueSubcategories);
+        setDeserializedHierarchy(deserializedHierarchy);
+        console.log("SubFolderScreenUniqSubCat", uniqueSubcategories);
+        console.log("SubFolderScreenPreviousRoute", previousRoute);
+        if(uniqueSubcategories.length === 0) {
+          if (justVisitedFilesScreen.current) {
+            justVisitedFilesScreen.current = false;
+          } else {
+            console.log("FIlESCREEN", category);
+            if (hierarchy !== null) {
+              AsyncStorage.setItem('hierarchy', hierarchy); // Store hierarchy
+            } // Store hierarchy
+  
+            router.push(`./FilesScreen?category=${category}`);
+          }
+        }else {
+          if (category !== null) {
+            AsyncStorage.setItem('parent', category); // Store category
+          }
+        }
+      }, [category, parent, hierarchy, localHierarchy])
+    );
+    
+    useEffect(() => {
+      if (previousRoute === 'FilesScreen') {
+        justVisitedFilesScreen.current = true;
+        // Retrieve hierarchy from AsyncStorage when navigating back from FilesScreen
+        AsyncStorage.getItem('hierarchy').then(storedHierarchy => {
+          if (storedHierarchy) {
+            setHierarchy(storedHierarchy);
+          }
+        });
+        AsyncStorage.getItem('parent').then(storedParent => {
+          if (storedParent) {
+            setParent(storedParent);
+          }
+        });
+        console.log("FilesScreen was PrevRoute");
+      } else {
+        // Use hierarchy from useLocalSearchParams otherwise
+        setHierarchy(localHierarchy);
+        console.log("SubFolderScreenCat", category);
+      }
+    }, [previousRoute, localHierarchy]); // Add localHierarchy and category to the dependencies
 
 
   const renderItem = ({ item }: { item: SubCategory }) => (
