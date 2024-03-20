@@ -20,7 +20,7 @@ const TravelScreen = () => {
   const [text, setText] = useState('');
   const [date, setDate] = useState('');
   const [currentDoc, setCurrentDoc] = useState(null);
-  const [atFirstDoc, setAtFirstDoc] = useState(false);
+  const [atFirstDoc, setAtFirstDoc] = useState(true);
   const [atLastDoc, setAtLastDoc] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,6 +47,7 @@ const TravelScreen = () => {
 
   const handleNextText = async () => {
     const db = getFirestore();
+    setAtFirstDoc(false);
     if (currentDoc) {
       const currentDate = currentDoc.data().date;
       console.log("currentDate", currentDate);
@@ -69,7 +70,17 @@ const TravelScreen = () => {
         setCurrentDoc(nextQuerySnapshot.docs[0]);
       }
   
-      if (nextQuerySnapshot.empty) {
+      // Check if the current document is the last one
+
+      const nextNextQuery = query(
+        collection(db, 'travel-schedule'),
+        where('date', '>', currentDoc.data().date),  
+        orderBy('date', 'desc'), 
+      );
+ 
+      const querySnapshot = await getDocs(nextNextQuery)
+
+      if (querySnapshot.docs.length < 1) {
         setAtLastDoc(true);
       } else {
         setAtLastDoc(false);
@@ -79,6 +90,7 @@ const TravelScreen = () => {
   
     const handlePreviousText = async () => {
       const db = getFirestore();
+      setAtLastDoc(false);
       if (currentDoc) {
         const currentTimestamp = currentDoc.data().processed;
         console.log("currentTimestamp", currentTimestamp);
@@ -101,7 +113,15 @@ const TravelScreen = () => {
           setCurrentDoc(prevQuerySnapshot.docs[0]);
         }
     
-        if (prevQuerySnapshot.empty) {
+        const nextPrevQuery = query(
+          collection(db, 'travel-schedule'),
+          where('date', '<', currentDoc.data().date),  
+          orderBy('date', 'desc'), 
+        );
+   
+        const querySnapshot = await getDocs(nextPrevQuery)
+  
+        if (querySnapshot.docs.length < 1) {
           setAtFirstDoc(true);
         } else {
           setAtFirstDoc(false);
@@ -121,17 +141,21 @@ const TravelScreen = () => {
           <Text style={styles.textText}>{text}</Text>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
-        {!atFirstDoc && (
-          <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-            <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
-          </TouchableOpacity>
-        )}
-        {!atLastDoc && (
-          <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-            <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
-          </TouchableOpacity>
-        )}
-        </View>
+            <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+              {!atFirstDoc && (
+                <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
+                  <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+              {!atLastDoc && (
+                <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
+                  <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
       </ScrollView>
     );
 };
