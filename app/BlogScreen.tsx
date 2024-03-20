@@ -26,6 +26,8 @@ const BlogScreen = () => {
   const [currentDoc, setCurrentDoc] = useState(null);
   const scrollViewRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [atFirstDoc, setAtFirstDoc] = useState(true);
+  const [atLastDoc, setAtLastDoc] = useState(false);
 
 
   useEffect(() => {
@@ -50,6 +52,7 @@ const BlogScreen = () => {
   const handleNextText = async () => {
     const db = getFirestore();
     if (currentDoc) {
+      setAtFirstDoc(false);
       const currentTimestamp = currentDoc.data().date;
       console.log("currentTimestamp", currentTimestamp);
       const nextQuery = query(
@@ -60,15 +63,34 @@ const BlogScreen = () => {
       );
       const nextQuerySnapshot = await getDocs(nextQuery);
   
+      let currentDocAfter = currentDoc;
       nextQuerySnapshot.forEach((doc) => {
         // Assuming doc.data() returns an object with text, date, and title
         setText(doc.data().text);
         setDate(doc.data().date);
         setTitle(doc.data().title);
         console.log("currentDoc", doc.data().date);
+        setCurrentDoc(doc);
+        currentDocAfter = doc;
       });
   
-      setCurrentDoc(nextQuerySnapshot.docs[0]);
+
+
+      // Check if the current document is the last one
+      console.log("currentDocAfter", currentDocAfter);
+      const nextNextQuery = query(
+        collection(db, 'blog'),
+        where('date', '<', currentDocAfter.data().date),  
+        orderBy('date', 'desc'), 
+      );
+ 
+      const querySnapshot = await getDocs(nextNextQuery)
+
+      if (querySnapshot.docs.length < 1) {
+        setAtLastDoc(true);
+      } else {
+        setAtLastDoc(false);
+      }
     }
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
@@ -76,6 +98,7 @@ const BlogScreen = () => {
 const handlePreviousText = async () => {
   const db = getFirestore();
   if (currentDoc) {
+    setAtLastDoc(false);
     const currentTimestamp = currentDoc.data().date;
     console.log("currentTimestamp", currentTimestamp);
     const nextQuery = query(
@@ -85,16 +108,31 @@ const handlePreviousText = async () => {
       limit(1)
     );
     const nextQuerySnapshot = await getDocs(nextQuery);
-
+    let currentDocAfter = currentDoc;
     nextQuerySnapshot.forEach((doc) => {
       // Assuming doc.data() returns an object with text, date, and title
       setText(doc.data().text);
       setDate(doc.data().date);
       setTitle(doc.data().title);
       console.log("currentDoc", doc.data().date);
+      currentDocAfter = doc;
     });
 
     setCurrentDoc(nextQuerySnapshot.docs[0]);
+
+    const nextPrevQuery = query(
+      collection(db, 'blog'),
+      where('date', '>', currentDocAfter.data().date),  
+      orderBy('date', 'asc'), 
+    );
+
+    const querySnapshot = await getDocs(nextPrevQuery)
+
+    if (querySnapshot.docs.length < 1) {
+      setAtFirstDoc(true);
+    } else {
+      setAtFirstDoc(false);
+    }
   }
   scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 };
@@ -112,13 +150,21 @@ if (isLoading) {
         <Text style={styles.blogEntryText}>{text}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
-      <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-        <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-        <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
-      </TouchableOpacity>
-      </View>
+            <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+              {!atFirstDoc && (
+                <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
+                  <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+              {!atLastDoc && (
+                <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
+                  <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
     </ScrollView>
   );
 };
