@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated,
-  ScrollView, Image, Dimensions, ActivityIndicator} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, 
+  ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import Swiper from 'react-native-swiper';
 
@@ -59,6 +59,7 @@ const BlogScreen = () => {
         </ScrollView>
       ))}
     </Swiper>
+
   );
 };
 
