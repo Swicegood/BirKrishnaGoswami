@@ -105,6 +105,7 @@ interface SubCategory {
         if(uniqueSubcategories.length === 0) {
           if (justVisitedFilesScreen.current) {
             justVisitedFilesScreen.current = false;
+            router.back();
           } else {
             console.log("FIlESCREEN", category);
             if (hierarchy !== null) {
