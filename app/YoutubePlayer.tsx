@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, Platform, ActivityIndicator } from 'react-native';
-import * as ScreenOrientation from 'expo-screen-orientation';import YoutubePlayer from 'react-native-youtube-iframe';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import { useLocalSearchParams } from 'expo-router';
 import { isLoading } from 'expo-font';
 

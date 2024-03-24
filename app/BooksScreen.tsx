@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image,
+import { View, Text, StyleSheet, Image, ScrollView,
    SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
 
@@ -7,24 +7,15 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const BooksScreen: React.FC = () => {
-  // Navigation function or hook should be implemented based on your navigation setup
-  const navigateToYearwise = () => {
-    // Navigation logic to 'Yearwise' screen
-  };
-
-  const navigateToBookwise = () => {
-    // Navigation logic to 'Bookwise' screen
-  };
-
 
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: windowWidth, alignSelf: 'center' }} />
         <View style={styles.content}>
           <Link href="./PurchaseScreen" asChild>
-          <TouchableOpacity style={styles.card} onPress={navigateToYearwise}>
+          <TouchableOpacity style={styles.card}>
             <Image
               source={require('../assets/images/placeholder_355_200.png')}
               resizeMode="cover"
@@ -44,7 +35,7 @@ const BooksScreen: React.FC = () => {
             </TouchableOpacity>
           </Link>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

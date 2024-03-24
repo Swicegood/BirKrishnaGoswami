@@ -3,7 +3,7 @@ import { Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-nativ
 import { Link } from 'expo-router';
 import { getAllImageFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 // Function to split array into chunks
 const chunkArray = (myArray, chunk_size) => {
@@ -21,11 +21,29 @@ const chunkArray = (myArray, chunk_size) => {
   
 const screenWidth = Dimensions.get('window').width;
 
-
 const GalleryComponent = () => {
   const [initialImage] = useState(0);
 
   const [images, setImages] = useState([]);
+  const [numColumns, setNumColumns] = useState(getOrientation());
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', onChange);
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  function getOrientation() {
+    const { width, height } = Dimensions.get('window');
+    return width > height ? 4 : 2;
+  }
+
+  function onChange() {
+    setNumColumns(getOrientation());
+  }
+
+
   useEffect(() => {
     getAllImageFiles().then((data) => {
       setImages(data);
@@ -39,7 +57,8 @@ const GalleryComponent = () => {
   return (
     <FlatList
       data={imageChunks}
-      numColumns={2}
+      numColumns={numColumns}
+      key={numColumns} // Add this line
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item, index }) => (
         <Link href={ {pathname: "./GalleryScreen", params: {imageChunk: item}} }asChild>
