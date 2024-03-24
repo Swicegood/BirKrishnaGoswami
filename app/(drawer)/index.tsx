@@ -16,7 +16,8 @@ import { useState, forwardRef, useEffect } from 'react';
 import { Link } from 'expo-router';
 import { collection, getFirestore, query, getDocs } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
-
+import * as ScreenOrientation from 'expo-screen-orientation';
+import Orientation from 'react-native-orientation-locker';
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png') },
@@ -42,7 +43,17 @@ export default function TabOneScireen() {
   const [activeSlide, setActiveSlide] = useState(0); // Add this state variable
   const [whatsAppUrl, setWhatsAppUrl] = useState('https://chat.whatsapp.com/FaPXfrT3qBLBSxd04TZr9X');
   const expoPushToken = NotificationHandler();
+  const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
 
+  useEffect(() => {
+    const subscription = ScreenOrientation.addOrientationChangeListener(({ orientationInfo }) => {
+      setOrientation(orientationInfo.orientation);
+    });
+  
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     const fetchWhatsAppUrl = async () => {
@@ -58,11 +69,14 @@ export default function TabOneScireen() {
     fetchWhatsAppUrl();
   }, []);
 
+
   return (
     <>
     <SafeAreaView style={styles.safeArea}>
 
     <View style={styles.carousel}>
+    {orientation === ScreenOrientation.Orientation.PORTRAIT_UP && (
+          <>
       <Carousel
               data={ENTRIES}
               renderItem={renderItem}
@@ -90,6 +104,8 @@ export default function TabOneScireen() {
               inactiveDotOpacity={0.4}
               inactiveDotScale={0.6}
             />
+            </>
+          )}
       </View>
 
      <ScrollView style={styles.container}>

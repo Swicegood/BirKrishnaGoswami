@@ -1,8 +1,7 @@
-import React from 'react';
-import { FlatList, Image, TouchableOpacity, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-
 
 const GalleryComponent = () => {
   const { imageChunk } = useLocalSearchParams<{ imageChunk: string }>();
@@ -10,13 +9,31 @@ const GalleryComponent = () => {
   // Split the string into an array of strings
   const images = imageChunk.split(',');
 
-  console.log("images4", images[4]); 
+  const [numColumns, setNumColumns] = useState(getOrientation());
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', onChange);
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  function getOrientation() {
+    const { width, height } = Dimensions.get('window');
+    return width > height ? 8 : 4;
+  }
+
+  function onChange() {
+    setNumColumns(getOrientation());
+  }
 
   return (
     <FlatList
       data={images}
-      numColumns={4}
+      numColumns={numColumns}
+      key={numColumns} // Add this line
       keyExtractor={(item, index) => index.toString()}
+      contentContainerStyle={{ justifyContent: 'center' }}
       renderItem={({ item, index }) => (
         <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: images}}} asChild>
           <TouchableOpacity style={{ padding: 2}}>
@@ -27,4 +44,5 @@ const GalleryComponent = () => {
     />
   );
 };
+
 export default GalleryComponent;
