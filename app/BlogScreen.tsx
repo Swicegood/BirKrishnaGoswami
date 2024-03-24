@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, 
-  ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated,
+  ScrollView, Image, Dimensions, ActivityIndicator} from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import Swiper from 'react-native-swiper';
+
+
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -20,154 +23,45 @@ function formatDate(dateString) {
 }
 
 const BlogScreen = () => {
-  const [text, setText] = useState('');
-  const [date, setDate] = useState('');
-  const [title, setTitle] = useState('');
-  const [currentDoc, setCurrentDoc] = useState(null);
-  const scrollViewRef = useRef(null);
+  const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [atFirstDoc, setAtFirstDoc] = useState(true);
-  const [atLastDoc, setAtLastDoc] = useState(false);
-
 
   useEffect(() => {
-    const fetchBlogEntry = async () => {
-      const db = getFirestore();
-      const q = query(collection(db, 'blog'), orderBy('date', 'desc'), limit(1));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and category
-        setText(doc.data().text);
-        setDate(doc.data().date);
-        setTitle(doc.data().title);
-        // Store the current document in the state variable
-        setCurrentDoc(doc);
+    const fetchBlogEntries = async () => {
+      try {
+        const db = getFirestore();
+        const q = query(collection(db, 'blog'), orderBy('date', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const posts = querySnapshot.docs.map(doc => doc.data());
+        setPosts(posts);
         setIsLoading(false);
-      });
+      } catch (error) {
+        console.error('Error fetching blog entries:', error);
+      }
     };
-
-    fetchBlogEntry();
+  
+    fetchBlogEntries();
   }, []);
 
-  const handleNextText = async () => {
-    const db = getFirestore();
-    if (currentDoc) {
-      setAtFirstDoc(false);
-      const currentTimestamp = currentDoc.data().date;
-      console.log("currentTimestamp", currentTimestamp);
-      const nextQuery = query(
-        collection(db, 'blog'), 
-        where('date', '<', currentTimestamp), 
-        orderBy('date', 'desc'), 
-        limit(1)
-      );
-      const nextQuerySnapshot = await getDocs(nextQuery);
-  
-      let currentDocAfter = currentDoc;
-      nextQuerySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and title
-        setText(doc.data().text);
-        setDate(doc.data().date);
-        setTitle(doc.data().title);
-        console.log("currentDoc", doc.data().date);
-        setCurrentDoc(doc);
-        currentDocAfter = doc;
-      });
-  
-
-
-      // Check if the current document is the last one
-      console.log("currentDocAfter", currentDocAfter);
-      const nextNextQuery = query(
-        collection(db, 'blog'),
-        where('date', '<', currentDocAfter.data().date),  
-        orderBy('date', 'desc'), 
-      );
- 
-      const querySnapshot = await getDocs(nextNextQuery)
-
-      if (querySnapshot.docs.length < 1) {
-        setAtLastDoc(true);
-      } else {
-        setAtLastDoc(false);
-      }
-    }
-    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-  };
-
-const handlePreviousText = async () => {
-  const db = getFirestore();
-  if (currentDoc) {
-    setAtLastDoc(false);
-    const currentTimestamp = currentDoc.data().date;
-    console.log("currentTimestamp", currentTimestamp);
-    const nextQuery = query(
-      collection(db, 'blog'), 
-      where('date', '>', currentTimestamp), 
-      orderBy('date', 'asc'), 
-      limit(1)
-    );
-    const nextQuerySnapshot = await getDocs(nextQuery);
-    let currentDocAfter = currentDoc;
-    nextQuerySnapshot.forEach((doc) => {
-      // Assuming doc.data() returns an object with text, date, and title
-      setText(doc.data().text);
-      setDate(doc.data().date);
-      setTitle(doc.data().title);
-      console.log("currentDoc", doc.data().date);
-      currentDocAfter = doc;
-    });
-
-    setCurrentDoc(nextQuerySnapshot.docs[0]);
-
-    const nextPrevQuery = query(
-      collection(db, 'blog'),
-      where('date', '>', currentDocAfter.data().date),  
-      orderBy('date', 'asc'), 
-    );
-
-    const querySnapshot = await getDocs(nextPrevQuery)
-
-    if (querySnapshot.docs.length < 1) {
-      setAtFirstDoc(true);
-    } else {
-      setAtFirstDoc(false);
-    }
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
   }
-  scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-};
-
-if (isLoading) {
-  return <ActivityIndicator size="large" color="#0000ff" />;
-}
 
   return (
-    <ScrollView ref={scrollViewRef} style={styles.container}>
-      <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
-      <View style={styles.content}>
-        <Text style={styles.date}>{formatDate(date)}</Text>
-        <Text style={styles.title}>{title.toUpperCase()}</Text>
-        <Text style={styles.blogEntryText}>{text}</Text>
-      </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
-            <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
-              {!atFirstDoc && (
-                <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-                  <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View style={{ flex: !atLastDoc ? 0 : 0 }}>
-              {!atLastDoc && (
-                <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-                  <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-    </ScrollView>
+    <Swiper loop={false}>
+      {posts.map((post, index) => (
+        <ScrollView style={styles.container} key={index}>
+           <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+     
+           <Text style={styles.date}>{formatDate(post.date)}</Text>
+           <Text style={styles.title}>{post.title.toUpperCase()}</Text>
+           <Text style={styles.blogEntryText}>{post.text}</Text>
+        </ScrollView>
+      ))}
+    </Swiper>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
