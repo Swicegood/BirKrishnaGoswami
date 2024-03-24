@@ -1,23 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, 
+  SafeAreaView, Dimensions, ScrollView} from 'react-native';
 import { Link } from 'expo-router';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const AudioScreen: React.FC = () => {
-  // Navigation function or hook should be implemented based on your navigation setup
-  const navigateToYearwise = () => {
-    // Navigation logic to 'Yearwise' screen
-  };
 
-  const navigateToBookwise = () => {
-    // Navigation logic to 'Bookwise' screen
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Audio Lectures</Text>
         </View>
@@ -43,7 +37,7 @@ const AudioScreen: React.FC = () => {
             </TouchableOpacity>
           </Link>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
