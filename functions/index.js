@@ -144,6 +144,7 @@ admin.initializeApp();
 
 exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) => {
   // Check if this is a subscription verification request
+  const {getFirestore, collection, getDocs} = require("firebase/firestore");
   if (req.query['hub.mode'] === 'subscribe' && req.query['hub.challenge']) {
     // Respond with the hub.challenge value to verify the subscription
     const challenge = req.query['hub.challenge'];
@@ -200,8 +201,10 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
   * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
   */
   async function getUserTokens() {
-    // Fetch tokens from your database. This is just a good placeholder.
-    // Replace this with your actual code to fetch tokens.
-    return ['ExponentPushToken[-RFVv5Cyl8v14P9aAE_2uh]'];
+    const db = getFirestore();
+    const tokensCollection = collection(db, 'push-tokens');
+    const snapshot = await getDocs(tokensCollection);
+    const tokens = snapshot.docs.map((doc) => doc.data().token);
+    return tokens;
   }
 });

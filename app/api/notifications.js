@@ -4,6 +4,7 @@ import { Text, View, Button, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { doc, getDoc, setDoc, getFirestore } from 'firebase/firestore';
 
 
 export default function NotificationHandler() {
@@ -105,6 +106,23 @@ async function registerForPushNotificationsAsync() {
     token = (await Notifications.getExpoPushTokenAsync({ projectId: Constants.expoConfig.extra.eas.projectId })).data;
     console.log(Constants.expoConfig.extra.eas.projectId);
     console.log(token);
+
+     // Check if token exists in Firestore
+     try {
+      db = getFirestore();
+      const tokenDoc = doc(db, 'push-tokens', token);
+      const tokenSnapshot = await getDoc(tokenDoc);
+    
+      // If it doesn't exist, add it
+      if (!tokenSnapshot.exists()) {
+        await setDoc(tokenDoc, { token });
+        console.log('Token added to Firestore', tokenDoc.id);
+      } else {
+        console.log('Token already exists in Firestore');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+    }
   } else {
     alert('Must use physical device for Push Notifications');
   }

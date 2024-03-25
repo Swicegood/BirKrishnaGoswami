@@ -17,7 +17,6 @@ import { Link } from 'expo-router';
 import { collection, getFirestore, query, getDocs } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import Orientation from 'react-native-orientation-locker';
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png') },
