@@ -3,7 +3,6 @@ import { View, StyleSheet, Dimensions, Platform, ActivityIndicator } from 'react
 import * as ScreenOrientation from 'expo-screen-orientation';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { useLocalSearchParams } from 'expo-router';
-import { isLoading } from 'expo-font';
 
 const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 

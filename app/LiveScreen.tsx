@@ -2,13 +2,15 @@
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
 import { initializeApp, getApp } from 'firebase/app';
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
 import React, { useEffect, useState } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { Image, Text, Dimensions, StyleSheet } from 'react-native';
+import { Image, Text, Dimensions, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { View } from '../components/Themed';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
+const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -51,7 +53,55 @@ interface FirebaseFunctionError {
     const [video, setVideo] = useState<GetYouTubeVideosResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const functions = getFunctions(getApp());
+    const [isLoading, setIsLoading] = useState(true);
+    const [videoHeight, setVideoHeight] = useState(Dimensions.get('window').width * 9 / 16); // initialize with a number
+    const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number
   
+    useEffect(() => {
+      getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
+      getVideoWidth().then(setVideoWidth); // set the initial width when the component mounts
+  
+      ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
+  
+      return () => {
+        ScreenOrientation.removeOrientationChangeListener(handleOrientationChange);
+      };
+    }, []);
+  
+    function handleOrientationChange() {
+      getVideoHeight().then(setVideoHeight);
+      getVideoWidth().then(setVideoWidth);
+    }
+  
+    async function getVideoHeight() {
+      const orientation = await ScreenOrientation.getOrientationAsync();
+      const screenWidth = Dimensions.get('window').width;
+      const screenHeight = Dimensions.get('window').height;
+  
+      if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+        // In portrait mode, set height based on screen width and aspect ratio
+        return screenWidth * 9 / 16;
+      } else {
+        // In landscape mode, set height to screen height
+        return screenHeight - NAVBAR_HEIGHT;
+      }
+    }
+  
+    async function getVideoWidth() {
+      const orientation = await ScreenOrientation.getOrientationAsync();
+      const screenWidth = Dimensions.get('window').width;
+      const screenHeight = Dimensions.get('window').height;
+  
+      if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+        // In portrait mode, set height based on screen width and aspect ratio
+        return screenWidth;
+      } else {
+        // In landscape mode, set height to screen height
+        return (screenHeight - NAVBAR_HEIGHT )* 16 / 9;
+      }
+    }
+  
+
     useEffect(() => {
       const fetchVideos = async () => {
         const getLiveVideo = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getLiveVideo');
@@ -90,11 +140,16 @@ interface FirebaseFunctionError {
 
     return (
       <View style={styles.textContainer}>
+      <View style={styles.centeredContent}>
       <YoutubePlayer
-        height={300} // Adjust based on your needs
-        play={true} // If you want the video to start playing as soon as it loads, set this to true
+        height={videoHeight} // Await the getVideoHeight() function to get the actual height value
+        width={videoWidth}
+        play={true}
         videoId={video}
+        onReady={() => setIsLoading(false)}
       />
+      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+      </View>
     </View>
     );
   };
@@ -103,6 +158,11 @@ interface FirebaseFunctionError {
     textContainer: {
       flex: 1,
       justifyContent: 'center',
+    },
+    centeredContent: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   });
   
