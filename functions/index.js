@@ -144,7 +144,6 @@ admin.initializeApp();
 
 exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) => {
   // Check if this is a subscription verification request
-  const {getFirestore, collection, getDocs} = require("firebase/firestore");
   if (req.query['hub.mode'] === 'subscribe' && req.query['hub.challenge']) {
     // Respond with the hub.challenge value to verify the subscription
     const challenge = req.query['hub.challenge'];
@@ -158,42 +157,67 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
     // Respond to indicate successful receipt of the notification
     res.status(200).send('OK');
 
+    // Log the entire request body
+    const xml2js = require('xml2js');
 
-    // Parse the request body to obtain the video ID  and other intersting info from the notification from YouTube
-    const videoId = req.body.videoId;
-    const videoTitle = req.body.videoTitle;
-    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    console.log(`New video: ${videoTitle} at ${videoUrl}`);
-
-
-    const userTokens = await getUserTokens();
-
-    // Send a message to each user token.
-    const {Expo} = require('expo-server-sdk');
-
-    // Create a new Expo SDK client
-    const expo = new Expo();
-
-    userTokens.forEach(async (token) => {
-      if (!Expo.isExpoPushToken(token)) {
-        console.error(`Push token ${token} is not a valid Expo push token`);
+    // Convert the Buffer to a string and parse the XML
+    xml2js.parseString(req.body.toString(), (err, result) => {
+      if (err) {
+        console.error('Failed to parse XML:', err);
         return;
       }
 
-      const message = {
-        to: token,
-        sound: 'default',
-        title: 'New Video Posted',
-        body: `A new video has been posted on BKGoswami YouTube entitled ${videoTitle}.`,
-        data: {link: videoUrl},
-      };
+      console.log('Parsed XML:', result);
 
-      try {
-        const ticket = await expo.sendPushNotificationsAsync([message]);
-        console.log(ticket);
-      } catch (error) {
-        console.error(`Failed to send push notification: ${error}`);
+      // Extract the video ID and other interesting info from the parsed XML
+      const videoId = result.feed.entry[0]['yt:videoId'][0];
+      const videoTitle = result.feed.entry[0]['title'][0];
+      const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      console.log(`New video: ${videoTitle} at ${videoUrl}`);
+
+      /**
+       * Retrieves user tokens.
+       *
+       * @async
+       * @function getUserTokens
+       * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
+       */
+      async function handleNotification() {
+        // Get Expo SDK
+        const {Expo} = require('expo-server-sdk');
+
+        // Get user tokens
+        const userTokens = await getUserTokens();
+
+        // Create an array of promises
+        const notifications = userTokens.map(async (token) => {
+          if (!Expo.isExpoPushToken(token)) {
+            console.error(`Push token ${token} is not a valid Expo push token`);
+            return;
+          }
+
+          const message = {
+            to: token,
+            sound: 'default',
+            title: 'New Video Posted',
+            body: `A new video has been posted on BKGoswami YouTube entitled ${videoTitle}.`,
+            data: {link: videoUrl},
+          };
+          // Create a new Expo SDK client
+          const expo = new Expo();
+
+          // Send the notification
+          try {
+            const ticket = await expo.sendPushNotificationsAsync([message]);
+            console.log(ticket);
+          } catch (error) {
+            console.error(`Failed to send push notification: ${error}`);
+          }
+        });
+        // Wait for all notifications to be sent
+        await Promise.all(notifications);
       }
+      handleNotification();
     });
   }
   /**
@@ -201,9 +225,9 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
   * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
   */
   async function getUserTokens() {
-    const db = getFirestore();
-    const tokensCollection = collection(db, 'push-tokens');
-    const snapshot = await getDocs(tokensCollection);
+    const db = admin.firestore();
+    const tokensCollection = db.collection('push-tokens');
+    const snapshot = await tokensCollection.get();
     const tokens = snapshot.docs.map((doc) => doc.data().token);
     return tokens;
   }
