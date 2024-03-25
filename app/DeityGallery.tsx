@@ -3,7 +3,7 @@ import { Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-nativ
 import { Link } from 'expo-router';
 import { getAllDeityFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-import * as ScreenOrientation from 'expo-screen-orientation';
+
 
 // Function to split array into chunks
 const chunkArray = (myArray, chunk_size) => {
@@ -24,8 +24,9 @@ const screenWidth = Dimensions.get('window').width;
 
 const GalleryComponent = () => {
   const [initialImage] = useState(0);
-  const [images, setImages] = useState([]);
   const [numColumns, setNumColumns] = useState(getOrientation());
+  const placeholderImages = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images
+  const [images, setImages] = useState(placeholderImages); // Set the initial state to the placeholder images
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', onChange);
@@ -43,7 +44,12 @@ const GalleryComponent = () => {
     setNumColumns(getOrientation());
   }
 
-
+useEffect(() => {
+    getAllDeityFiles().then((data) => {
+      setImages(data.length ? data : placeholderImages); // If data is fetched, set images to data. Otherwise, keep the placeholder images.
+    });
+  }
+, []);
 
   useEffect(() => {
     getAllDeityFiles().then((data) => {
@@ -51,13 +57,10 @@ const GalleryComponent = () => {
     });
   }, []);
 
-  // Split images into chunks of 15
-  const imageChunks = chunkArray(images, 2);
-
-  console.log("imageChunks", imageChunks[1]);
+ 
   return (
     <FlatList
-      data={imageChunks}
+      data={chunkArray(images, 15)}
       numColumns={numColumns}
       key={numColumns} // Add this line
       keyExtractor={(item, index) => index.toString()}

@@ -22,9 +22,8 @@ const chunkArray = (myArray, chunk_size) => {
 const screenWidth = Dimensions.get('window').width;
 
 const GalleryComponent = () => {
-  const [initialImage] = useState(0);
-
-  const [images, setImages] = useState([]);
+  const placeholderImages = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images
+  const [images, setImages] = useState(placeholderImages); // Set the initial state to the placeholder images
   const [numColumns, setNumColumns] = useState(getOrientation());
 
   useEffect(() => {
@@ -32,6 +31,12 @@ const GalleryComponent = () => {
     return () => {
       subscription.remove();
     };
+  }, []);
+
+  useEffect(() => {
+    getAllImageFiles().then((data) => {
+      setImages(data.length ? data : placeholderImages); // If data is fetched, set images to data. Otherwise, keep the placeholder images.
+    });
   }, []);
 
   function getOrientation() {
@@ -50,13 +55,10 @@ const GalleryComponent = () => {
     });
   }, []);
 
-  
   // Split images into chunks of 15
-  const imageChunks = chunkArray(images, 15);
-
   return (
     <FlatList
-      data={imageChunks}
+      data={chunkArray(images, 15)}
       numColumns={numColumns}
       key={numColumns} // Add this line
       keyExtractor={(item, index) => index.toString()}

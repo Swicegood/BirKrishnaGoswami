@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Link } from 'expo-router';
-import { getAllTempleFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 import { collection, getFirestore, query, orderBy, limit, getDocs, where, addDoc } from "firebase/firestore";
 
@@ -10,6 +9,8 @@ const screenWidth = Dimensions.get('window').width;
 
 
 const GalleryComponent = () => {
+  const placeholderImages = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images
+  const [images, setImages] = useState(placeholderImages); // Set the initial state to the placeholder images
 
   type ImageItem = {
     url: string;
@@ -17,8 +18,8 @@ const GalleryComponent = () => {
     location: string;
   };
   
-  const [images, setImages] = useState<ImageItem[]>([]);
   const [initialImage] = useState(0);
+
 
   useEffect(() => {
     const db = getFirestore();
