@@ -193,7 +193,7 @@ export default function TabOneScireen() {
                 <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
               </TouchableOpacity>
         </Link>
-          <Link href="./RecentVideosScreen" asChild>
+          <Link href="./(tabs)/RecentUploads" asChild>
             <TouchableOpacity style={styles.buttonContainer}> 
                 <Image
                   source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image

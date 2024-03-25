@@ -58,12 +58,12 @@ const functions = getFunctions(getApp());
 useEffect(() => {
   setVideos([]); // Clear the videos stateß
   const fetchVideos = async () => {
-    const getYouTubeVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubeVideos');
+    const getYouTubePlaylistVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubeVideos');
 
     // Use the interface for the request
     const request: GetYouTubeVideosRequest = { playlistId: id };
 
-    getYouTubeVideos(request)
+    getYouTubePlaylistVideos(request)
       .then((result: { data: GetYouTubeVideosResponse }) => {
         // Use the interface for the response
         const response: GetYouTubeVideosResponse = result.data;
