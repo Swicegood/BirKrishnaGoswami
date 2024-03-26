@@ -232,3 +232,32 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
     return tokens;
   }
 });
+
+const qs = require('qs');
+
+exports.subscribeToPubSub = functions.https.onRequest(async (req, res) => {
+  console.log('Attempt Subscribing to PubSub');
+  const data = {
+    'hub.mode': 'subscribe',
+    'hub.topic': 'https://www.youtube.com/feeds/videos.xml?channel_id=UCLiuTwQ-ap30PbKzprrN2Hg',
+    'hub.callback': 'https://us-central1-birkrishnagoswami-b7360.cloudfunctions.net/handleYouTubeNotification',
+    'hub.verify': 'sync',
+    'hub.lease_seconds': '864000',
+  };
+
+  try {
+    const response = await axios.post('https://pubsubhubbub.appspot.com/subscribe', qs.stringify(data), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    console.log(`Status: ${response.status}`);
+    console.log('Headers: ', response.headers);
+    console.log('Data: ', response.data);
+    res.status(200).send('Subscribed to PubSub');
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    console.error(error.stack);
+    res.status(500).send(`An error occurred while subscribing to PubSub: ${error.message}`);
+  }
+});
