@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAllFiles } from '../app/api/apiWrapper';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
-
+import { getDocs, query, where, collection, getFirestore } from 'firebase/firestore';
 
 
 interface File {
@@ -45,9 +45,24 @@ const FilesScreen = () => {
         return { ...file, category: parentFolder };
       });
   
+      // add dates from matched urls from firestore
+
       // Filter files to only include those that belong to the current folder
       const folderFiles = categorizedFiles.filter(file => file.category === category);
-      setFiles(folderFiles);
+
+      const db = getFirestore();
+      const folderFilesWithDate = await Promise.all(folderFiles.map(async file => {
+        let docData;
+        const q = query(collection(db, "audio-tracks"), where("url", "==", file.url));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          docData = querySnapshot.docs[0].data();
+        }
+        return { ...file, date: docData?.freindly_date };
+      }));
+      setFiles(folderFilesWithDate);
+  
+
     })();
   }, []);
 
