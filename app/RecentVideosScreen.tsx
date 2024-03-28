@@ -4,7 +4,7 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
-import { View, FlatList, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import PlaylistItem from '../components/PlaylistItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from 'expo-router'
