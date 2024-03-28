@@ -19,11 +19,11 @@ import NotificationHandler from '../api/notifications';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 const ENTRIES = [
-  { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png') },
-  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
-  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
-  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
-  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png') },
+  { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png'), link: '../QuoteScreen' },
+  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png'), link: './news' },
+  { title: 'Slide 3', image: require('../../assets/images/placeholder_355_200.png'), link: '../PrabhupadaScreen' },
+  { title: 'Slide 4', image: require('../../assets/images/placeholder_355_200.png'), link: '../BooksScreen' },
+  { title: 'Slide 5', image: require('../../assets/images/placeholder_355_200.png'), link: '../EbooksScreen' },
   // Add more entries here
 ];
 
@@ -32,9 +32,11 @@ const windowHeight = Dimensions.get('window').height;
 
 function renderItem({ item, index }: { item: any, index: number }) {
   return (
-    <View style={styles.slide}>
-      <Image source={item.image} style={styles.image} />
-    </View>
+    <Link href={item.link}>
+      <View style={styles.slide}>
+        <Image source={item.image} style={styles.image} />
+      </View>
+    </Link>
   );
 }
 export default function TabOneScireen() {
