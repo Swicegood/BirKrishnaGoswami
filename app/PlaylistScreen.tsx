@@ -2,7 +2,7 @@
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
 import { initializeApp, getApp } from 'firebase/app';
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
 import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import VideoItem from '../components/VideoItem'; // Import the PlaylistItem component
@@ -58,7 +58,7 @@ const functions = getFunctions(getApp());
 useEffect(() => {
   setVideos([]); // Clear the videos stateß
   const fetchVideos = async () => {
-    const getYouTubePlaylistVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubeVideos');
+    const getYouTubePlaylistVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubePlaylistVideos');
 
     // Use the interface for the request
     const request: GetYouTubeVideosRequest = { playlistId: id };

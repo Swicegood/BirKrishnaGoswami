@@ -31,7 +31,7 @@ const PlaylistItem = ({ title, lastModified, thumbnail, id }) => {
 
   return (
     <View style={styles.item}>
-      <Link href={{pathname:'./PlaylistScreen', params: {id: id}}}>
+      <Link href={{pathname:'../PlaylistScreen', params: {id: id}}}>
         <Image style={styles.image} source={{ uri: thumbnail }} />
       </Link>
       <View style={styles.textContainer}>

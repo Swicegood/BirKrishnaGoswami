@@ -5,9 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { Image, Text } from 'react-native';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-const placeholderImage = { source: require('../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'), dimensions: { width: 600, height: 600 } };const PhotosScreen = () => {
+const placeholderImage = { source: require('../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'), dimensions: { width: 600, height: 600 } };
+
+const PhotosScreen = () => {
   const { imagesSlice } = useLocalSearchParams<{ imagesSlice: string }>();
-  const [images, setImages] = useState([]);
+  const imageUrls = imagesSlice.split(',');
+  const [images, setImages] = useState(imageUrls.map(() => placeholderImage));
   const [imageHeight, setImageHeight] = useState(0);
   const [imageWidth, setImageWidth] = useState(0);
 
@@ -21,7 +24,6 @@ const placeholderImage = { source: require('../assets/images/placeholder-podq8ja
       ScreenOrientation.removeOrientationChangeListener(handleOrientationChange);
     };
   }, []);
-
 
   useEffect(() => {
     // Split the string into an array of strings
@@ -95,5 +97,4 @@ const placeholderImage = { source: require('../assets/images/placeholder-podq8ja
     </View>
   );
 };
-
 export default PhotosScreen;

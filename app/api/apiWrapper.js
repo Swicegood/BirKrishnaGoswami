@@ -4,7 +4,7 @@ import { Image } from 'react-native';
 const urls = {
   filesList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_files.txt",
   imageList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_images.txt",
-  deityList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_deities.txt",
+  deityList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/deities300w.txt",
   templeList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_temples.txt"
 }
 

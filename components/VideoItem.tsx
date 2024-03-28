@@ -4,7 +4,7 @@ import { Link } from 'expo-router'
 
 const VideoItem = ({ title, lastModified, thumbnail, id }) => {
   return (
-    <Link href={{pathname: './YoutubePlayer', params:{id: id}}}> {/* This is the link to the PlaylistScreen */}
+    <Link href={{pathname: '/YoutubePlayer', params:{id: id}}}> {/* This is the link to the PlaylistScreen */}
     <View style={styles.item}>
       {/* You would replace require with your dynamic image based on the playlist */}
       <Image style={styles.image} source={{ uri: thumbnail }} />

@@ -27,6 +27,12 @@ const GalleryComponent = () => {
     setNumColumns(getOrientation());
   }
 
+  const originalImagesChunk = (imageUrlArray: string) => {
+    const imageUrls = imageUrlArray.split(',');
+    const originalUrls = imageUrls.map(url => url.replace('300w', 'original'));
+    return originalUrls;
+  };
+
   return (
     <FlatList
       data={images}
@@ -35,7 +41,7 @@ const GalleryComponent = () => {
       keyExtractor={(item, index) => index.toString()}
       contentContainerStyle={{ justifyContent: 'center' }}
       renderItem={({ item, index }) => (
-        <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: images}}} asChild>
+        <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: originalImagesChunk(imageChunk)}}} asChild>
           <TouchableOpacity style={{ padding: 2}}>
             <Image defaultSource={placeholderImage} source={{uri: item}} style={{ width: 100, height: 100 }} />
           </TouchableOpacity>
