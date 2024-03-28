@@ -37,7 +37,7 @@ export default function DrawerLayout() {
       }}
     />
     <Drawer.Screen
-      name="news" // This is the name of the page and must match the url from root
+      name="NewsScreen" // This is the name of the page and must match the url from root
       options={{
         drawerLabel: 'News',
         title: 'News About Gurudeva',
