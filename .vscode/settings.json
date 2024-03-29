@@ -1,6 +1,0 @@
-{
-    "flexigpt.anthropic.apiKey": "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",
-    "flexigpt.anthropic.defaultOrigin": "https://api.anthropic.com/v1/messages",
-    "flexigpt.anthropic.defaultCompletionModel": "claude-3-opus-20240229",
-    "flexigpt.anthropic.defaultChatCompletionModel": "claude-3-opus-20240229"
-}
