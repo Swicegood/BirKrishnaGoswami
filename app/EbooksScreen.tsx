@@ -4,14 +4,18 @@ import { View, Text, StyleSheet, Image, TouchableOpacity,
 import { collection, getFirestore, query, orderBy, getDocs } from "firebase/firestore";
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 import { Link } from 'expo-router';
-import { setParams } from 'expo-router/src/global-state/routing';
 
 const itemWidth = Dimensions.get('screen').width / 2 - 20; // Width of the item 
 const itemHeight = itemWidth * 1.5; // Height of the item
 
-const PurchaseScreen = () => {
+interface EBooksScreenProps {
+  vponly?: boolean;
+}
+
+const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -19,8 +23,11 @@ const PurchaseScreen = () => {
       const q = query(collection(db, 'ebooks'), orderBy('renderorder', 'asc'));
       const querySnapshot = await getDocs(q);
       setData(querySnapshot.docs.map((doc) => {
-        return { ...doc.data(), key: doc.id };  // Add the key property to the object
-      }));
+        const data = doc.data();
+        if (!vponly || (vponly && data.renderorder > 99)) {
+          return { ...data, key: doc.id };  // Add the key property to the object
+        }
+      }).filter(Boolean));  // Filter out undefined values
       setIsLoading(false);
     }
   
@@ -127,4 +134,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PurchaseScreen;
+export default EBooksScreen;

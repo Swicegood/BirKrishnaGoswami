@@ -20,10 +20,10 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png'), link: '../QuoteScreen' },
-  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png'), link: './news' },
-  { title: 'Slide 3', image: require('../../assets/images/placeholder_355_200.png'), link: '../PrabhupadaScreen' },
+  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png'), link: './NewsScreen' },
+  { title: 'Slide 3', image: require('../../assets/images/placeholder_355_200.png'), link: './MemoriesScreen' },
   { title: 'Slide 4', image: require('../../assets/images/placeholder_355_200.png'), link: '../BooksScreen' },
-  { title: 'Slide 5', image: require('../../assets/images/placeholder_355_200.png'), link: '../EbooksScreen' },
+  { title: 'Slide 5', image: require('../../assets/images/placeholder_355_200.png'), link: '../(tabs3)/PlaylistScreen' },
   // Add more entries here
 ];
 

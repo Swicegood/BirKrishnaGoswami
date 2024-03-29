@@ -47,12 +47,16 @@ interface FirebaseFunctionError {
     details?: any; // The details can vary depending on the error
   }
   
-
-const PlaylistScreen = () => {
-const { id } = useLocalSearchParams(); // Get the playlist ID from the URL
-const [playlists, setVideos] = useState([]);
-const [isLoading, setIsLoading] = useState(true);
-const functions = getFunctions(getApp());
+  interface PlaylistScreenProps {
+    id?: string;
+  }
+  
+const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
+  const { id: searchParamId } = useLocalSearchParams(); // Get the playlist ID from the URL
+  const id = propId || searchParamId; // Use the prop id if provided, otherwise use the search param id
+  const [playlists, setVideos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const functions = getFunctions(getApp());
 
 
 useEffect(() => {
