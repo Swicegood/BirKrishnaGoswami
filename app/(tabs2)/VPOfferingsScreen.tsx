@@ -60,7 +60,7 @@ const BlogScreen = () => {
                   <Text style={styles.title}>{item.title}</Text>
                   <Text style={styles.date}>{formatDate(item.date)} | {item.location}</Text>
                 </View>
-                <Link href={{ pathname: "../ReadVPScreen", params: { url: item.contenturl } }} asChild>
+                <Link href={{ pathname: "../ReadVPScreen", params: { offering: JSON.stringify(item) } }} asChild>
                   <TouchableOpacity style={styles.button}>
                     <Text style={styles.buttonText}>READ NOW</Text>
                   </TouchableOpacity>

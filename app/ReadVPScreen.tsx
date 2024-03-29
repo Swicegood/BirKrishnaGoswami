@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
-  ActivityIndicator, Image, Dimensions } from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import { useLocalSearchParams } from 'expo-router';
+
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
     return '';
@@ -16,7 +18,9 @@ function formatDate(dateString) {
   return `${month} ${day}`;
 }
 
-const TravelScreen = () => {
+const ReadVPNowScreen = () => {
+  const { offering } = useLocalSearchParams<{ offering: string }>();
+  const post = JSON.parse(offering);
   const [text, setText] = useState('');
   const [date, setDate] = useState('');
   const [currentDoc, setCurrentDoc] = useState(null);
@@ -24,25 +28,11 @@ const TravelScreen = () => {
   const [atLastDoc, setAtLastDoc] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-
-
   useEffect(() => {
-    const fetchText = async () => {
-      const db = getFirestore();
-      const q = query(collection(db, 'offerings'), orderBy('date', 'desc'), limit(1));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and category
-        setText(doc.data().text);
-        setDate(doc.data().date);
-      
-        // Store the current document in the state variable
-        setCurrentDoc(doc);
-      });
-      setIsLoading(false);
-    };
-
-    fetchText();
+    setCurrentDoc(post);
+    setText(post.text);
+    setDate(post.date);
+    setIsLoading(false);
   }, []);
 
   const handleNextText = async () => {
@@ -206,4 +196,4 @@ const styles = StyleSheet.create({
   
 });
 
-export default TravelScreen;
+export default ReadVPNowScreen;
