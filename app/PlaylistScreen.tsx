@@ -4,10 +4,12 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
-import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator, Platform, Dimensions} from 'react-native';
 import VideoItem from '../components/VideoItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, Link } from 'expo-router'; 
+
+const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -54,10 +56,23 @@ interface FirebaseFunctionError {
 const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
   const { id: searchParamId } = useLocalSearchParams(); // Get the playlist ID from the URL
   const id = propId || searchParamId; // Use the prop id if provided, otherwise use the search param id
-  const [playlists, setVideos] = useState([]);
+  const [videos, setVideos] = useState<{ id: string; title: string; thumbnailUrl: string; dateModified: string; }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const functions = getFunctions(getApp());
-
+  const [videoHeight, setVideoHeight] = useState<number>(0);
+  const [videoWidth, setVideoWidth] = useState<number>(0);
+  
+  useEffect(() => {
+    const fetchDimensions = async () => {
+      const height = await getVideoHeight();
+      const width = await getVideoWidth();
+      setVideoHeight(height);
+      setVideoWidth(width);
+    };
+  
+    fetchDimensions();
+  }, []);
+  
 
 useEffect(() => {
   setVideos([]); // Clear the videos stateß
@@ -71,14 +86,14 @@ useEffect(() => {
       .then((result: { data: GetYouTubeVideosResponse }) => {
         // Use the interface for the response
         const response: GetYouTubeVideosResponse = result.data;
-        const videos = response.items; // Change this line
+        const vids = response.items; // Change this line
         console.log("videos", videos[4]);
-        videos.forEach(video => {
+        vids.forEach(video => {
           const title = video.snippet.title;
           const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'
           const dateModified = video.contentDetails.videoPublishedAt;
           const id = video.contentDetails.videoId;
-          setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
+          setVideos(vids => [...vids, { id, title, thumbnailUrl, dateModified }]);
           setIsLoading(false);
         });
       })
@@ -90,9 +105,61 @@ useEffect(() => {
   fetchVideos();
 }, []);
 
+
+
+async function getVideoHeight() {
+  const orientation = await ScreenOrientation.getOrientationAsync();
+  const screenWidth = Dimensions.get('window').width;
+  const screenHeight = Dimensions.get('window').height;
+
+  if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+    // In portrait mode, set height based on screen width and aspect ratio
+    return screenWidth * 9 / 16;
+  } else {
+    // In landscape mode, set height to screen height
+    return screenHeight - NAVBAR_HEIGHT;
+  }
+}
+
+async function getVideoWidth() {
+  const orientation = await ScreenOrientation.getOrientationAsync();
+  const screenWidth = Dimensions.get('window').width;
+  const screenHeight = Dimensions.get('window').height;
+
+  if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+    // In portrait mode, set height based on screen width and aspect ratio
+    return screenWidth;
+  } else {
+    // In landscape mode, set height to screen height
+    return (screenHeight - NAVBAR_HEIGHT )* 16 / 9;
+  }
+}
+
   const renderItem = ({ item }) => (
     <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
   );
+
+  const renderHeader = () => {
+    const videoHeight = getVideoHeight();
+    const videoWidth = getVideoWidth();
+  
+    return (
+      <View style={{ height: videoHeight, width: videoWidth }}>
+        {/* Render your header content here */}
+      </View>
+    );
+  };
+  
+  const renderFooter = () => {
+    const videoHeight = getVideoHeight();
+    const videoWidth = getVideoWidth();
+  
+    return (
+      <View style={{ height: videoHeight, width: videoWidth }}>
+        {/* Render your footer content here */}
+      </View>
+    );
+  };
 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -101,10 +168,10 @@ useEffect(() => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={playlists}
+        data={videos}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
-        // If you want to add a header or footer, you can use ListHeaderComponent and ListFooterComponent props
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
       />
     </View>
   );
