@@ -36,7 +36,7 @@ const DayScreen = () => {
     </Text>
     <Text>      
     </Text>
-      <Text style={styles.dateText}>{item.month}/{item.year}</Text>
+    <Text style={styles.dateText}>{item.month.slice(2)}/{item.year}</Text>
     </View>
   </View>
       ))}
