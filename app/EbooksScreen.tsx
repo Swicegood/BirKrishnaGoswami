@@ -25,7 +25,8 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
       setData(querySnapshot.docs.map((doc) => {
         const data = doc.data();
         if (!vponly || (vponly && data.renderorder > 99)) {
-          return { ...data, key: doc.id };  // Add the key property to the object
+          let modifiedUrl = data.imgurl.replace('.png', '.jpg');
+          return { ...data, imgurl: modifiedUrl, key: doc.id };  // Add the key property to the object
         }
       }).filter(Boolean));  // Filter out undefined values
       setIsLoading(false);

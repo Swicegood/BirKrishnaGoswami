@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams} from 'expo-router';
 import { getAllImageFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-import * as ScreenOrientation from 'expo-screen-orientation';
+
 
 // Function to split array into chunks
 const chunkArray = (myArray, chunk_size) => {
@@ -22,6 +22,8 @@ const chunkArray = (myArray, chunk_size) => {
 const screenWidth = Dimensions.get('window').width;
 
 const GalleryComponent = () => {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  console.log("id", id);
   const placeholderImages = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images
   const [images, setImages] = useState(placeholderImages); // Set the initial state to the placeholder images
   const [numColumns, setNumColumns] = useState(getOrientation());
@@ -35,7 +37,7 @@ const GalleryComponent = () => {
 
   useEffect(() => {
     getAllImageFiles().then((data) => {
-      setImages(data.length ? data : placeholderImages); // If data is fetched, set images to data. Otherwise, keep the placeholder images.
+      setImages(data.length ? data.filter(item => item.includes(id)) : placeholderImages);  
     });
   }, []);
 
@@ -47,13 +49,6 @@ const GalleryComponent = () => {
   function onChange() {
     setNumColumns(getOrientation());
   }
-
-
-  useEffect(() => {
-    getAllImageFiles().then((data) => {
-      setImages(data);
-    });
-  }, []);
 
   // Split images into chunks of 15
   return (
