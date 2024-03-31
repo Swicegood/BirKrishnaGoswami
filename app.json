@@ -18,14 +18,19 @@
     "ios": {
       "supportsTablet": true,
       "requireFullScreen": true,
-      "bundleIdentifier": "com.jagadguru.birkrishnagoswami"
+      "bundleIdentifier": "com.isckon.birkrishnagoswami",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jagadguru.birkrishnagoswami"
+      "package": "com.iskcon.birkrishnagoswami"
     },
     "web": {
       "bundler": "metro",
