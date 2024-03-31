@@ -23,7 +23,7 @@ const ENTRIES = [
   { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png'), link: './NewsScreen' },
   { title: 'Slide 3', image: require('../../assets/images/placeholder_355_200.png'), link: './MemoriesScreen' },
   { title: 'Slide 4', image: require('../../assets/images/placeholder_355_200.png'), link: '../BooksScreen' },
-  { title: 'Slide 5', image: require('../../assets/images/placeholder_355_200.png'), link: '../(tabs3)/PlaylistScreen' },
+  { title: 'Slide 5', image: require('../../assets/images/placeholder_355_200.png'), link: '../(tabs3)/VPPlaylistScreen' },
   // Add more entries here
 ];
 

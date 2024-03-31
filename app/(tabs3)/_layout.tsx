@@ -1,8 +1,8 @@
 import React from 'react';
 import { Image, View, Dimensions } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import Playlist from './PlaylistScreen'; // Replace with the actual path to the RecentUploads component
-import VPOfferings from './VPOfferingsScreen'; // Replace with the actual path to the RecentVideosScreen component
+import Playlist from './VPPlaylistScreen'; // Replace with the actual path to the RecentUploads component
+import VPOfferings from './VPBooksScreen'; // Replace with the actual path to the RecentVideosScreen component
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -13,14 +13,14 @@ export default function TabLayout() {
       <View style={{ flex: 1 }}>
         <Tab.Navigator tabBarPosition="top">
           <Tab.Screen
-            name="VPOfferingsScreen"
+            name="VPBooksScreen"
             component={VPOfferings}
             options={{
               title: 'EBooks',
             }}
           />
           <Tab.Screen
-            name="PlaylistScreen"
+            name="VPPlaylistScreen"
             component={Playlist}
             options={{
               title: 'Playlist',
