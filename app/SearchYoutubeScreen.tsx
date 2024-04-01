@@ -48,8 +48,17 @@ interface FirebaseFunctionError {
   }
   
 
+  interface Video {
+    id: string;
+    title: string;
+    thumbnailUrl: string;
+    dateModified: string;
+  }
+  
+  // Then, when initializing the state:
+
   const SearchYoutubeVideosScreen = () => {
-    const [videos, setVideos] = useState([]);
+    const [videos, setVideos] = useState<Video[]>([]);
     const [searchTerm, setSearchTerm] = useState(''); // State to hold the search term
     const [hasSearched, setHasSearched] = useState(false);
     const functions = getFunctions(getApp());

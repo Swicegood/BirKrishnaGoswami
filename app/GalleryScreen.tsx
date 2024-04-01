@@ -7,7 +7,7 @@ const GalleryComponent = () => {
   const { imageChunk } = useLocalSearchParams<{ imageChunk: string }>();
   
   // Split the string into an array of strings
-  const images = imageChunk.split(',');
+  const images:<string[]> = imageChunk.split(',');
 
   const [numColumns, setNumColumns] = useState(getOrientation());
 
@@ -27,10 +27,9 @@ const GalleryComponent = () => {
     setNumColumns(getOrientation());
   }
 
-  const originalImagesChunk = (imageUrlArray: string) => {
-    const imageUrls = imageUrlArray.split(',');
-    const originalUrls = imageUrls.map(url => url.replace('300w', 'original'));
-    return originalUrls;
+  const originalImage = (imageUrl: string) => {
+    const originalUrl = imageUrl.replace('300w', 'original');
+    return originalUrl;
   };
 
   return (
@@ -40,8 +39,8 @@ const GalleryComponent = () => {
       key={numColumns} // Add this line
       keyExtractor={(item, index) => index.toString()}
       contentContainerStyle={{ justifyContent: 'center' }}
-      renderItem={({ item, index }) => (
-        <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: originalImagesChunk(imageChunk)}}} asChild>
+      renderItem={({ item }) => (
+        <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: originalImage(imageChunk)}}} asChild>
           <TouchableOpacity style={{ padding: 2}}>
             <Image defaultSource={placeholderImage} source={{uri: item}} style={{ width: 100, height: 100 }} />
           </TouchableOpacity>

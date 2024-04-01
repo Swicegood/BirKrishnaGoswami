@@ -13,7 +13,7 @@ interface VideoItemProps {
 }
 
 const VideoPlayerItem = () => {
-  const { id } = useLocalSearchParams<VideoItemProps>();
+  const { id } = useLocalSearchParams<{id : string}>(); // Get the video ID from the URL
   const [videoHeight, setVideoHeight] = useState(Dimensions.get('window').width * 9 / 16); // initialize with a number
   const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number
   const [isLoading, setIsLoading] = useState(true);

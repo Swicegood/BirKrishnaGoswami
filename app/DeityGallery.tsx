@@ -6,18 +6,18 @@ import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96h
 
 
 // Function to split array into chunks
-const chunkArray = (myArray, chunk_size) => {
-    let index = 0;
-    const arrayLength = myArray.length;
-    const tempArray = [];
-    
-    for (index = 0; index < arrayLength; index += chunk_size) {
-      const myChunk = myArray.slice(index, index+chunk_size);
-      tempArray.push(myChunk);
-    }
+const chunkArray = (myArray: string[], chunk_size: number): string[][] => {
+  let index = 0;
+  const arrayLength = myArray.length;
+  const tempArray = [];
   
-    return tempArray;
-  };
+  for (index = 0; index < arrayLength; index += chunk_size) {
+    const myChunk = myArray.slice(index, index+chunk_size);
+    tempArray.push(myChunk);
+  }
+
+  return tempArray;
+}
   
 const screenWidth = Dimensions.get('window').width;
 
@@ -69,10 +69,9 @@ useEffect(() => {
           <TouchableOpacity>
             <Image 
               defaultSource={placeholderImage} // placeholder image
-              source={{ uri: item[0]}}
+              source={{ uri: String(item[0])}}
               style={{ width: screenWidth / 2, height: 200 }} 
             />
-            {console.log("item", item[0])}
           </TouchableOpacity>
         </Link>
       )}

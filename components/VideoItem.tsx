@@ -2,7 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { Link } from 'expo-router'
 
-const VideoItem = ({ title, lastModified, thumbnail, id }) => {
+interface VideoItemProps {
+  title: string;
+  lastModified: string;
+  thumbnail: string;
+  id: string;
+}
+
+const VideoItem: React.FC<VideoItemProps> = ({ title, lastModified, thumbnail, id }) => {
   return (
     <Link href={{pathname: '/YoutubePlayer', params:{id: id}}}> {/* This is the link to the PlaylistScreen */}
     <View style={styles.item}>

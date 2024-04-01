@@ -54,8 +54,8 @@ interface FirebaseFunctionError {
   }
   
 const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
-  const { id: searchParamId } = useLocalSearchParams(); // Get the playlist ID from the URL
-  const id = propId || searchParamId; // Use the prop id if provided, otherwise use the search param id
+  const { id } = useLocalSearchParams<{ id: string }>();// Get the playlist ID from the URL
+  const final_id = propId || id; // Use the prop id if provided, otherwise use the search param id
   const [videos, setVideos] = useState<{ id: string; title: string; thumbnailUrl: string; dateModified: string; }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const functions = getFunctions(getApp());
@@ -80,23 +80,27 @@ useEffect(() => {
     const getYouTubePlaylistVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubePlaylistVideos');
 
     // Use the interface for the request
-    const request: GetYouTubeVideosRequest = { playlistId: id };
+    const request: GetYouTubeVideosRequest = { playlistId: final_id };
 
     getYouTubePlaylistVideos(request)
-      .then((result: { data: GetYouTubeVideosResponse }) => {
-        // Use the interface for the response
-        const response: GetYouTubeVideosResponse = result.data;
-        const vids = response.items; // Change this line
-        console.log("videos", videos[4]);
-        vids.forEach(video => {
-          const title = video.snippet.title;
-          const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'
-          const dateModified = video.contentDetails.videoPublishedAt;
-          const id = video.contentDetails.videoId;
-          setVideos(vids => [...vids, { id, title, thumbnailUrl, dateModified }]);
-          setIsLoading(false);
-        });
-      })
+    .then((result: { data: GetYouTubeVideosResponse }) => {
+      // Use the interface for the response
+      const response: GetYouTubeVideosResponse = result.data;
+      let vids = response.items; // Change this line
+    
+      // Sort videos by date, newest first
+      vids = vids.sort((a, b) => new Date(b.contentDetails.videoPublishedAt).getTime() - new Date(a.contentDetails.videoPublishedAt).getTime());
+    
+      console.log("videos", videos[4]);
+      vids.forEach(video => {
+        const title = video.snippet.title;
+        const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'
+        const dateModified = video.contentDetails.videoPublishedAt;
+        const id = video.contentDetails.videoId;
+        setVideos(vids => [...vids, { id, title, thumbnailUrl, dateModified }]);
+        setIsLoading(false);
+      });
+    })
       .catch((error: FirebaseFunctionError) => {
         console.error("Error calling the function: ", error.message);
       });
