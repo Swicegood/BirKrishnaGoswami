@@ -6,7 +6,7 @@ import * as Progress from 'react-native-progress';
 
 const PdfViewScreen = () => {
   const [progress, setProgress] = useState(0);
-  const { url } = useLocalSearchParams();
+  const { url } = useLocalSearchParams<{ url: string }>();
   console.log(url);
 
   return (

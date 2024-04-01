@@ -12,8 +12,16 @@ interface EBooksScreenProps {
   vponly?: boolean;
 }
 
+interface EBook {
+  title: string;
+  imgurl: string;
+  contenturl: string;
+  renderorder: number;
+  key: string;
+}
+
 const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<EBook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
 
@@ -22,13 +30,17 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
       const db = getFirestore();
       const q = query(collection(db, 'ebooks'), orderBy('renderorder', 'asc'));
       const querySnapshot = await getDocs(q);
-      setData(querySnapshot.docs.map((doc) => {
+      const result = querySnapshot.docs
+      .map((doc) => {
         const data = doc.data();
         if (!vponly || (vponly && data.renderorder > 99)) {
           let modifiedUrl = data.imgurl.replace('.png', '.jpg');
-          return { ...data, imgurl: modifiedUrl, key: doc.id };  // Add the key property to the object
+          return { ...data, imgurl: modifiedUrl, key: doc.id };
         }
-      }).filter(Boolean));  // Filter out undefined values
+        return null;  // Return null when the condition is not met
+      })
+      .filter(item => item !== null);  // Filter out null values
+      setData(result as EBook[]);
       setIsLoading(false);
     }
   
@@ -39,7 +51,12 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
-  const BookItem = ({ item }) => {
+  interface BookItemProps {
+    item: EBook;
+  }
+  
+  const BookItem: React.FC<BookItemProps> = ({ item }) => {
+   
     const [isImageLoaded, setIsImageLoaded] = useState(false);
 
     return (
