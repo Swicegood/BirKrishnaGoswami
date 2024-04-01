@@ -7,7 +7,7 @@ const GalleryComponent = () => {
   const { imageChunk } = useLocalSearchParams<{ imageChunk: string }>();
   
   // Split the string into an array of strings
-  const images:<string[]> = imageChunk.split(',');
+  const images: string[] = imageChunk.split(',');
 
   const [numColumns, setNumColumns] = useState(getOrientation());
 
