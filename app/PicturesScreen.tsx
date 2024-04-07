@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, TouchableOpacity } from 'react-native';
 import { Link, useLocalSearchParams} from 'expo-router';
 import { getAllImageFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
@@ -24,8 +24,8 @@ const screenWidth = Dimensions.get('window').width;
 const GalleryComponent = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   console.log("id", id);
-  const placeholderImages = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images
-  const [images, setImages] = useState(placeholderImages); // Set the initial state to the placeholder images
+  const placeholderImages: string[] = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images // Create an array of 15 placeholder images
+  const [images, setImages] = useState<string[]>(placeholderImages); // Set the initial state to the placeholder images
   const [numColumns, setNumColumns] = useState(getOrientation());
 
   useEffect(() => {
@@ -36,9 +36,17 @@ const GalleryComponent = () => {
   }, []);
 
   useEffect(() => {
-    getAllImageFiles().then((data) => {
-      setImages(data.length ? data.filter(item => item.includes(id)) : placeholderImages);  
+    let isMounted = true;  // add this line
+  
+    getAllImageFiles().then((data: string[]) => {
+      if (isMounted) {  // check if component is still mounted
+        setImages(data.length ? data.filter(item => item.includes(id)) : placeholderImages);
+      }
     });
+  
+    return () => {
+      isMounted = false;  // set to false when component unmounts
+    };
   }, []);
 
   function getOrientation() {

@@ -1,33 +1,30 @@
 import React from 'react';
-import { Image, View, Dimensions } from 'react-native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import Playlist from './SPPlaylistScreen'; // Replace with the actual path to the RecentUploads component
-import VPOfferings from './VPOfferingsScreen'; // Replace with the actual path to the RecentVideosScreen component
-
-const Tab = createMaterialTopTabNavigator();
+import { FontAwesome } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
+import { View, Image, Dimensions } from 'react-native';
 
 export default function TabLayout() {
   return (
     <View style={{ flex: 1 }}>
-      <Image source={require('../../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
-      <View style={{ flex: 1 }}>
-        <Tab.Navigator tabBarPosition="top">
-          <Tab.Screen
-            name="VPOfferingsScreen"
-            component={VPOfferings}
-            options={{
-              title: 'Vyasa Puja Offerings',
-            }}
-          />
-          <Tab.Screen
-            name="SPPlaylistScreen"
-            component={Playlist}
-            options={{
-              title: 'Playlist',
-            }}
-          />
-        </Tab.Navigator>
-      </View>
+    <Image source={require('../../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+    <View style={{ flex: 1 }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: 'red' }}>
+      <Tabs.Screen 
+        name="VPOfferingsScreen" 
+        options={{
+          title: 'Vyasa Puja Offerings',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="book" color={color} />,
+        }} 
+      />
+      <Tabs.Screen 
+        name="SPPlaylistScreen" 
+        options={{
+          title: 'Playlist',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="youtube" color={color} />,
+        }} 
+      />
+    </Tabs>
+    </View>
     </View>
   );
 }

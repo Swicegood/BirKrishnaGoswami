@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensio
 import { Link } from 'expo-router';
 
 const windowHeight = Dimensions.get('window').height;
-const track = "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3";
+const track = "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3";
 
 
 const chanting: React.FC = () => {

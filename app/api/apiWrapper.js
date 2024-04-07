@@ -2,10 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
 
 const urls = {
-  filesList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_files.txt",
-  imageList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_images.txt",
-  deityList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/deities300w.txt",
-  templeList: "http://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_temples.txt"
+  filesList: "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_files.txt",
+  imageList: "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_images.txt",
+  deityList: "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/deities300w.txt",
 }
 
 async function fetchFilesList(filesListUrl) {
@@ -62,8 +61,5 @@ async function getAllDeityFiles() {
   return fetchAndCacheFiles('deities', urls.deityList);
 }
 
-async function getAllTempleFiles() {
-  return fetchAndCacheFiles('temples', urls.templeList);
-}
 
-export { getAllFiles, getAllImageFiles, getAllDeityFiles, getAllTempleFiles };
+export { getAllFiles, getAllImageFiles, getAllDeityFiles };

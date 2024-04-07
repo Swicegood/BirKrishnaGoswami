@@ -1,28 +1,22 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import RecentUploads from './RecentUploads'; // Replace with the actual path to the RecentUploads component
-import RecentVideosScreen from './RecentVideosScreen'; // Replace with the actual path to the RecentVideosScreen component
-
-const Tab = createMaterialTopTabNavigator();
+import { FontAwesome } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
   return (
-    <Tab.Navigator tabBarPosition="top">
-      <Tab.Screen
-        name="RecentUploads"
-        component={RecentUploads} // Add this line
+    <Tabs screenOptions={{ tabBarActiveTintColor: 'red' }}>
+      <Tabs.Screen 
+        name="RecentUploads" 
         options={{
-          title: 'Recent Uploads',
-        }}
-      />
-      <Tab.Screen
-        name="RecentVideosScreen"
-        component={RecentVideosScreen} // Add this line
+          title: "Recent Uploads",
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="youtube" color={color} />,
+          }} />
+      <Tabs.Screen 
+        name="RecentVideosScreen" 
         options={{
-          title: 'Playlists',
-        }}
-      />
-    </Tab.Navigator>
+          title: "Playlists",
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="youtube" color={color} />,
+          }} />
+    </Tabs>
   );
 }

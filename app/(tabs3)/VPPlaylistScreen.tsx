@@ -4,7 +4,7 @@
 import PlaylistScreen from "../PlaylistScreen";
 
 const SPPlaylistScreen = () => {
-  return <PlaylistScreen id="PL5EjcFVEeY4hSMum9l9N777F4LiurfPXI" />;
+  return <PlaylistScreen id="PL5EjcFVEeY4gvmQjG_zgeaUBRyTaiCACt" />;
 };
 
 export default SPPlaylistScreen;
