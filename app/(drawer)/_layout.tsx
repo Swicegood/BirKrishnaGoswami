@@ -1,6 +1,6 @@
 
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Pressable, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import  CustomHeader  from '../../components/CustomHeader';
 import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';

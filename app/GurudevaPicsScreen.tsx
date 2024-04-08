@@ -2,45 +2,57 @@ import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Link } from 'expo-router';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-import { collection, getFirestore, query, orderBy, limit, getDocs, where, addDoc } from "firebase/firestore";
+import { collection, getFirestore, query, orderBy, getDocs } from "firebase/firestore";
 
   
 const screenWidth = Dimensions.get('window').width;
 
+type ImageItem = {
+  url: string;
+  id: string;
+  description: string;
+};
+
 
 const GalleryComponent = () => {
-  const placeholderImages = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images
-  const [images, setImages] = useState(placeholderImages); // Set the initial state to the placeholder images
 
-  type ImageItem = {
-    url: string;
-    description: string;
-    location: string;
-  };
+
+  // Create an array of 15 placeholder ImageItem objects
+  const placeholderImages: ImageItem[] = new Array(15).fill({
+    url: null,
+    description: '',
+    id: '',
+  });
   
-  const [initialImage] = useState(0);
+  // Set the initial state to the placeholder ImageItem objects
+  const [images, setImages] = useState<ImageItem[]>(placeholderImages);
 
 
   useEffect(() => {
     const db = getFirestore();
-    const newImages = [];
+    
+    const newImages: ImageItem[] = [];
     const q = query(collection(db, 'bkgpics'), orderBy('id'));
   
     getDocs(q)
-      .then((snapshot) => {
-        snapshot.docs.forEach((doc) => {
-          const data = doc.data();
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        // Check if an image with the same id already exists in the newImages array
+        if (!newImages.some((image) => image.id === data.id)) {
           newImages.push({
             url: data.url,
             description: data.description,
-            id: data.id,
-            date: data.date,
+            id: data.id
           });
-        });
-        setImages(newImages);
-      })
-      .catch((error) => console.log('Error getting documents: ', error));
-  }, []);
+        }
+      });
+      setImages(newImages);
+    })
+    .catch((error) => console.log('Error getting documents: ', error));
+
+  }
+  , []);
   
   return (
     <FlatList
@@ -50,8 +62,7 @@ const GalleryComponent = () => {
       renderItem={({ item, index }) => (
         <Link href={ {pathname: "./PicturesScreen", params: {id: item.id}} }asChild>
         <TouchableOpacity style={{ padding: 20, borderRadius: 10 }}>
-          <Image defaultSource={placeholderImage} source={{uri: item.url}} style={{ width: (screenWidth / 2) - 40, height: 170, borderRadius: 10 }} />  
-          <Text style={styles.text} >{item.location}</Text>
+          <Image source={item.url ? {uri: item.url} : placeholderImage} style={{ width: (screenWidth / 2) - 40, height: 170, borderRadius: 10 }} />
           <Text style={[styles.text, { flexShrink: 1 }]}>{item.description}</Text>
         </TouchableOpacity>
         </Link>

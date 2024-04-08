@@ -3,7 +3,6 @@
 // https://firebase.google.com/docs/web/setup#available-libraries  
 import { initializeApp, getApp } from 'firebase/app';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { getAnalytics } from "firebase/analytics";
 import VideoItem from '../../components/VideoItem'; // Import the PlaylistItem component
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TextInput, Button, Text, ActivityIndicator } from 'react-native';
@@ -22,7 +21,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 
 interface GetYouTubeVideosRequest {

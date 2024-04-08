@@ -1,9 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'expo-router';
-import firebase from 'firebase/app';
-import { collection, getFirestore, query, orderBy, getDocs } from "firebase/firestore";
+import { initializeApp } from 'firebase/app';
+import { collection, getFirestore, query, getDocs } from "firebase/firestore";
 import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+
+// TODO: Replace the following with your app's Firebase project configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD8JpSB_tK2CBj1tC6f434-vezZ2x0bRbk",
+  authDomain: "birkrishnagoswami-b7360.firebaseapp.com",
+  projectId: "birkrishnagoswami-b7360",
+  storageBucket: "birkrishnagoswami-b7360.appspot.com",
+  messagingSenderId: "790459013032",
+  appId: "1:790459013032:web:d33b61fc48a0178cf82f9d",
+  measurementId: "G-7GVXDMLLSY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+
 
 const YearScreen = () => {
   const [data, setData] = useState({});
