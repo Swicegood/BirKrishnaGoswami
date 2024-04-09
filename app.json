@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bir Krishna Goswami",
     "slug": "bir-krishna-goswami",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",

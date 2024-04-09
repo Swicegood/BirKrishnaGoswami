@@ -47,7 +47,7 @@ const QuoteScreen = () => {
     if (currentDoc) {
       setAtFirstDoc(false);
       const currentTimestamp = currentDoc.data().processed;
-      console.log("currentTimestamp", currentTimestamp);
+      console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
       const nextQuery = query(
         collection(db, 'thought-of-the-days'), 
         where('processed', '<', currentTimestamp), 
@@ -85,7 +85,7 @@ const QuoteScreen = () => {
           // If no documents were found for the previous date, query for the next most recent "processed" timestamp
           querySnapshot = await getDocs(query(
             collection(db, 'thought-of-the-days'), 
-            where('processed', '>', currentTimestamp), 
+            where('processed', '<', currentTimestamp), 
             orderBy('processed', 'desc'), 
             limit(1)
           ));
@@ -97,7 +97,7 @@ const QuoteScreen = () => {
           setQuote(doc.data().totd);
           setDate(doc.data().date);
 
-        console.log("currentDoc", doc.data().processed);
+          console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
         });
 
         setCurrentDoc(querySnapshot.docs[0]);
@@ -126,7 +126,7 @@ const QuoteScreen = () => {
     setAtLastDoc(false);
     if (currentDoc) {
       const currentTimestamp = currentDoc.data().processed;
-      console.log("currentTimestamp", currentTimestamp);
+      console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
       const prevQuery = query(
         collection(db, 'thought-of-the-days'), 
         where('processed', '>', currentTimestamp), 
@@ -134,6 +134,11 @@ const QuoteScreen = () => {
         limit(1)
       );
       const prevQuerySnapshot = await getDocs(prevQuery);
+
+      if (prevQuerySnapshot.empty) {
+        // If no documents were found for the previous date, query for the next most recent "processed" timestamp
+        setAtFirstDoc(true);
+      }
     
       if (!prevQuerySnapshot.empty) {
         const doc = prevQuerySnapshot.docs[0];
@@ -166,7 +171,7 @@ const QuoteScreen = () => {
           pQuerySnapshot = await getDocs(query(
             collection(db, 'thought-of-the-days'), 
             where('processed', '>', currentTimestamp), 
-            orderBy('processed', 'desc'), 
+            orderBy('processed', 'asc'), 
             limit(1)
           ));
 
@@ -176,7 +181,7 @@ const QuoteScreen = () => {
         // Assuming doc.data() returns an object with text, date, and title
         setQuote(doc.data().totd);
         setDate(doc.data().date);
-        console.log("currentDoc", doc.data().processed);
+        console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
       });
   
       if (pQuerySnapshot.docs[0]) {

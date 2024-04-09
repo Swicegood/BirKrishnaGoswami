@@ -12,9 +12,11 @@ const PdfViewScreen = () => {
   return (
     <View style={styles.container}>
       <WebView
-        source={{ uri: url }}
+        source={{ uri: 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) }}
         onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
         style={styles.webView}
+        domStorageEnabled={true}
+        javaScriptEnabled={true}
       />
       {progress < 1 && (
         <View style={styles.progressBarContainer}>
