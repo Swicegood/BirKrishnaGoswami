@@ -1,26 +1,11 @@
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
-import { initializeApp, getApp } from 'firebase/app';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { httpsCallable } from 'firebase/functions';
 import VideoItem from '../../components/VideoItem'; // Import the PlaylistItem component
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TextInput, Button, Text, ActivityIndicator } from 'react-native';
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyD8JpSB_tK2CBj1tC6f434-vezZ2x0bRbk",
-  authDomain: "birkrishnagoswami-b7360.firebaseapp.com",
-  projectId: "birkrishnagoswami-b7360",
-  storageBucket: "birkrishnagoswami-b7360.appspot.com",
-  messagingSenderId: "790459013032",
-  appId: "1:790459013032:web:d33b61fc48a0178cf82f9d",
-  measurementId: "G-7GVXDMLLSY"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { functions } from '../api/firebase';
 
 
 interface GetYouTubeVideosRequest {
@@ -47,7 +32,6 @@ interface FirebaseFunctionError {
 
   const YoutubeChannelVideosScreen = () => {
     const [videos, setVideos] = useState([]);
-    const functions = getFunctions(getApp());
     const [isLoading, setIsLoading] = useState(true);
   
     // Function to fetch videos based on search term
@@ -90,7 +74,6 @@ interface FirebaseFunctionError {
               // Use the interface for the response
               const response: GetYouTubeVideosResponse = result.data;
               const videos = response.items; // Change this line
-              console.log("videos", videos[4]);
               videos.forEach(video => {
                 const title = video.snippet.title;
                 const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'

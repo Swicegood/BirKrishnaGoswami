@@ -2,9 +2,30 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { Link } from 'expo-router'
 
+interface PlaylistItemProps {
+  title: string;
+  lastModified: string;
+  thumbnail: string;
+  id: string;
+}
+
+const PlaylistItem: React.FC<PlaylistItemProps> = ({ title, lastModified, thumbnail, id }) => {
 
 
-const PlaylistItem = ({ title, lastModified, thumbnail, id }) => {
+  return (
+    <Link href={{pathname: '/PlaylistScreen', params:{id: id}}}> {/* This is the link to the PlaylistScreen */}
+    <View style={styles.item}>
+        <Image style={styles.image} source={{ uri: thumbnail }} />
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.lastModified}>Last Modified: {lastModified.split("T")[0]}</Text>
+        <Text style={styles.lastModified}>{lastModified.split("T")[1]}</Text>
+      </View>
+    </View>
+    </Link>
+  );
+};
+
   const styles = StyleSheet.create({
     item: {
       flexDirection: 'row',
@@ -28,19 +49,5 @@ const PlaylistItem = ({ title, lastModified, thumbnail, id }) => {
       fontSize: 12,
     },
   });
-
-  return (
-    <View style={styles.item}>
-      <Link href={{pathname:'../PlaylistScreen', params: {id: id}}}>
-        <Image style={styles.image} source={{ uri: thumbnail }} />
-      </Link>
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.lastModified}>Last Modified: {lastModified.split("T")[0]}</Text>
-        <Text style={styles.lastModified}>{lastModified.split("T")[1]}</Text>
-      </View>
-    </View>
-  );
-};
 
 export default PlaylistItem;
