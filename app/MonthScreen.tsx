@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useGlobalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { View, Text, TouchableOpacity,StyleSheet, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const MonthScreen = () => {
-  const { year, dataString } = useGlobalSearchParams();  
+  const { year, dataString }: { year: string; dataString: string } = useLocalSearchParams();
   const [data, setData] = useState({});
 
 
   useEffect(() => {
     if (!dataString) {
+      console.log('Year: ', year);
+      console.log('No data string');
       return;
     }
-    const parsedData = JSON.parse(dataString);
-    setData(parsedData);
+    try {
+      const parsedData = JSON.parse(dataString);
+      setData(parsedData);
+    } catch (error) {
+      console.error('Error parsing data:', error);
+    }
   }, [dataString]);
 
 

@@ -67,9 +67,9 @@ useEffect(() => {
   return (
     <ScrollView>
     <View>
-    {Object.keys(data).sort((a, b) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : a - b).map((year) => (
+    {Object.keys(data).sort((a, b) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : Number(a) - Number(b)).map((year) => (
       <View style={styles.container} key={year}>
-        <Link href={{ pathname: './MonthScreen', params: { year: year, dataString: JSON.stringify(data[year]) } }} asChild>
+        <Link href={{ pathname: './MonthScreen', params: { year: String(year), dataString: JSON.stringify(data[year]) } }} asChild>
           <TouchableOpacity style={styles.playButton}>
             {/* Replace with your play icon */}
             <Image source={require('../assets/images/folder.png')} style={styles.playIcon} />
@@ -78,7 +78,7 @@ useEffect(() => {
         <View style={styles.textContainer}>
           <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>{year}</Text>
         </View>
-        <Text style={styles.countText}>{data[year]?.length}</Text>
+        <Text style={styles.countText}>{Object.keys(data[year])?.length || year }</Text>
       </View>
     ))}
     </View>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
   countText: {
     position: 'absolute',
-    right: 10,
+    right: 30,
   },
   playButton: {
     marginRight: 30,

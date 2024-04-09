@@ -23,15 +23,18 @@
         "UIBackgroundModes": [
           "audio"
         ]
-      }
+      },
+      "buildNumber": "2",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "versionCode" : 11,    
+      "versionCode" : 12,    
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.iskcon.birkrishnagoswami"
+      "package": "com.iskcon.birkrishnagoswami",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -39,7 +42,17 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -50,6 +63,15 @@
       },
       "eas": {
         "projectId": "189748c1-d7c8-43b7-9805-7eca99c23f26"
+      },
+      "firebase": {
+        "apiKey": "AIzaSyD8JpSB_tK2CBj1tC6f434-vezZ2x0bRbk",
+        "authDomain": "birkrishnagoswami-b7360.firebaseapp.com",
+        "projectId": "birkrishnagoswami-b7360",
+        "storageBucket": "birkrishnagoswami-b7360.appspot.com",
+        "messagingSenderId": "790459013032",
+        "appId": "1:790459013032:web:d33b61fc48a0178cf82f9d",
+        "measurementId": "G-7GVXDMLLSY"
       }
     }
   }

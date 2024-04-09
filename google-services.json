@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "790459013032",
+    "project_id": "birkrishnagoswami-b7360",
+    "storage_bucket": "birkrishnagoswami-b7360.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790459013032:android:5419369979601d2bf82f9d",
+        "android_client_info": {
+          "package_name": "com.iskcon.birkrishnagoswami"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-zGiewi8gbOnChzyvug8ynoh8fxzQUAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

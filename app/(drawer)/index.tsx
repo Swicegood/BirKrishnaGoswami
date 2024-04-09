@@ -20,28 +20,13 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { initializeApp } from 'firebase/app';
 
 const ENTRIES = [
-  { title: 'Slide 1', image: require('../../assets/images/placeholder_355_200.png'), link: '../QuoteScreen' },
-  { title: 'Slide 2', image: require('../../assets/images/placeholder_355_200.png'), link: './NewsScreen' },
-  { title: 'Slide 3', image: require('../../assets/images/placeholder_355_200.png'), link: './MemoriesScreen' },
-  { title: 'Slide 4', image: require('../../assets/images/placeholder_355_200.png'), link: '../BooksScreen' },
-  { title: 'Slide 5', image: require('../../assets/images/placeholder_355_200.png'), link: '../(tabs3)/VPPlaylistScreen' },
+  { title: 'Slide 1', image: require('../../assets/images/quotes_placeholder_355x200.jpg'), link: '../QuoteScreen' },
+  { title: 'Slide 2', image: require('../../assets/images/news_placeholder_355x200.jpg'), link: './NewsScreen' },
+  { title: 'Slide 3', image: require('../../assets/images/memories_placeholder_355x200.jpg'), link: './MemoriesScreen' },
+  { title: 'Slide 4', image: require('../../assets/images/books_placeholder_355x200.jpg'), link: '../BooksScreen' },
+  { title: 'Slide 5', image: require('../../assets/images/vyasa_puja_placeholder_355x200.jpg'), link: '../(tabs3)/VPPlaylistScreen' },
   // Add more entries here
 ];
-
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyD8JpSB_tK2CBj1tC6f434-vezZ2x0bRbk",
-  authDomain: "birkrishnagoswami-b7360.firebaseapp.com",
-  projectId: "birkrishnagoswami-b7360",
-  storageBucket: "birkrishnagoswami-b7360.appspot.com",
-  messagingSenderId: "790459013032",
-  appId: "1:790459013032:web:d33b61fc48a0178cf82f9d",
-  measurementId: "G-7GVXDMLLSY"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
