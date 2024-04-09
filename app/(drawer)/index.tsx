@@ -14,10 +14,10 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
 import { useState, forwardRef, useEffect } from 'react';
 import { Link } from 'expo-router';
-import { collection, getFirestore, query, getDocs } from "firebase/firestore";
+import { collection, query, getDocs } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { initializeApp } from 'firebase/app';
+import { db } from '../api/firebase'; 
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/quotes_placeholder_355x200.jpg'), link: '../QuoteScreen' },
@@ -59,7 +59,6 @@ export default function TabOneScireen() {
 
   useEffect(() => {
     const fetchWhatsAppUrl = async () => {
-      const db = getFirestore(app);
       const q = query(collection(db, 'whatsapp'));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {

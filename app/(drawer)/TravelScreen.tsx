@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
   ActivityIndicator, Image, Dimensions } from 'react-native';
-import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from '../api/firebase';
 
 
@@ -48,7 +48,6 @@ const TravelScreen = () => {
   }, []);
 
   const handleNextText = async () => {
-    const db = getFirestore();
     setAtFirstDoc(false);
     if (currentDoc) {
       const currentDate = currentDoc.data().date;
@@ -91,7 +90,6 @@ const TravelScreen = () => {
   };
   
     const handlePreviousText = async () => {
-      const db = getFirestore();
       setAtLastDoc(false);
       if (currentDoc) {
         const currentTimestamp = currentDoc.data().processed;

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { getAllFiles } from '../app/api/apiWrapper';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
-import { getDocs, query, where, collection, getFirestore } from 'firebase/firestore';
-
+import { getDocs, query, where, collection } from 'firebase/firestore';
+import { db } from './api/firebase';
 
 interface File {
   category: string;
@@ -49,8 +49,6 @@ const FilesScreen = () => {
 
       // Filter files to only include those that belong to the current folder
       const folderFiles = categorizedFiles.filter(file => file.category === category);
-
-      const db = getFirestore();
       const folderFilesWithDate = await Promise.all(folderFiles.map(async file => {
         let docData;
         const q = query(collection(db, "audio-tracks"), where("url", "==", file.url));
@@ -88,8 +86,6 @@ const FilesScreen = () => {
     </View>
   </View>
   );
-
-
 
   return (
     <View>

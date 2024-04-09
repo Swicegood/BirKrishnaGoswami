@@ -4,8 +4,8 @@ import { Text, View, Button, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import { doc, getDoc, setDoc, getFirestore } from 'firebase/firestore';
-
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 export default function NotificationHandler() {
     // Your code here
@@ -109,7 +109,6 @@ async function registerForPushNotificationsAsync() {
 
      // Check if token exists in Firestore
      try {
-      db = getFirestore();
       const tokenDoc = doc(db, 'push-tokens', token);
       const tokenSnapshot = await getDoc(tokenDoc);
     

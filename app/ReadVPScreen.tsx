@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
   ActivityIndicator } from 'react-native';
-import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { useLocalSearchParams } from 'expo-router';
+import { db } from './api/firebase';
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -36,7 +37,6 @@ const ReadVPNowScreen = () => {
   }, []);
 
   const handleNextText = async () => {
-    const db = getFirestore();
     setAtFirstDoc(false);
     if (currentDoc) {
       const currentDate = currentDoc.data().date;
@@ -79,7 +79,6 @@ const ReadVPNowScreen = () => {
   };
   
     const handlePreviousText = async () => {
-      const db = getFirestore();
       setAtLastDoc(false);
       if (currentDoc) {
         const currentTimestamp = currentDoc.data().processed;

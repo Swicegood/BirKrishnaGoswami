@@ -225,7 +225,6 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
   * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
   */
   async function getUserTokens() {
-    const db = admin.firestore();
     const tokensCollection = db.collection('push-tokens');
     const snapshot = await tokensCollection.get();
     const tokens = snapshot.docs.map((doc) => doc.data().token);

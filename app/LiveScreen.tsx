@@ -1,30 +1,13 @@
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
-import { initializeApp, getApp } from 'firebase/app';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { httpsCallable } from 'firebase/functions';
 import React, { useEffect, useState } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { Image, Text, Dimensions, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { View } from '../components/Themed';
 import * as ScreenOrientation from 'expo-screen-orientation';
-
-const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyD8JpSB_tK2CBj1tC6f434-vezZ2x0bRbk",
-  authDomain: "birkrishnagoswami-b7360.firebaseapp.com",
-  projectId: "birkrishnagoswami-b7360",
-  storageBucket: "birkrishnagoswami-b7360.appspot.com",
-  messagingSenderId: "790459013032",
-  appId: "1:790459013032:web:d33b61fc48a0178cf82f9d",
-  measurementId: "G-7GVXDMLLSY"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
+import { functions } from './api/firebase';
 
 interface GetYouTubeVideosRequest {
     channelId: string;
@@ -50,7 +33,6 @@ interface FirebaseFunctionError {
   const LiveScreen = () => {
     const [video, setVideo] = useState<GetYouTubeVideosResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const functions = getFunctions(getApp());
     const [isLoading, setIsLoading] = useState(true);
     const [videoHeight, setVideoHeight] = useState(Dimensions.get('window').width * 9 / 16); // initialize with a number
     const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number

@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, 
   ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
-import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import Swiper from 'react-native-swiper';
 import { useLocalSearchParams } from 'expo-router';
 
