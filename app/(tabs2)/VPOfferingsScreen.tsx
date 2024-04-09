@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, 
   ScrollView, Dimensions, ActivityIndicator, FlatList } from 'react-native';
-import { collection, getFirestore, query, orderBy, getDocs} from "firebase/firestore";
+import { collection, query, orderBy, getDocs} from "firebase/firestore";
 import { Link } from 'expo-router';
+import { db } from '../api/firebase';
 
 const itemWidth = Dimensions.get('screen').width / 3; // Width of the item 
 
@@ -29,7 +30,6 @@ const BlogScreen = () => {
   useEffect(() => {
     const fetchBlogEntries = async () => {
       try {
-        const db = getFirestore();
         const q = query(collection(db, 'offerings'), orderBy('date', 'desc'));
         const querySnapshot = await getDocs(q);
         const posts = querySnapshot.docs.map(doc => doc.data());

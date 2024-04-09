@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
    Image, Dimensions, ActivityIndicator } from 'react-native';
-import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import { db } from './api/firebase';
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -26,7 +27,6 @@ const QuoteScreen = () => {
 
   useEffect(() => {
     const fetchQuote = async () => {
-      const db = getFirestore();
       const q = query(collection(db, 'thought-of-the-days'), orderBy('date', 'desc'), limit(1));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
@@ -44,7 +44,6 @@ const QuoteScreen = () => {
   }, []);
 
   const handleNextQuote = async () => {
-    const db = getFirestore();
     if (currentDoc) {
       setAtFirstDoc(false);
       const currentTimestamp = currentDoc.data().processed;
@@ -124,7 +123,6 @@ const QuoteScreen = () => {
   };
 
   const handlePreviousQuote = async () => {
-    const db = getFirestore();
     setAtLastDoc(false);
     if (currentDoc) {
       const currentTimestamp = currentDoc.data().processed;

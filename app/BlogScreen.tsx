@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet,
   ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import Swiper from 'react-native-swiper';
+import { db } from './api/firebase';
 
 
 
@@ -29,7 +30,6 @@ const BlogScreen = () => {
   useEffect(() => {
     const fetchBlogEntries = async () => {
       try {
-        const db = getFirestore();
         const q = query(collection(db, 'blog'), orderBy('date', 'desc'));
         const querySnapshot = await getDocs(q);
         const posts = querySnapshot.docs.map(doc => doc.data());

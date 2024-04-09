@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Link } from 'expo-router';
 import placeholderImage from '../../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-import { collection, getFirestore, query, orderBy, limit, getDocs, where, addDoc } from "firebase/firestore";
-
+import { collection, query, orderBy, limit, getDocs, where, addDoc } from "firebase/firestore";
+import { db } from '../api/firebase';
   
 const screenWidth = Dimensions.get('window').width;
 
@@ -22,7 +22,6 @@ const GalleryComponent = () => {
 
 
   useEffect(() => {
-    const db = getFirestore();
     const newImages = [];
     const q = query(collection(db, 'news'), orderBy('date'));
   

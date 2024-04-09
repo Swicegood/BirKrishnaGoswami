@@ -24,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 const YearScreen = () => {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const db = getFirestore();  
+  const db = getFirestore(app);  
 
 
 useEffect(() => {
@@ -67,20 +67,20 @@ useEffect(() => {
   return (
     <ScrollView>
     <View>
-      {Object.keys(data).sort((a, b) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : a - b).map((year) => (
-        <View style={styles.container}>
-  <Link href={{ pathname: './MonthScreen', params: { year: year, dataString: JSON.stringify(data[year]) } }} asChild>
-    <TouchableOpacity style={styles.playButton}>
-      {/* Replace with your play icon */}
-      <Image source={require('../assets/images/folder.png')} style={styles.playIcon} />
-    </TouchableOpacity>
-  </Link>
-  <View style={styles.textContainer}>
-    <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>{year}</Text>
-  </View>
-  <Text style={styles.countText}>{data[year]?.length}</Text>
-</View>
-      ))}
+    {Object.keys(data).sort((a, b) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : a - b).map((year) => (
+      <View style={styles.container} key={year}>
+        <Link href={{ pathname: './MonthScreen', params: { year: year, dataString: JSON.stringify(data[year]) } }} asChild>
+          <TouchableOpacity style={styles.playButton}>
+            {/* Replace with your play icon */}
+            <Image source={require('../assets/images/folder.png')} style={styles.playIcon} />
+          </TouchableOpacity>
+        </Link>
+        <View style={styles.textContainer}>
+          <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>{year}</Text>
+        </View>
+        <Text style={styles.countText}>{data[year]?.length}</Text>
+      </View>
+    ))}
     </View>
     </ScrollView>
   );
@@ -93,6 +93,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc', // Adjust color as needed
     backgroundColor: 'white',
+  },
+  musicContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   countText: {
     position: 'absolute',

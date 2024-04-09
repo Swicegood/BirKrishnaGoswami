@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, 
   ActivityIndicator, FlatList, SafeAreaView, Dimensions } from 'react-native';
 import { collection, getFirestore, query, orderBy, getDocs } from "firebase/firestore";
-
-
+import { db } from './api/firebase';
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 import { Link } from 'expo-router';
-import { isLoading } from 'expo-font';
 
 
 const itemWidth = Dimensions.get('screen').width / 2 - 20; // Width of the item 
@@ -20,7 +18,6 @@ const PurchaseScreen = () => {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const db = getFirestore();
       const q = query(collection(db, 'books'));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {

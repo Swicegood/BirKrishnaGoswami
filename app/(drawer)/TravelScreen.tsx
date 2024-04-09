@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
   ActivityIndicator, Image, Dimensions } from 'react-native';
 import { collection, getFirestore, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import { db } from '../api/firebase';
+
+
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
     return '';
@@ -28,7 +31,6 @@ const TravelScreen = () => {
 
   useEffect(() => {
     const fetchText = async () => {
-      const db = getFirestore();
       const q = query(collection(db, 'travel-schedule'), orderBy('date', 'desc'), limit(1));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
