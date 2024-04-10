@@ -40,6 +40,7 @@ exports.getYouTubePlaylists = functions.https.onRequest(async (req, res) => {
 exports.getYouTubePlaylistVideos = functions.https.onRequest(async (req, res) => {
   const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
   const playlistId = req.body.data.playlistId; // Extract channelId from the body of the request
+  const nextPageToken = req.body.data.nextPageToken; // Extract nextPageToken from the body of the request
 
   try {
     const response = await axios.get(`https://www.googleapis.com/youtube/v3/playlistItems`, {
@@ -48,6 +49,7 @@ exports.getYouTubePlaylistVideos = functions.https.onRequest(async (req, res) =>
         playlistId: playlistId,
         maxResults: 50, // Adjust based on your needs
         key: API_KEY,
+        pageToken: nextPageToken, // Add this line
       },
     });
 
@@ -225,6 +227,7 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
   * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
   */
   async function getUserTokens() {
+    const db = admin.firestore();
     const tokensCollection = db.collection('push-tokens');
     const snapshot = await tokensCollection.get();
     const tokens = snapshot.docs.map((doc) => doc.data().token);
