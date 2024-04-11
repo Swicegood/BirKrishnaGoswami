@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, Image, TouchableOpacity } from 'react-native';
 import { Link, useLocalSearchParams} from 'expo-router';
-import { getAllImageFiles } from './api/apiWrapper';
+import { getAllFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 
 
@@ -38,7 +38,7 @@ const GalleryComponent = () => {
   useEffect(() => {
     let isMounted = true;  // add this line
   
-    getAllImageFiles().then((data: string[]) => {
+    getAllFiles('imageList', 'imageFiles').then((data: string[]) => {
       if (isMounted) {  // check if component is still mounted
         setImages(data.length ? data.filter(item => item.includes(id)) : placeholderImages);
       }

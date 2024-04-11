@@ -208,7 +208,7 @@ const QuoteScreen = () => {
   if (isLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
-
+// Button labels PREVIOUS AND NEXT are backwards for user clarity
   return (
     <ScrollView style={styles.container}>
 
@@ -221,14 +221,14 @@ const QuoteScreen = () => {
             <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
               {!atFirstDoc && (
                 <TouchableOpacity style={styles.nextButton} onPress={handlePreviousQuote}>
-                  <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
+                  <Text style={styles.nextButtonText}>{'<'} NEXT</Text>
                 </TouchableOpacity>
               )}
             </View>
             <View style={{ flex: !atLastDoc ? 0 : 0 }}>
               {!atLastDoc && (
                 <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
-                  <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
+                  <Text style={styles.nextButtonText}>PREVIOUS {'>'}</Text>
                 </TouchableOpacity>
               )}
             </View>

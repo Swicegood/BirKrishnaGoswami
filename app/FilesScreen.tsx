@@ -21,7 +21,7 @@ const FilesScreen = () => {
   console.log("FileSccreenCat", category);
   useEffect(() => {
     (async () => {
-      const allFiles: File[] = (await getAllFiles()).map((url: string) => {
+      const allFiles: File[] = (await getAllFiles('audioFilesList', 'mp3Files')).map((url: string) => {
         const segments = url.split('/');
         const filename = segments[segments.length - 1]; // Get the last segment of the URL
         const title = filename.split('.')[0]; // Remove the file extension

@@ -78,7 +78,7 @@ const FolderScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const files: File[] = (await getAllFiles()).map(url => ({ url }));
+      const files: File[] = (await getAllFiles('audioFilesList', 'mp3Files')).map(url => ({ url }));
       const hierarchy = files.map(file => {
         const hierarchyFromUrl = extractHierarchyFromUrl(file.url);
         return hierarchyFromUrl;

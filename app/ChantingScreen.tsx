@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { Link } from 'expo-router';
+import { doc, getDoc } from "firebase/firestore";
+import { db } from './api/firebase';
 
 const windowHeight = Dimensions.get('window').height;
-const track = "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3";
-
 
 const chanting: React.FC = () => {
   // Navigation function or hook should be implemented based on your navigation setup
+  const [track, setTrack] = useState<string>("https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3");
+
+  useEffect(() => {
+    const fetchChanting = async () => {
+      const docRef = doc(db, "files-urls", "chanting");
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setTrack(data.url);
+      }
+    };
+
+    fetchChanting();
+  }, []);
 
 
   return (

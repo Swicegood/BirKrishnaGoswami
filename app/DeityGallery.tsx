@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
-import { getAllDeityFiles } from './api/apiWrapper';
+import { getAllFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 
 
@@ -44,15 +44,15 @@ const GalleryComponent = () => {
     setNumColumns(getOrientation());
   }
 
-useEffect(() => {
-    getAllDeityFiles().then((data) => {
-      setImages(data.length ? data : placeholderImages); // If data is fetched, set images to data. Otherwise, keep the placeholder images.
-    });
-  }
-, []);
+  useEffect(() => {
+    getAllFiles('deityList', 'deities').then((data) => {
+        setImages(data.length ? data : placeholderImages); // If data is fetched, set images to data. Otherwise, keep the placeholder images.
+      });
+    }
+  , []);
 
   useEffect(() => {
-    getAllDeityFiles().then((data) => {
+    getAllFiles('deityList', 'deities').then((data) => {
       setImages(data);
     });
   }, []);

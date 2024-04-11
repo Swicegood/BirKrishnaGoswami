@@ -1,11 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Image } from 'react-native';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
-const urls = {
-  filesList: "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_files.txt",
-  imageList: "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/all_images.txt",
-  deityList: "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/deities300w.txt",
-}
 
 async function fetchFilesList(filesListUrl) {
   const proxyUrl = '';
@@ -47,19 +43,20 @@ async function fetchAndCacheFiles(key, url) {
   return files;
 }
 
-async function getAllFiles() {
-  return fetchAndCacheFiles('mp3Files', urls.filesList);
+async function getAllFiles(docId, cacheKey) {
+  try {
+    const docRef = doc(db, 'files-urls', docId);
+    const docSnapshot = await getDoc(docRef);
+
+    if (docSnapshot.exists()) {
+      return fetchAndCacheFiles(cacheKey, docSnapshot.data().url);
+    } else {
+      console.log("No such document!");
+    }
+  } catch (error) {
+    console.log("Error getting document:", error);
+  }
 }
 
-async function getAllImageFiles() {
-  return fetchAndCacheFiles('imageFiles', urls.imageList);
-}
 
-// ... Other code ...
-
-async function getAllDeityFiles() {
-  return fetchAndCacheFiles('deities', urls.deityList);
-}
-
-
-export { getAllFiles, getAllImageFiles, getAllDeityFiles };
+export { getAllFiles };
