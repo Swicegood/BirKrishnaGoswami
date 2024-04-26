@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, SafeAreaView, Dimensions, FlatList, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, StyleSheet, Image, SafeAreaView, Dimensions, 
+  FlatList, TouchableOpacity, Linking, ScrollView } from 'react-native';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -20,6 +21,7 @@ const DonationScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ScrollView>
       <View style={styles.container}>
         <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: windowWidth, alignSelf: 'center' }} />
         <View style={styles.content}>
@@ -35,6 +37,7 @@ const DonationScreen = () => {
             />
         </View>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

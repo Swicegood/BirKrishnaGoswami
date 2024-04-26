@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, 
-  ScrollView, Dimensions, ActivityIndicator, FlatList } from 'react-native';
-import { collection, query, orderBy, getDocs} from "firebase/firestore";
+import {
+  View, Text, TouchableOpacity, StyleSheet,
+  ScrollView, Dimensions, ActivityIndicator, FlatList
+} from 'react-native';
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { Link } from 'expo-router';
 import { db } from '../api/firebase';
 
@@ -39,36 +41,38 @@ const BlogScreen = () => {
         console.error('Error fetching blog entries:', error);
       }
     };
-  
+
     fetchBlogEntries();
   }, []);
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
   return (
-    
-    <ScrollView style={styles.container}>
-     <FlatList 
 
-            data={posts}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.content}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <Text style={styles.date}>{formatDate(item.date)} | {item.location}</Text>
-                </View>
-                <Link href={{ pathname: "../ReadVPScreen", params: { offering: JSON.stringify(item) } }} asChild>
-                  <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>READ NOW</Text>
-                  </TouchableOpacity>
-                </Link>
-              </View>
-            )}
-      />
-  </ScrollView>
+
+    <FlatList
+      data={posts}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.content}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.date}>{formatDate(item.date)} | {item.location}</Text>
+          </View>
+          <Link href={{ pathname: "../ReadVPScreen", params: { offering: JSON.stringify(item) } }} asChild>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>READ NOW</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      )}
+    />
     
 
   );
@@ -124,11 +128,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 10,
     marginTop: 10,
-    width: itemWidth-16,
+    width: itemWidth - 16,
     height: 40,
     alignItems: 'center',
   },
-  
+
 });
 
 export default BlogScreen;
