@@ -13,17 +13,19 @@ interface VideoItemProps {
 }
 
 const VideoPlayerItem = () => {
+  console.log("VideoPlayerItem");
   const { id } = useLocalSearchParams<{id : string}>(); // Get the video ID from the URL
   const [videoHeight, setVideoHeight] = useState(Dimensions.get('window').width * 9 / 16); // initialize with a number
   const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log("useEffect");
     getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
     getVideoWidth().then(setVideoWidth); // set the initial width when the component mounts
-
+    console.log("useEffect2");
     ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
-
+    console.log("useEffect3");
     return () => {
       ScreenOrientation.removeOrientationChangeListener(handleOrientationChange);
     };
@@ -35,35 +37,45 @@ const VideoPlayerItem = () => {
   }
 
   async function getVideoHeight() {
-    const orientation = await ScreenOrientation.getOrientationAsync();
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
-
-    if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
-      // In portrait mode, set height based on screen width and aspect ratio
-      return screenWidth * 9 / 16;
-    } else {
-      // In landscape mode, set height to screen height
-      return screenHeight - NAVBAR_HEIGHT;
+    try {
+      const orientation = await ScreenOrientation.getOrientationAsync();
+      const screenWidth = Dimensions.get('window').width;
+      const screenHeight = Dimensions.get('window').height;
+  
+      if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+        // In portrait mode, set height based on screen width and aspect ratio
+        return screenWidth * 9 / 16;
+      } else {
+        // In landscape mode, set height to screen height
+        return screenHeight - NAVBAR_HEIGHT;
+      }
+    } catch (error) {
+      console.error('Error getting video height:', error);
+      return 0; // Return a default value
     }
   }
-
+  
   async function getVideoWidth() {
-    const orientation = await ScreenOrientation.getOrientationAsync();
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
-
-    if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
-      // In portrait mode, set height based on screen width and aspect ratio
-      return screenWidth;
-    } else {
-      // In landscape mode, set height to screen height
-      return (screenHeight - NAVBAR_HEIGHT )* 16 / 9;
+    try {
+      const orientation = await ScreenOrientation.getOrientationAsync();
+      const screenWidth = Dimensions.get('window').width;
+      const screenHeight = Dimensions.get('window').height;
+  
+      if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+        // In portrait mode, set height based on screen width and aspect ratio
+        return screenWidth;
+      } else {
+        // In landscape mode, set height to screen height
+        return (screenHeight - NAVBAR_HEIGHT) * 16 / 9;
+      }
+    } catch (error) {
+      console.error('Error getting video width:', error);
+      return 0; // Return a default value
     }
   }
 
 
-
+ console.log("id", id);
   return (
     <View style={styles.textContainer}>
       <View style={styles.centeredContent}>
@@ -71,6 +83,7 @@ const VideoPlayerItem = () => {
         height={videoHeight} // Await the getVideoHeight() function to get the actual height value
         width={videoWidth}
         play={true}
+        webViewProps={{androidLayerType: 'software'}}
         videoId={id}
         onReady={() => setIsLoading(false)}
       />

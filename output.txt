@@ -1,0 +1,8 @@
+
+> bkgonestopshop@1.0.0 start
+> expo start
+
+Starting project at /Users/jaga/BKGOneStopShop
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.

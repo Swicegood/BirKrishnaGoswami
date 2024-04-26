@@ -3,6 +3,10 @@ import { useGlobalSearchParams, Link } from 'expo-router';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
+function customDecodeURI(str) {
+  return decodeURIComponent(str.replace(/%27/g, "'").replace(/%28/g, "(").replace(/%29/g, ")"));
+}
+
 const DayScreen = () => {
   const { year, month, dataString } = useGlobalSearchParams();  
   const [data, setData] = useState<any[]>([]);
@@ -13,7 +17,7 @@ const DayScreen = () => {
     }
     const parsedData = JSON.parse(dataString);
     const dataWithTitles = parsedData.map((url: string) => {
-      const title = url?.split('/').pop() || ''; // Extract basename from URL
+      const title = customDecodeURI(url)?.split('/').pop() || ''; // Extract basename from URL
       return { url, title, month, year};
     });
     setData(dataWithTitles);

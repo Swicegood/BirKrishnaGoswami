@@ -5,12 +5,15 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } fr
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from './api/firebase';
 
+function customEncodeURI(str) {
+  return encodeURIComponent(str).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29');
+}
+
 const YearScreen = () => {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-
-
-useEffect(() => {
+  
+  useEffect(() => {
   const fetchData = async () => {
     const q = query(collection(db, 'audio-tracks'));
     const querySnapshot = await getDocs(q);
@@ -22,11 +25,11 @@ useEffect(() => {
         const month = monthNames[date.getMonth()];
         if (!acc[year]) acc[year] = {};
         if (!acc[year][month]) acc[year][month] = [];
-        acc[year][month].push(doc.data().url);
+        acc[year][month].push(customEncodeURI(doc.data().url));
       } else {
         if (!acc['Unknown']) acc['Unknown'] = {};
         if (!acc['Unknown']['Unknown']) acc['Unknown']['Unknown'] = [];
-        acc['Unknown']['Unknown'].push(doc.data().url);
+        acc['Unknown']['Unknown'].push(customEncodeURI(doc.data().url));
       }
       return acc;
     }, {});
