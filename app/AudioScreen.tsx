@@ -255,6 +255,7 @@ const formatTime = (milliseconds) => {
 
 const styles = StyleSheet.create({
     musicContainer: {
+      flex: 1,
       alignItems: "center",
       justifyContent: "center",
       marginTop: 0, // Add some margin to separate the title and the button
