@@ -12,7 +12,7 @@ const BioScreen = () => {
           <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
       </View>
       <View style={styles.content}>
-          <Text style={styles.date}>Date of Birth: 1949</Text>
+          <Text style={styles.date}>Year of Appearance: 1949</Text>
           <Text style={styles.bodyText}>
   Bir Krishna Goswami is one of the spiritual leaders of the International Society for Krishna Consciousness. He has a special status of being among the first Western-born members of the authorized chain of disciplic succession descending from the Supreme Lord, Krishna. In modern times, the most essential task of Krishna conscious spiritual masters is to publish the Vedic scriptures of ancient India and distribute them throughout the world. Bir Krishna Goswami has made this mission his life and soul.{'\n\n'}
 
