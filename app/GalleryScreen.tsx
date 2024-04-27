@@ -28,7 +28,7 @@ const GalleryComponent = () => {
   }
 
   const originalImage = (imageUrl: string) => {
-    const originalUrl = imageUrl.replace('300w', 'original');
+    const originalUrl = imageUrl.replace('300w', '1024w');
     return originalUrl;
   };
 
