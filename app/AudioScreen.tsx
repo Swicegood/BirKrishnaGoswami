@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Dimensions,
+  Share
 } from "react-native";
 import { Audio, InterruptionModeIOS } from "expo-av";
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
@@ -191,6 +192,9 @@ const formatTime = (milliseconds) => {
       <View style={styles.overlay}>
       <View style={styles.content}>
       <View style={{ flex: 1 }} /> 
+      <TouchableOpacity onPress={() => shareAudioTrack(file.url)}>
+          <Text style={styles.title}>Share Audio File</Text>
+        </TouchableOpacity>
       <Text style={styles.title}>{file.title.toUpperCase().replace('_',' ')}</Text>
         <Slider
             style={styles.slider}
@@ -340,5 +344,27 @@ const styles = StyleSheet.create({
     },
   
   });
+  const shareAudioTrack = async (url) => {
+    try {
+      const result = await Share.share({
+        message: 'Check out this cool audio by Srila Gurudeva!',
+        url: url  // Replace VIDEO_ID with the actual ID
+      });
   
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // Shared with activity type of result.activityType
+          console.log('Shared with', result.activityType);
+        } else {
+          // Shared
+          console.log('Shared successfully!');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // Dismissed
+        console.log('Share dismissed');
+      }
+    } catch (error) {
+      console.error('Error sharing YouTube video:', error);
+    }
+  };
 export default AudioScreen;
