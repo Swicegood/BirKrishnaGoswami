@@ -1,19 +1,11 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from 'expo-router';
+import { SplashScreen, Stack, usePathname } from 'expo-router';
 import { useEffect } from 'react';
-import { Pressable, useColorScheme } from 'react-native';
+import { StyleSheet, useColorScheme, SafeAreaView } from 'react-native';
+import StableHeader from '../components/StableHeader';
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
 
 
 
@@ -24,7 +16,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(drawer)',
+  initialRouteName: '(drawer)/index',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -33,7 +25,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,    
+    ...FontAwesome.font,
   })
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -52,17 +44,29 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav/>;
+  return <RootLayoutNav />;
 }
+
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const pathname = usePathname();
+
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>        
-      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+    <>
+      <Stack
+        screenOptions={{
+          header: () => <StableHeader />,
+        }}
+      >
       </Stack>
-    </ThemeProvider>
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: '#993D39', // Use the same color as your header
+    fontColor: 'white',
+  },
+});

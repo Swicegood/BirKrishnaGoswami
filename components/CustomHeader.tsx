@@ -1,8 +1,7 @@
 import {Text, View} from './Themed';
 import {StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { useNavigation } from 'expo-router';
 
 type DrawerParamList = {
   Home: undefined;
@@ -10,12 +9,12 @@ type DrawerParamList = {
 };
 
 function CustomHeader() {
-  const navigation = useNavigation<DrawerNavigationProp<DrawerParamList, 'Home'>>();
+  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.toggleDrawer()}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
           <Text style={styles.menuText}>☰</Text>
         </TouchableOpacity>
         <Text style={styles.headerText}></Text>
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
     // Style your menu button
   },
   menuText: {
-    fontSize: 28,
+    fontSize: 48,
     fontWeight: 'bold',
     color: 'white', // Choose your color
   },

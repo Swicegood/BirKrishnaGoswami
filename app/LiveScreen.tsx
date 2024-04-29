@@ -42,6 +42,8 @@ const LiveScreen = () => {
   const [videoHeight, setVideoHeight] = useState(Dimensions.get('window').width * 9 / 16); // initialize with a number
   const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number
 
+  const NAVBAR_HEIGHT = 56;
+
   useEffect(() => {
     getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
     getVideoWidth().then(setVideoWidth); // set the initial width when the component mounts
