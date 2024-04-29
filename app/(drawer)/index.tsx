@@ -124,7 +124,7 @@ export default function TabOneScireen() {
             <Text style={styles.buttonText}>LIVE</Text>
           </TouchableOpacity>
         </Link>
-        <Link href="./audio" asChild>
+        <Link href="./AudioStartScreen" asChild>
         <TouchableOpacity style={styles.buttonContainer}> 
             <Image
               source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
@@ -185,7 +185,7 @@ export default function TabOneScireen() {
 
       <View style={styles.buttonRow}>
         {/* Button components */}
-        <Link href="./SearchYoutubeScreen" asChild>
+        <Link href="./SearchYouTubeScreen" asChild>
             <TouchableOpacity style={styles.buttonContainer}> 
                 <Image
                   source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image

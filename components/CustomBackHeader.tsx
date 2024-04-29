@@ -3,6 +3,7 @@ import {StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { FontAwesome } from '@expo/vector-icons';
 
 type DrawerParamList = {
   Home: undefined;
@@ -10,16 +11,18 @@ type DrawerParamList = {
   index: undefined;
 };
 
-function CustomBackHeader() {
+function CustomBackHeader({title}: {title: string}) {
   const navigation = useNavigation<DrawerNavigationProp<DrawerParamList, 'Home'>>();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
-      <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('index')}>
-         <Text style={styles.menuText}>&lt;</Text>
+      <TouchableOpacity  style={styles.leftItem} onPress={() => navigation.navigate('index')}>
+         <FontAwesome name="angle-left" size={32} color="white" />
       </TouchableOpacity>
-        <Text style={styles.headerText}></Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.headerText}>{title}</Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -38,16 +41,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: '#ED4D4E', // Set the background color for your header
   },
-  menuButton: {
-    // Style your menu button
-  },
-  menuText: {
+  titleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     fontSize: 28,
     fontWeight: 'bold',
-    color: 'white', // Choose your color
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ED4D4E', // Choose your color
   },
+  leftItem: {
+    zIndex: 1,
+    fontSize: 28,
+    color: 'white',
+},
   headerText: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white', // Choose your color
   },

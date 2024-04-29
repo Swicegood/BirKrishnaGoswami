@@ -21,6 +21,8 @@ function StableHeader() {
     } else {
         if (pathname === '/PicturesScreen') {
             setHeaderContent(<CustomHeaderMain title="PICTURES" />);
+        } else if (pathname === '/AudioStartScreen') {
+            setHeaderContent(<CustomHeaderMain title="AUDIO" />);
         } else if (pathname === '/ChantingScreen') {
             setHeaderContent(<CustomHeaderMain title="CHANTING" />);
         } else if (pathname === '/DayScreen') {
@@ -73,11 +75,21 @@ function StableHeader() {
             setHeaderContent(<CustomHeaderMain title="TEMPLES" />);
         } else if (pathname === '/YearScreen') {
             setHeaderContent(<CustomHeaderMain title="AUDIO" />);
-        } else if (pathname === '/YouTubePlayerScreen') {
-            setHeaderContent(<CustomHeaderMain title="YOUTUBE" />);
+        } else if (pathname === '/RecentUploads') {
+            setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
+        } else if (pathname === '/RecentVideosScreen') {
+            setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
+        } else if (pathname === '/SPPlaylistScreen') {
+            setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
+        }  else if (pathname === '/VPOfferingsScreen') {
+            setHeaderContent(<CustomHeaderMain title="OFFERINGS" />);
+        }  else if (pathname === '/VPBooksScreen') {
+            setHeaderContent(<CustomHeaderMain title="BOOKS" />);
+        }  else if (pathname === '/VPPlaylistScreen') {
+            setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
         } else {
             setHeaderContent(<CustomHeaderMain title="" />);
-        }
+        } 
     }
   }, [pathname]);
 

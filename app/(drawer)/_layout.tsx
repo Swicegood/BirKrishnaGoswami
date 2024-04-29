@@ -25,7 +25,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'About',
         title: 'overview',
-        header: () => <CustomBackHeader />,
+        header: () => <CustomBackHeader title='BIO'/>,
       }}
     />
     <Drawer.Screen
@@ -33,7 +33,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'Travel Schedule',
         title: 'Travel Schedule',
-        header: () => <CustomBackHeader />,
+        header: () => <CustomBackHeader title='TRAVEL'/>,
       }}
     />
     <Drawer.Screen
@@ -41,7 +41,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'News',
         title: 'News About Gurudeva',
-        header: () => <CustomBackHeader />,
+        header: () => <CustomBackHeader title='NEWS'/>,
       }}
     />
     <Drawer.Screen
@@ -49,7 +49,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'Downloads',
         title: 'Downloads',
-        header: () => <CustomBackHeader />,
+        header: () => <CustomBackHeader title='DOWNLOADS'/>,
       }}
     />
     <Drawer.Screen 
