@@ -25,7 +25,7 @@ export default function DrawerLayout() {
       options={{
         drawerLabel: 'About',
         title: 'overview',
-        header: () => <CustomBackHeader title='BIO'/>,
+        header: () => <CustomBackHeader title='BIOGRAPHY'/>,
       }}
     />
     <Drawer.Screen

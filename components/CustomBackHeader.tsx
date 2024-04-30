@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { FontAwesome } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
 
 type DrawerParamList = {
   Home: undefined;
@@ -15,6 +16,8 @@ function CustomBackHeader({title}: {title: string}) {
   const navigation = useNavigation<DrawerNavigationProp<DrawerParamList, 'Home'>>();
 
   return (
+    <>
+      <StatusBar style="light" />
     <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
       <TouchableOpacity  style={styles.leftItem} onPress={() => navigation.navigate('index')}>
@@ -25,6 +28,7 @@ function CustomBackHeader({title}: {title: string}) {
         </View>
       </View>
     </SafeAreaView>
+    </>
   );
 }
 

@@ -1,7 +1,9 @@
-import {Text, View} from './Themed';
-import {StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View } from './Themed';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+
 
 type DrawerParamList = {
   Home: undefined;
@@ -12,14 +14,17 @@ function CustomHeader() {
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
-          <Text style={styles.menuText}>☰</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerText}></Text>
-      </View>
-    </SafeAreaView>
+    <>
+      <StatusBar style="light" />
+      <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
+            <Text style={styles.menuText}>☰</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerText}></Text>
+        </View>
+      </SafeAreaView>
+    </>
   );
 }
 
