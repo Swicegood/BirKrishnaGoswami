@@ -5,12 +5,17 @@ import { httpsCallable } from 'firebase/functions';
 import React, { useEffect, useState } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import {
-  Image, Text, Dimensions, StyleSheet, Share, Button,
+  Image, Text, Dimensions, StyleSheet, Share, Pressable,
   TouchableOpacity, ActivityIndicator
 } from 'react-native';
 import { View } from '../components/Themed';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { functions } from './api/firebase';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, router } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Entypo from '@expo/vector-icons/Entypo';
+
 
 interface GetYouTubeVideosRequest {
   channelId: string;
@@ -36,6 +41,7 @@ interface FirebaseFunctionError {
 
 
 const LiveScreen = () => {
+  const navigation = useNavigation();
   const [video, setVideo] = useState<GetYouTubeVideosResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -115,47 +121,71 @@ const LiveScreen = () => {
 
   if (error || !video) {
     return (
-      <View>
-        <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get('window').width, height: 200 }} />
-        <Text>Live Streaming is not available right now!</Text>
-        <Text> Please try again later. </Text>
-      </View>
+      <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
+        <View style={styles.header}>
+          {navigation.canGoBack() && (
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
+              <FontAwesome name="angle-left" size={32} color="white" />
+            </TouchableOpacity>
+          )}
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>LIVE STREAMING</Text>
+          </View>
+          <View style={styles.rightItem}>
+            <View style={styles.circle}>
+              <TouchableOpacity onPress={() => shareYouTubeVideo('https://www.youtube.com/watch?v=' + video)}>
+                <Entypo name="share" size={26} color="#ED4D4E" fontWeight='bold' />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        <View>
+          <Image source={require('../assets/images/video-monetiztion-not-available.jpg')} style={{ width: Dimensions.get('window').width, height: 200 }} />
+          <View style={styles.subTextContainer}>
+            <Text style={styles.subText}>Live Streaming is not available right now!</Text>
+            <Text style={styles.subText}> Please try again later. </Text>
+          </View>
+        </View>
+      </SafeAreaView>
     );
   }
 
   console.log("live video video", video);
 
   return (
-    <View style={styles.textContainer}>
-      <View style={styles.centeredContent}>
-        <YoutubePlayer
-          height={videoHeight} // Await the getVideoHeight() function to get the actual height value
-          width={videoWidth}
-          play={true}
-          videoId={video}
-          onReady={() => setIsLoading(false)}
-        />
-        <TouchableOpacity onPress={() => shareYouTubeVideo('https://www.youtube.com/watch?v='+video)}>
-          <Text>Share YouTube Video</Text>
-        </TouchableOpacity>
-        {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+    <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
+      <View style={styles.header}>
+        {navigation.canGoBack() && (
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
+            <FontAwesome name="angle-left" size={32} color="white" />
+          </TouchableOpacity>
+        )}
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>LIVE STREAMING</Text>
+        </View>
+        <View style={styles.rightItem}>
+          <View style={styles.circle}>
+            <TouchableOpacity onPress={() => shareYouTubeVideo('https://www.youtube.com/watch?v=' + video)}>
+              <Entypo name="share" size={26} color="#ED4D4E" fontWeight='bold' />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+      <View style={styles.textContainer}>
+        <View style={styles.centeredContent}>
+          <YoutubePlayer
+            height={videoHeight} // Await the getVideoHeight() function to get the actual height value
+            width={videoWidth}
+            play={true}
+            videoId={video}
+            onReady={() => setIsLoading(false)}
+          />
+          {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  textContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  centeredContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
 
 const shareYouTubeVideo = async (url) => {
   try {
@@ -181,6 +211,76 @@ const shareYouTubeVideo = async (url) => {
   }
 };
 
+const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: '#993D39', // Use the same color as your header
+  },
+  header: {
+    height: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    backgroundColor: '#ED4D4E', // Set the background color for your header
+  },
+  titleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent', // Choose your color
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  leftItem: {
+    zIndex: 1,
+    fontSize: 28,
+    color: 'white',
+  },
+  rightItem: {
+    backgroundColor: 'transparent',
+  },
+  subText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black', // Choose your color
+    textAlign: 'center',
+    margin: 10,
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  centeredContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  circle: {
+    width: 30, // Or whatever size you want
+    height: 30, // Should be the same as width
+    borderRadius: 15, // Half of your width and height
+    backgroundColor: 'white', // Or whatever color you want
+    justifyContent: 'center', // Center the child items vertically
+    alignItems: 'center', // Center the child items horizontally
+  },
+  subTextContainer: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.60,
+    shadowRadius: 20,
+    elevation: 5,
+  },
+
+
+});
 
 export default LiveScreen;
 

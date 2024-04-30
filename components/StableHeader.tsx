@@ -42,8 +42,6 @@ function StableHeader() {
         } else if (pathname === '/GalleryScreen') {
             setHeaderContent(<CustomHeaderMain title="GALLERY" />);
         } else if (pathname === '/GurudevaPicsScreen') {
-            setHeaderContent(<CustomHeaderMain title="PHOTOS" />);
-        } else if (pathname === '/LiveScreen') {
             setHeaderContent(<CustomHeaderMain title="LIVE" />);
         } else if (pathname === '/MemoriesScreen') {
             setHeaderContent(<CustomHeaderMain title="MEMORIES" />);
@@ -87,8 +85,6 @@ function StableHeader() {
             setHeaderContent(<CustomHeaderMain title="BOOKS" />);
         }  else if (pathname === '/VPPlaylistScreen') {
             setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
-        } else {
-            setHeaderContent(<CustomHeaderMain title="" />);
         } 
     }
   }, [pathname]);

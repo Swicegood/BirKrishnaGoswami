@@ -38,6 +38,7 @@
     "expo-router": "^2.0.0",
     "expo-screen-orientation": "~6.0.6",
     "expo-server-sdk": "^3.7.0",
+    "expo-sharing": "~11.5.0",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "expo-system-ui": "~2.4.0",
@@ -62,8 +63,7 @@
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "~0.19.6",
     "react-native-webview": "^13.2.2",
-    "react-native-youtube-iframe": "^2.3.0",
-    "expo-sharing": "~11.5.0"
+    "react-native-youtube-iframe": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
