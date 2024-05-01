@@ -45,7 +45,7 @@ const YearScreen = () => {
   if (isLoading) {
     return (
       <View style={styles.musicContainer}>
-        <ActivityIndicator size="large" color="#C68446" />
+        <ActivityIndicator size="large" color="#ED4D4E" />
       </View>
     );
   }

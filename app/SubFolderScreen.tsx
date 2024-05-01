@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView
 import { Link, useLocalSearchParams, useFocusEffect, router} from 'expo-router';
 import { useNavigationState } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomHeaderMain from '../components/CustomHeaderMain';
 
 
 
@@ -168,8 +169,8 @@ interface SubCategory {
 
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-
+    <>
+    <CustomHeaderMain title={category} />
       <View>
       <FlatList
         data={subCategories}
@@ -180,7 +181,7 @@ interface SubCategory {
         contentContainerStyle={styles.contentContainer}
       />
     </View>
-    </SafeAreaView>
+    </>
   );
 };
 

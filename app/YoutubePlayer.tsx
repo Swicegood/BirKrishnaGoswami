@@ -87,7 +87,7 @@ const VideoPlayerItem = () => {
         videoId={id}
         onReady={() => setIsLoading(false)}
       />
-      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+      {isLoading && <ActivityIndicator size="large" color="#ED4D4E" />}
       </View>
     </View>
   );

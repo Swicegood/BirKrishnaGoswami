@@ -39,6 +39,8 @@ function StableHeader() {
             setHeaderContent(<CustomHeaderMain title="DONATE" />);
         } else if (pathname === '/EbooksScreen') {
             setHeaderContent(<CustomHeaderMain title="EBOOKS" />);
+        } else if (pathname === '/FolderScreen') {
+            setHeaderContent(<CustomHeaderMain title="AUDIO" />);
         } else if (pathname === '/GalleryScreen') {
             setHeaderContent(<CustomHeaderMain title="GALLERY" />);
         } else if (pathname === '/GurudevaPicsScreen') {
@@ -67,8 +69,6 @@ function StableHeader() {
             setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
         } else if (pathname === '/SearchYouTubeScreen') {
             setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
-        } else if (pathname === '/SubFolderScreen') {
-            setHeaderContent(<CustomHeaderMain title="AUDIO" />);
         } else if (pathname === '/TemplesScreen') {
             setHeaderContent(<CustomHeaderMain title="TEMPLES" />);
         } else if (pathname === '/YearScreen') {

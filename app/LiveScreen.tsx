@@ -121,6 +121,7 @@ const LiveScreen = () => {
 
   if (error || !video) {
     return (
+      <>
       <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
         <View style={styles.header}>
           {navigation.canGoBack() && (
@@ -139,21 +140,21 @@ const LiveScreen = () => {
             </View>
           </View>
         </View>
-        <View>
+
+      </SafeAreaView>
           <Image source={require('../assets/images/video-monetiztion-not-available.jpg')} style={{ width: Dimensions.get('window').width, height: 200 }} />
           <View style={styles.subTextContainer}>
             <Text style={styles.subText}>Live Streaming is not available right now!</Text>
             <Text style={styles.subText}> Please try again later. </Text>
           </View>
-        </View>
-      </SafeAreaView>
+      </>
     );
   }
 
   console.log("live video video", video);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
+    <>
       <View style={styles.header}>
         {navigation.canGoBack() && (
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
@@ -180,10 +181,10 @@ const LiveScreen = () => {
             videoId={video}
             onReady={() => setIsLoading(false)}
           />
-          {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+          {isLoading && <ActivityIndicator size="large" color="#ED4D4E" />}
         </View>
       </View>
-    </SafeAreaView>
+    </>
   );
 };
 

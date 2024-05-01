@@ -130,7 +130,7 @@ const TravelScreen = () => {
     };
     
     if (isLoading) {
-      return <ActivityIndicator size="large" color="#0000ff" />;
+      return <ActivityIndicator size="large" color="#ED4D4E" />;
     }
 
     return (

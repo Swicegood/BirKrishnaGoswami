@@ -4,6 +4,7 @@ import { Link, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
 import { getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from './api/firebase';
+import CustomHeaderMain from '../components/CustomHeaderMain';
 
 interface File {
   category: string;
@@ -88,6 +89,8 @@ const FilesScreen = () => {
   );
 
   return (
+    <>
+    <CustomHeaderMain title={category} />
     <View>
       <FlatList
         data={files}
@@ -95,6 +98,7 @@ const FilesScreen = () => {
         renderItem={renderItem}
       />
     </View>
+    </>
   );
 };
 

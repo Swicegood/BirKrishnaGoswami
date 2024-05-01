@@ -109,13 +109,12 @@ const FolderScreen = () => {
 if (isLoading){
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color="#0000ff" />
+      <ActivityIndicator size="large" color="#ED4D4E" />
     </View>)
 }
 
   return (
     <HierarchyContext.Provider value={deserializedHierarchy}>
-      <SafeAreaView style={styles.safeArea}>
         <View>
           <FlatList
             data={data}
@@ -126,7 +125,6 @@ if (isLoading){
             contentContainerStyle={styles.contentContainer}
           />
         </View>
-      </SafeAreaView>
     </HierarchyContext.Provider>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, 
-  ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
+  ScrollView, Image, Dimensions } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { useLocalSearchParams } from 'expo-router';
 
