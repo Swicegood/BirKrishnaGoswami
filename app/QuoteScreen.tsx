@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
-   Image, Dimensions, ActivityIndicator } from 'react-native';
+import {
+  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+  Image, Dimensions, ActivityIndicator
+} from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from './api/firebase';
 
@@ -12,7 +14,7 @@ function formatDate(dateString) {
   const dateParts = dateString.split('/');
   const date = new Date(`20${dateParts[2]}`, dateParts[0] - 1, dateParts[1]);
   const month = months[date.getMonth()];
-  const day = String(date.getDate()).padStart(2, '0');
+  const day = String(date.getDate());
 
   return `${month} ${day}`;
 }
@@ -31,9 +33,9 @@ const QuoteScreen = () => {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         // Assuming doc.data() returns an object with text, date, and category
-        setQuote(doc.data().totd);
+        setQuote((doc.data().totd).replace(/"/g, '').replace(/“/g, '').replace(/\n/g, ''));
         setDate(doc.data().date);
-      
+
         // Store the current document in the state variable
         setCurrentDoc(doc);
       });
@@ -49,52 +51,52 @@ const QuoteScreen = () => {
       const currentTimestamp = currentDoc.data().processed;
       console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
       const nextQuery = query(
-        collection(db, 'thought-of-the-days'), 
-        where('processed', '<', currentTimestamp), 
-        orderBy('processed', 'desc'), 
+        collection(db, 'thought-of-the-days'),
+        where('processed', '<', currentTimestamp),
+        orderBy('processed', 'desc'),
         limit(1)
       );
       const nextQuerySnapshot = await getDocs(nextQuery);
-  
+
       if (!nextQuerySnapshot.empty) {
         const doc = nextQuerySnapshot.docs[0];
         const date = currentDoc.data().date;
         console.log("currentDate", date);
-  
+
         // Convert the date to "MM/DD/YYYY" format
         const dateParts = date.split('/');
         const fullYearDate = `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
-  
+
         // Subtract one day from the current date
         const fullDateParts = fullYearDate.split('/');
         const previousDate = new Date(+fullDateParts[2], +fullDateParts[0] - 1, +fullDateParts[1]);
         previousDate.setDate(previousDate.getDate() - 1);
-  
+
         // Format the new date to "MM/DD/YY"
         const previousDateString = `${String(previousDate.getMonth() + 1).padStart(2, '0')}/${String(previousDate.getDate()).padStart(2, '0')}/${String(previousDate.getFullYear()).slice(-2)}`;
         console.log("previous date", previousDateString);
         // Fetch the quote for the new date
 
         let querySnapshot = await getDocs(query(
-          collection(db, 'thought-of-the-days'), 
-          where('date', '==', previousDateString), 
+          collection(db, 'thought-of-the-days'),
+          where('date', '==', previousDateString),
           orderBy('processed', 'desc')
         ));
 
         if (querySnapshot.empty) {
           // If no documents were found for the previous date, query for the next most recent "processed" timestamp
           querySnapshot = await getDocs(query(
-            collection(db, 'thought-of-the-days'), 
-            where('processed', '<', currentTimestamp), 
-            orderBy('processed', 'desc'), 
+            collection(db, 'thought-of-the-days'),
+            where('processed', '<', currentTimestamp),
+            orderBy('processed', 'desc'),
             limit(1)
           ));
         }
 
-        
+
         querySnapshot.forEach((doc) => {
           // Assuming doc.data() returns an object with text, date, and category
-          setQuote(doc.data().totd);
+          setQuote((doc.data().totd).replace(/"/g, '').replace(/“/g, '').replace(/\n/g, ''));
           setDate(doc.data().date);
 
           console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
@@ -102,16 +104,16 @@ const QuoteScreen = () => {
 
         setCurrentDoc(querySnapshot.docs[0]);
         setIsLoading(false);
-        
+
       }
       // Check if the current document is the last one
 
       const nextNextQuery = query(
         collection(db, 'thought-of-the-days'),
-        where('date', '<', currentDoc.data().date),  
-        orderBy('date', 'desc'), 
+        where('date', '<', currentDoc.data().date),
+        orderBy('date', 'desc'),
       );
-  
+
       const querySnapshot = await getDocs(nextNextQuery)
 
       if (querySnapshot.docs.length < 1) {
@@ -128,9 +130,9 @@ const QuoteScreen = () => {
       const currentTimestamp = currentDoc.data().processed;
       console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
       const prevQuery = query(
-        collection(db, 'thought-of-the-days'), 
-        where('processed', '>', currentTimestamp), 
-        orderBy('processed', 'asc'), 
+        collection(db, 'thought-of-the-days'),
+        where('processed', '>', currentTimestamp),
+        orderBy('processed', 'asc'),
         limit(1)
       );
       const prevQuerySnapshot = await getDocs(prevQuery);
@@ -139,29 +141,29 @@ const QuoteScreen = () => {
         // If no documents were found for the previous date, query for the next most recent "processed" timestamp
         setAtFirstDoc(true);
       }
-    
+
       if (!prevQuerySnapshot.empty) {
         const doc = prevQuerySnapshot.docs[0];
         const date = currentDoc.data().date;
         console.log("currentDate", date);
-  
+
         // Convert the date to "MM/DD/YYYY" format
         const dateParts = date.split('/');
         const fullYearDate = `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
-  
+
         // Subtract one day from the current date
         const fullDateParts = fullYearDate.split('/');
         const previousDate = new Date(+fullDateParts[2], +fullDateParts[0] - 1, +fullDateParts[1]);
         previousDate.setDate(previousDate.getDate() + 1);
-  
+
         // Format the new date to "MM/DD/YY"
         const previousDateString = `${String(previousDate.getMonth() + 1).padStart(2, '0')}/${String(previousDate.getDate()).padStart(2, '0')}/${String(previousDate.getFullYear()).slice(-2)}`;
         console.log("previous date", previousDateString);
         // Fetch the quote for the new date
 
         let pQuerySnapshot = await getDocs(query(
-          collection(db, 'thought-of-the-days'), 
-          where('date', '==', previousDateString), 
+          collection(db, 'thought-of-the-days'),
+          where('date', '==', previousDateString),
           orderBy('processed', 'desc')
         ));
 
@@ -169,40 +171,40 @@ const QuoteScreen = () => {
         if (pQuerySnapshot.empty) {
           // If no documents were found for the previous date, query for the next most recent "processed" timestamp
           pQuerySnapshot = await getDocs(query(
-            collection(db, 'thought-of-the-days'), 
-            where('processed', '>', currentTimestamp), 
-            orderBy('processed', 'asc'), 
+            collection(db, 'thought-of-the-days'),
+            where('processed', '>', currentTimestamp),
+            orderBy('processed', 'asc'),
             limit(1)
           ));
 
-      }
+        }
 
-      pQuerySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and title
-        setQuote(doc.data().totd);
-        setDate(doc.data().date);
-        console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
-      });
-  
-      if (pQuerySnapshot.docs[0]) {
-        setCurrentDoc(pQuerySnapshot.docs[0]);
-      }
-  
-      const nextPrevQuery = query(
-        collection(db, 'thought-of-the-days'),
-        where('processed', '>', currentDoc.data().processed), 
-      );
- 
-      const querySnapshot = await getDocs(nextPrevQuery)
+        pQuerySnapshot.forEach((doc) => {
+          // Assuming doc.data() returns an object with text, date, and title
+          setQuote((doc.data().totd).replace(/"/g, '').replace(/“/g, '').replace(/\n/g, ''));
+          setDate(doc.data().date);
+          console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
+        });
 
-      if (querySnapshot.docs.length < 1) {
-        setAtFirstDoc(true);
-      } else {
-        setAtFirstDoc(false);
+        if (pQuerySnapshot.docs[0]) {
+          setCurrentDoc(pQuerySnapshot.docs[0]);
+        }
+
+        const nextPrevQuery = query(
+          collection(db, 'thought-of-the-days'),
+          where('processed', '>', currentDoc.data().processed),
+        );
+
+        const querySnapshot = await getDocs(nextPrevQuery)
+
+        if (querySnapshot.docs.length < 1) {
+          setAtFirstDoc(true);
+        } else {
+          setAtFirstDoc(false);
+        }
       }
     }
-  }
-};
+  };
 
 
   if (isLoading) {
@@ -211,37 +213,41 @@ const QuoteScreen = () => {
         <ActivityIndicator size="large" color="#ED4D4E" />
       </View>)
   }
-// Button labels PREVIOUS AND NEXT are backwards for user clarity
+  // Button labels PREVIOUS AND NEXT are backwards for user clarity
   return (
-    <ScrollView style={styles.container}>
-
-      <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
-      <View style={styles.content}>
-        <Text style={styles.date}>{formatDate(date)}</Text>
-        <Text style={styles.quoteText}>{quote}</Text>
+    <View style={{flex: 1}}>
+      <View style={styles.quoteContainer}>
+        <Image source={require('../assets/images/placeholder_355_240.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+        <View style={styles.content}>
+          <Text style={styles.date}>{formatDate(date)}</Text>
+          <Text style={styles.quoteText}>{quote}</Text>
+        </View>
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
-            <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
-              {!atFirstDoc && (
-                <TouchableOpacity style={styles.nextButton} onPress={handlePreviousQuote}>
-                  <Text style={styles.nextButtonText}>{'<'} NEXT</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View style={{ flex: !atLastDoc ? 0 : 0 }}>
-              {!atLastDoc && (
-                <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
-                  <Text style={styles.nextButtonText}>PREVIOUS {'>'}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+      <View style={{  justifyContent: 'space-between'}}>
+
+        <View style={{ padding: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+            {!atFirstDoc && (
+              <TouchableOpacity style={styles.nextButton} onPress={handlePreviousQuote}>
+                <Text style={styles.nextButtonText}>{'<'} NEXT</Text>
+              </TouchableOpacity>
+            )}
           </View>
-    </ScrollView>
+          <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+            {!atLastDoc && (
+              <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
+                <Text style={styles.nextButtonText}>PREV. {'>'}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  quoteContainer: {
     flex: 1,
   },
   header: {
@@ -261,10 +267,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#E53935',
+    padding: 10,
   },
   quoteText: {
-    fontSize: 20,
+    fontSize: 18,
     marginTop: 10,
+    fontFamily: 'UbuntuRegular',
+    marginLeft: 10,
+    marginRight: 10,
   },
   category: {
     fontSize: 16,
@@ -282,7 +292,7 @@ const styles = StyleSheet.create({
     color: '#E53935',
     padding: 10,
   },
-  
+
 });
 
 export default QuoteScreen;

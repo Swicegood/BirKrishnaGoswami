@@ -130,11 +130,11 @@ const ReadVPNowScreen = () => {
             <Text style={styles.textText}>{text}</Text>
           </View>
         </ScrollView>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
+        <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
           <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
             {!atFirstDoc && (
               <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-                <Text style={styles.nextButtonText}>{'<'} PREVIOUS</Text>
+                <Text style={styles.nextButtonText}>{'<'} PREV.</Text>
               </TouchableOpacity>
             )}
           </View>
