@@ -65,7 +65,6 @@ const renderItem = ({ item }) => {
   }
 
   return (
-      <SafeAreaView style={styles.safeArea}>
         <View>
           <FlatList
             data={data}
@@ -76,7 +75,6 @@ const renderItem = ({ item }) => {
             contentContainerStyle={styles.contentContainer}
           />
         </View>
-      </SafeAreaView>
   );
 };
 
@@ -123,6 +121,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     width: itemWidth,
     marginBottom: 16, // Space between rows
+    padding: 8,
   },
   image: {
     width: '100%',

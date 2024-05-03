@@ -19,7 +19,7 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({ title, lastModified, thumbn
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.lastModified}>Last Modified: {lastModified.split("T")[0]}</Text>
-        <Text style={styles.lastModified}>{lastModified.split("T")[1]}</Text>
+        <Text style={styles.lastModified}>{lastModified.split("T")[1].split(":").slice(0, -1).join(":")}</Text>
       </View>
     </View>
     </Link>
@@ -31,19 +31,25 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({ title, lastModified, thumbn
       flexDirection: 'row',
       padding: 10,
       alignItems: 'center',
+      marginVertical: -12,
     },
     image: {
-      width: Dimensions.get('window').width / 2,
-      height: Dimensions.get('window').height / 8,
+      width: Dimensions.get('window').width / 2.1,
+      height: Dimensions.get('window').height / 9,
       borderRadius: 5,
       marginRight: 10,
     },
     textContainer: {
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
+      width: Dimensions.get('window').width / 2.1,
+      height: Dimensions.get('window').height / 9,
     },
     title: {
       fontSize: 16,
       fontWeight: 'bold',
+      paddingBottom: 10,
+      marginRight: 5,
+      marginTop: 5,
     },
     lastModified: {
       fontSize: 12,

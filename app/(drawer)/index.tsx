@@ -20,11 +20,11 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { db } from '../api/firebase'; 
 
 const ENTRIES = [
-  { title: 'Slide 1', image: require('../../assets/images/quotes_placeholder_355x200.jpg'), link: '../QuoteScreen' },
-  { title: 'Slide 2', image: require('../../assets/images/news_placeholder_355x200.jpg'), link: './NewsScreen' },
-  { title: 'Slide 3', image: require('../../assets/images/memories_placeholder_355x200.jpg'), link: './MemoriesScreen' },
-  { title: 'Slide 4', image: require('../../assets/images/books_placeholder_355x200.jpg'), link: '../BooksScreen' },
-  { title: 'Slide 5', image: require('../../assets/images/vyasa_puja_placeholder_355x200.jpg'), link: '../(tabs3)/VPPlaylistScreen' },
+  { title: 'Slide 1', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: '../QuoteScreen' },
+  { title: 'Slide 2', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: './NewsScreen' },
+  { title: 'Slide 3', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: './MemoriesScreen' },
+  { title: 'Slide 4', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: '../BooksScreen' },
+  { title: 'Slide 5', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: '../(tabs3)/VPPlaylistScreen' },
   // Add more entries here
 ];
 
@@ -88,6 +88,7 @@ export default function TabOneScireen() {
               loop={true}
               onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
             />
+            <View style={{ position: 'absolute', top: 130, left: 140, backgroundColor: 'transparent' }}>
             <Pagination // Add this component
               dotsLength={ENTRIES.length}
               activeDotIndex={activeSlide}
@@ -100,11 +101,12 @@ export default function TabOneScireen() {
                   backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
               }}
               inactiveDotStyle={{
-                  backgroundColor: 'gray' // Change this to the color you want for the inactive dots
+                  backgroundColor: 'white' // Change this to the color you want for the inactive dots
               }}
               inactiveDotOpacity={0.4}
               inactiveDotScale={0.6}
             />
+            </View>
             </>
           )}
       </View>
@@ -306,8 +308,6 @@ const styles = StyleSheet.create<Styles>({
     marginBottom: 0, // No bottom margin
   },
   slide: {
-    width: windowWidth,
-    height: windowHeight * 0.2, // Adjust this value as needed
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#9DD6EB',
@@ -318,7 +318,6 @@ const styles = StyleSheet.create<Styles>({
   },
   image: {
     width: windowWidth, // Adjust this value as needed
-    height: windowHeight * 0.2, // Adjust this value as needed
     resizeMode: 'cover',
   },
   safeArea: {

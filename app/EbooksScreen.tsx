@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
   },
   item: {
     width: itemWidth,
-    marginBottom: 20,
     alignItems: 'center', // Center children horizontally
     justifyContent: 'center', // Center children vertically
   },
@@ -122,6 +121,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   contentContainer: {
+    marginTop: 10,
     alignItems: 'center',
   },
   itemContainer: {
@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     marginTop: 8,
+    marginRight: 8,
     textAlign: 'center',
   },
   buttonText: {
@@ -152,6 +153,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: itemWidth-16,
     alignItems: 'center',
+    marginLeft: 8,
   },
 });
 

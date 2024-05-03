@@ -65,17 +65,11 @@ function StableHeader() {
             setHeaderContent(<CustomHeaderMain title="QUOTE" />);
         } else if (pathname === '/ReadVPScreen') {
             setHeaderContent(<CustomHeaderMain title="VYASA PUJA" />);
-        } else if (pathname === '/RecentVideosScreen') {
-            setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
         } else if (pathname === '/SearchYouTubeScreen') {
             setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
         } else if (pathname === '/TemplesScreen') {
             setHeaderContent(<CustomHeaderMain title="TEMPLES" />);
         } else if (pathname === '/YearScreen') {
-            setHeaderContent(<CustomHeaderMain title="AUDIO" />);
-        } else if (pathname === '/RecentUploads') {
-            setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
-        } else if (pathname === '/RecentVideosScreen') {
             setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
         } else if (pathname === '/SPPlaylistScreen') {
             setHeaderContent(<CustomHeaderMain title="VIDEOS" />);

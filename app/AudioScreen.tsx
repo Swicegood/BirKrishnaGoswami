@@ -223,7 +223,7 @@ const AudioScreen = () => {
             <View style={styles.header}>
               {navigation.canGoBack() && (
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
-                  <FontAwesome name="angle-left" size={32} color="white" />
+                  <FontAwesome name="angle-left" size={32} color="white" hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} />
                 </TouchableOpacity>
               )}
 
@@ -328,6 +328,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#FFFFFF',
     marginBottom: 30,
+    marginRight: 20,
   },
   slider: {
     width: screenWidth * 0.9, // Set the width as needed
