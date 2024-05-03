@@ -50,14 +50,18 @@ const LiveScreen = () => {
 
   const NAVBAR_HEIGHT = 56;
 
+  let subscription;
+
   useEffect(() => {
     getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
     getVideoWidth().then(setVideoWidth); // set the initial width when the component mounts
 
-    ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
+    subscription = ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
 
     return () => {
-      ScreenOrientation.removeOrientationChangeListener(handleOrientationChange);
+      if (subscription) {
+        ScreenOrientation.removeOrientationChangeListener(subscription);
+      }
     };
   }, []);
 
@@ -122,31 +126,31 @@ const LiveScreen = () => {
   if (error || !video) {
     return (
       <>
-      <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
-        <View style={styles.header}>
-          {navigation.canGoBack() && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
-              <FontAwesome name="angle-left" size={32} color="white" />
-            </TouchableOpacity>
-          )}
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>LIVE STREAMING</Text>
-          </View>
-          <View style={styles.rightItem}>
-            <View style={styles.circle}>
-              <TouchableOpacity onPress={() => shareYouTubeVideo('https://www.youtube.com/watch?v=' + video)}>
-                <Entypo name="share" size={26} color="#ED4D4E" fontWeight='bold' />
+        <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
+          <View style={styles.header}>
+            {navigation.canGoBack() && (
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
+                <FontAwesome name="angle-left" size={32} color="white" />
               </TouchableOpacity>
+            )}
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>LIVE STREAMING</Text>
+            </View>
+            <View style={styles.rightItem}>
+              <View style={styles.circle}>
+                <TouchableOpacity onPress={() => shareYouTubeVideo('https://www.youtube.com/watch?v=' + video)}>
+                  <Entypo name="share" size={26} color="#ED4D4E" fontWeight='bold' />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
 
-      </SafeAreaView>
-          <Image source={require('../assets/images/video-monetiztion-not-available.jpg')} style={{ width: Dimensions.get('window').width, height: 200 }} />
-          <View style={styles.subTextContainer}>
-            <Text style={styles.subText}>Live Streaming is not available right now!</Text>
-            <Text style={styles.subText}> Please try again later. </Text>
-          </View>
+        </SafeAreaView>
+        <Image source={require('../assets/images/video-monetiztion-not-available.jpg')} style={{ width: Dimensions.get('window').width, height: 200 }} />
+        <View style={styles.subTextContainer}>
+          <Text style={styles.subText}>Live Streaming is not available right now!</Text>
+          <Text style={styles.subText}> Please try again later. </Text>
+        </View>
       </>
     );
   }

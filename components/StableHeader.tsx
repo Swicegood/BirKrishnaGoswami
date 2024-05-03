@@ -44,7 +44,7 @@ function StableHeader() {
         } else if (pathname === '/GalleryScreen') {
             setHeaderContent(<CustomHeaderMain title="GALLERY" />);
         } else if (pathname === '/GurudevaPicsScreen') {
-            setHeaderContent(<CustomHeaderMain title="LIVE" />);
+            setHeaderContent(<CustomHeaderMain title="PHOTOS" />);
         } else if (pathname === '/MemoriesScreen') {
             setHeaderContent(<CustomHeaderMain title="MEMORIES" />);
         } else if (pathname === '/MonthScreen') {

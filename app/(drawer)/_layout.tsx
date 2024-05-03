@@ -18,6 +18,8 @@ function CustomDrawerContent() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.drawerContent}>
         <View style={styles.header}>
+        <View style={styles.circle} />
+          <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
         </View>
         <View style={styles.content}><Link href="./BioScreen" asChild>
           <Text style={styles.drawerText}>About</Text>
@@ -130,8 +132,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontFamily: 'PacificoRegular',
   },
   content: {
     backgroundColor: 'white',
@@ -159,5 +161,13 @@ const styles = StyleSheet.create({
     color: '#3f3f3f', // Choose your color
     marginTop: 20,
     marginBottom: 30,
+  },
+  circle: {
+    width: 90, // Adjust as needed
+    height: 90, // Adjust as needed
+    borderRadius: 45, // Half of width and height
+    backgroundColor: '#fff', // Adjust as needed
+    alignSelf: 'center',
+    marginBottom: 20, // Adjust as needed
   },
 });

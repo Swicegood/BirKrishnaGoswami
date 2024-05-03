@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import { Link, useLocalSearchParams, useFocusEffect, router} from 'expo-router';
 import { useNavigationState } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
