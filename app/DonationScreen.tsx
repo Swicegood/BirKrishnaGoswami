@@ -23,7 +23,7 @@ const DonationScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView>
       <View style={styles.container}>
-        <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: windowWidth, alignSelf: 'center' }} />
+        <Image source={require('../assets/images/placeholder_355_160.png')} style={{ width: windowWidth, alignSelf: 'center' }} />
         <View style={styles.content}>
             <Text style={styles.headerText}>Hare Krishna!</Text>
             <Text style={styles.cardText}>Thank you for considering donating to the mission of Srila Bir Krishna Goswami Maharaja. 
@@ -88,14 +88,15 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       padding: 10,
       fontSize: 34,
-      color: '#ED4D4E',
+      color: '#bb1900',
+      fontFamily: 'PacificoRegular',
   },
   subHeaderText: {
       fontWeight: 'bold',
       textAlign: 'center',
       padding: 10,
       fontSize: 24,
-      color: '#ED4D4E',
+      color: 'red',
   },
   secondText: {
         fontWeight: 'bold',

@@ -14,6 +14,7 @@ export default function TabLayout() {
         options={{
           title: 'Vyasa Puja Offerings',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="book" color={color} />,
+          headerShown: false,
         }} 
       />
       <Tabs.Screen 
@@ -21,6 +22,7 @@ export default function TabLayout() {
         options={{
           title: 'Playlist',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="youtube" color={color} />,
+          headerShown: false,
         }} 
       />
     </Tabs>

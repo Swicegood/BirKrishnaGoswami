@@ -2,12 +2,13 @@
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
 import { httpsCallable } from 'firebase/functions';
-import { View, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity,
+import { FlatList, StyleSheet, ActivityIndicator, TouchableOpacity,
   Text, Dimensions} from 'react-native';
 import VideoItem from '../components/VideoItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams, Link } from 'expo-router'; 
+import { useLocalSearchParams } from 'expo-router'; 
 import { functions } from './api/firebase';
+import { View } from '../components/Themed';
 
 const NAVBAR_HEIGHT = 44;
 
@@ -222,6 +223,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: -10,
   },
 });
 

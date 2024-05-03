@@ -114,10 +114,9 @@ interface FirebaseFunctionError {
     container: {
       flex: 1,
       backgroundColor: '#fff',
+      padding: -10,
     },
     searchInput: {
-      margin: 10,
-      padding: 10,
       borderColor: 'gray',
       borderWidth: 1,
     },

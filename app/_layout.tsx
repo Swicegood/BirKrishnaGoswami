@@ -27,6 +27,7 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     OblikBold: require('../assets/fonts/Oblik-Bold.otf'),
     UbuntuRegular: require('../assets/fonts/Ubuntu-Regular.ttf'),
+    PacificoRegular: require('../assets/fonts/Pacifico-Regular.ttf'),
     ...FontAwesome.font,
   })
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
