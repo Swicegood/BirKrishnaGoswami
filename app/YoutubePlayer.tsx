@@ -19,18 +19,21 @@ const VideoPlayerItem = () => {
   const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number
   const [isLoading, setIsLoading] = useState(true);
 
+  let subscription;
+
   useEffect(() => {
-    console.log("useEffect");
     getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
     getVideoWidth().then(setVideoWidth); // set the initial width when the component mounts
-    console.log("useEffect2");
-    ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
-    console.log("useEffect3");
+  
+    subscription = ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
+  
     return () => {
-      ScreenOrientation.removeOrientationChangeListener(handleOrientationChange);
+      if (subscription) {
+        ScreenOrientation.removeOrientationChangeListener(subscription);
+      }
     };
   }, []);
-
+  
   function handleOrientationChange() {
     getVideoHeight().then(setVideoHeight);
     getVideoWidth().then(setVideoWidth);
@@ -83,7 +86,6 @@ const VideoPlayerItem = () => {
         height={videoHeight} // Await the getVideoHeight() function to get the actual height value
         width={videoWidth}
         play={true}
-        webViewProps={{androidLayerType: 'software'}}
         videoId={id}
         onReady={() => setIsLoading(false)}
       />
