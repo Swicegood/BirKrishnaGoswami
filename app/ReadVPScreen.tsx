@@ -4,6 +4,8 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { useLocalSearchParams } from 'expo-router';
 import { db } from './api/firebase';
+import RenderHTML from 'react-native-render-html';
+
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -127,7 +129,7 @@ const ReadVPNowScreen = () => {
         <ScrollView style={styles.container}>
           <View style={styles.content}>
             <Text style={styles.date}>{date}</Text>
-            <Text style={styles.textText}>{text}</Text>
+            <RenderHTML contentWidth={width} source={{ html: text }} />
           </View>
         </ScrollView>
         <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
@@ -175,6 +177,7 @@ const styles = StyleSheet.create({
   textText: {
     fontSize: 20,
     marginTop: 10,
+    fontFamily: 'UbuntuRegular',
   },
   category: {
     fontSize: 16,

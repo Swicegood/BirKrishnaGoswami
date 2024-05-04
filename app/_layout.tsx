@@ -62,7 +62,7 @@ function RootLayoutNav() {
           header: () => <StableHeader />,
         }}
       >
-        <Stack.Screen name="YoutubePlayer" options={{animation: 'none'}} />
+        <Stack.Screen name="YoutubePlayer" options={{animation: 'none', header: () => <StableHeader />}} />
       </Stack>
     </>
   );

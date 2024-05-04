@@ -79,6 +79,8 @@ function StableHeader() {
             setHeaderContent(<CustomHeaderMain title="BOOKS" />);
         }  else if (pathname === '/VPPlaylistScreen') {
             setHeaderContent(<CustomHeaderMain title="VIDEOS" />);
+        } else if (pathname === '/YoutubePlayer') {
+            setHeaderContent(<CustomHeaderMain title="VIDEO" />);
         } 
     }
   }, [pathname]);

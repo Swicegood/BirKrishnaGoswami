@@ -21,10 +21,10 @@ import { db } from '../api/firebase';
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: '../QuoteScreen' },
-  { title: 'Slide 2', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: './NewsScreen' },
-  { title: 'Slide 3', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: './MemoriesScreen' },
-  { title: 'Slide 4', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: '../BooksScreen' },
-  { title: 'Slide 5', image: require('../../assets/images/quotes_placeholder_355x160.jpg'), link: '../(tabs3)/VPPlaylistScreen' },
+  { title: 'Slide 2', image: require('../../assets/images/news_placeholder_355x160.jpg'), link: './NewsScreen' },
+  { title: 'Slide 3', image: require('../../assets/images/memories_placeholder_355x160.jpg'), link: './MemoriesScreen' },
+  { title: 'Slide 4', image: require('../../assets/images/books_placeholder_355x160.jpg'), link: '../BooksScreen' },
+  { title: 'Slide 5', image: require('../../assets/images/vyasa_puja_placeholder_355x160.jpg'), link: '../(tabs3)/VPPlaylistScreen' },
   // Add more entries here
 ];
 
