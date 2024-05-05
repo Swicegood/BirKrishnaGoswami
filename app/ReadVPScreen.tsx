@@ -3,7 +3,7 @@ import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView,
   ActivityIndicator, Dimensions
 } from 'react-native';
-import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, where, Query, QuerySnapshot } from "firebase/firestore";
 import { useLocalSearchParams } from 'expo-router';
 import { db } from './api/firebase';
 import RenderHTML from 'react-native-render-html';
@@ -25,8 +25,7 @@ function formatDate(dateString) {
 }
 
 const ReadVPNowScreen = () => {
-  const { offering } = useLocalSearchParams<{ offering: string }>();
-  const post = JSON.parse(offering);
+  const { offeringDate } = useLocalSearchParams<{ offeringDate: string }>();
   const [text, setText] = useState('');
   const [date, setDate] = useState('');
   const [currentDoc, setCurrentDoc] = useState(null);
@@ -35,9 +34,31 @@ const ReadVPNowScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setCurrentDoc(post);
-    setText(post.text);
-    setDate(post.date);
+
+    const q = query(
+      collection(db, 'offerings'),
+      where('date', '==', offeringDate),
+      limit(1)
+    );
+    const querySnapShot = getDocs(q);
+    querySnapShot.then((snapshot) => {
+      if (snapshot.docs.length > 0) {
+        const post = snapshot.docs[0];
+        const newText = post?.data().text;
+        const newDate = post?.data().date;
+    
+        if (newText !== text) {
+          setText(newText);
+        }
+    
+        if (newDate !== date) {
+          setDate(newDate);
+        }
+    
+        setCurrentDoc(post);
+      }
+    });
+
     setIsLoading(false);
   }, []);
 
@@ -52,24 +73,41 @@ const ReadVPNowScreen = () => {
         orderBy('date', 'desc'),
         limit(1)
       );
-      const nextQuerySnapshot = await getDocs(nextQuery);
+      let nextdoc = null;
+      let newText = text;
+      let newDate = date;
+      
+      try {
+        const nextQuerySnapshot = await getDocs(nextQuery);
+        // rest of your code
 
       nextQuerySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and category
-        setText(doc.data().text);
-        setDate(doc.data().date);
-        console.log("currentDoc", doc.data().date);
+        newText = doc.data().text;
+        newDate = doc.data().date;
+        console.log("nextDate", newDate);
+        nextdoc = doc;
       });
-
-      if (nextQuerySnapshot.docs[0]) {
-        setCurrentDoc(nextQuerySnapshot.docs[0]);
+      
+      if (newText !== text) {
+        setText(newText);
       }
-
+      
+      if (newDate !== date) {
+        setDate(newDate);
+      }
+      
+      if (nextdoc) {
+        setCurrentDoc(nextdoc);
+      }
+    } catch (error) {
+      console.error("Failed to get documents:", error);
+      // handle the error as needed
+    }
       // Check if the current document is the last one
-
+    try{
       const nextNextQuery = query(
         collection(db, 'offerings'),
-        where('date', '>', currentDoc.data().date),
+        where('date', '<', currentDoc.data().date),
         orderBy('date', 'desc'),
       );
 
@@ -80,27 +118,40 @@ const ReadVPNowScreen = () => {
       } else {
         setAtLastDoc(false);
       }
+    } catch (error) {
+      console.error("Failed to get documents:", error);
+      // handle the error as needed
     }
+  }
   };
 
   const handlePreviousText = async () => {
     setAtLastDoc(false);
     if (currentDoc) {
-      const currentTimestamp = currentDoc.data().processed;
-      console.log("currentTimestamp", currentTimestamp);
+      const currentDate = currentDoc.data().date;
+      console.log("currentTimestamp", currentDate);
       const prevQuery = query(
         collection(db, 'offerings'),
-        where('date', '>', currentTimestamp),
+        where('date', '>', currentDate),
         orderBy('date', 'asc'),
         limit(1)
       );
       const prevQuerySnapshot = await getDocs(prevQuery);
 
       prevQuerySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and title
-        setText(doc.data().text);
-        setDate(doc.data().date);
-        console.log("currentDoc", doc.data().processed);
+        const newData = doc.data();
+        const newText = newData.text;
+        const newDate = newData.date;
+      
+        if (newText !== text) {
+          setText(newText);
+        }
+      
+        if (newDate !== date) {
+          setDate(newDate);
+        }
+      
+        console.log("currentDoc", newDate);
       });
 
       if (prevQuerySnapshot.docs[0]) {
@@ -109,7 +160,7 @@ const ReadVPNowScreen = () => {
 
       const nextPrevQuery = query(
         collection(db, 'offerings'),
-        where('date', '<', currentDoc.data().date),
+        where('date', '>', currentDoc.data().date),
         orderBy('date', 'desc'),
       );
 
@@ -123,10 +174,13 @@ const ReadVPNowScreen = () => {
     }
   };
 
+
   if (isLoading) {
     return <ActivityIndicator size="large" color="#ED4D4E" />;
   }
-
+if (currentDoc){
+  console.log("CurrentDoc", currentDoc.data().date);
+}
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
@@ -143,14 +197,14 @@ const ReadVPNowScreen = () => {
         <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
           {!atFirstDoc && (
             <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-              <Text style={styles.nextButtonText}>{'<'} PREV.</Text>
+              <Text style={styles.nextButtonText}>{'<'} NEXT</Text>
             </TouchableOpacity>
           )}
         </View>
         <View style={{ flex: !atLastDoc ? 0 : 0 }}>
           {!atLastDoc && (
             <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-              <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
+              <Text style={styles.nextButtonText}>PREV. {'>'}</Text>
             </TouchableOpacity>
           )}
         </View>

@@ -7,8 +7,16 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 
 const placeholderImage = { source: require('../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'), dimensions: { width: 600, height: 600 } };
 
+type SearchParams = {
+  imagesSlice: string;
+  captionsSlice?: string;
+  index?: string;
+};
+
 const PhotosScreen = () => {
-  const { imagesSlice, captionsSlice } = useLocalSearchParams<{ imagesSlice: string, captionsSlice: string }>();
+  const { imagesSlice, captionsSlice, index } = useLocalSearchParams<SearchParams>();
+ console.log("index", index);
+ console.log("parseInt(index, 10)", index ? parseInt(index, 10) : -1);
   const imageUrls = imagesSlice.split(',');
   const captions = captionsSlice ? captionsSlice.split(',') : [];
   const [images, setImages] = useState(imageUrls.map(() => placeholderImage));
@@ -34,7 +42,6 @@ const PhotosScreen = () => {
     const imageUrls = imagesSlice.split(',');
 
     // Initialize images with placeholder
-    setImages(imageUrls.map(() => placeholderImage));
 
     // Fetch dimensions for all images
     const imagePromises = imageUrls.map((url, index) =>
@@ -101,19 +108,35 @@ const PhotosScreen = () => {
     }
   }
 
-  console.log('images', images);
-  return (
-    <View style={{ flex: 1, backgroundColor: 'black', position: 'relative' }}>
-      <ImageGallery
-        style={{ width: Dimensions.get('window').width, height: 300 }}
-        images={images}
-      />
-      <View style={{ flex: 1, alignItems: 'center', position: 'absolute', top: '80%', left: 0, right: 0 }}>
-        <Text style={{ color: 'white', fontSize: 20, textAlign: 'center' }}>
-          {captions[0]}
-        </Text>
-      </View>
+  console.log("images", images[parseInt(index, 10)]);
+
+  const shiftedImages = [...images];
+const shiftedCaptions = captions ? [...captions] : [];
+
+if (index) {
+  const currentIndex = parseInt(index, 10);
+  const beginning = shiftedImages.splice(currentIndex);
+  shiftedImages.unshift(...beginning);
+
+  if (captions) {
+    const beginningCaptions = shiftedCaptions.splice(currentIndex);
+    shiftedCaptions.unshift(...beginningCaptions);
+  }
+}
+console.log("shiftedImages", images[0].source.url);
+return (
+  <View style={{ flex: 1, backgroundColor: 'black', position: 'relative' }}>
+    <ImageGallery
+      style={{ width: Dimensions.get('window').width, height: 300 }}
+      images={shiftedImages}
+    />
+    <View style={{ flex: 1, alignItems: 'center', position: 'absolute', top: '80%', left: 0, right: 0 }}>
+      <Text style={{ color: 'white', fontSize: 20, textAlign: 'center' }}>
+        {shiftedCaptions ? shiftedCaptions[0]: ''}
+      </Text>
     </View>
-  );
+  </View>
+);
+
 };
 export default PhotosScreen;

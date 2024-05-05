@@ -28,9 +28,9 @@ const GalleryComponent = () => {
   }
 
   const originalImage = (imageUrl: string) => {
-    const originalUrl = imageUrl.replace('300w', '1024w');
+    const originalUrl = imageUrl.replace(/300w/g, '1024w');
     return originalUrl;
-  };
+  }
 
   return (
     <FlatList
@@ -39,8 +39,8 @@ const GalleryComponent = () => {
       key={numColumns} // Add this line
       keyExtractor={(item, index) => index.toString()}
       contentContainerStyle={{ justifyContent: 'center' }}
-      renderItem={({ item }) => (
-        <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: originalImage(imageChunk)}}} asChild>
+      renderItem={({ item, index }) => (
+        <Link href={{pathname: "./PhotosScreen", params: {imagesSlice: originalImage(imageChunk), index: index.toString()}}} asChild>
           <TouchableOpacity style={{ padding: 2}}>
             <Image defaultSource={placeholderImage} source={{uri: item}} style={{ width: 100, height: 100 }} />
           </TouchableOpacity>
