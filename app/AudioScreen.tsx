@@ -18,6 +18,7 @@ import ReplayIcon from "../components/ReplayIcon";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
+import { throttle } from 'lodash';
 
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -166,22 +167,23 @@ const AudioScreen = () => {
 
 
 
+  const updateState = throttle((status) => {
+    setPosition(status.positionMillis);
+    // ...
+  }, 1000); // Adjust this value as needed
+  
   useEffect(() => {
     if (sound) {
       sound.setOnPlaybackStatusUpdate(updateState);
     }
-
+  
     return () => {
       if (sound) {
         sound.setOnPlaybackStatusUpdate(null);
       }
+      updateState.cancel(); // Cancel any scheduled execution of updateState when the component unmounts
     };
   }, [sound]);
-
-  const updateState = (status) => {
-    setPosition(status.positionMillis);
-    // ...
-  };
 
 
   const formatTime = (milliseconds) => {
