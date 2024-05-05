@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView,
-  ActivityIndicator } from 'react-native';
+import {
+  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+  ActivityIndicator, Dimensions
+} from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { useLocalSearchParams } from 'expo-router';
 import { db } from './api/firebase';
 import RenderHTML from 'react-native-render-html';
 
+const contentWidth = Dimensions.get('window').width;
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -44,32 +47,32 @@ const ReadVPNowScreen = () => {
       const currentDate = currentDoc.data().date;
       console.log("currentDate", currentDate);
       const nextQuery = query(
-        collection(db, 'offerings'), 
-        where('date', '<', currentDate), 
-        orderBy('date', 'desc'), 
+        collection(db, 'offerings'),
+        where('date', '<', currentDate),
+        orderBy('date', 'desc'),
         limit(1)
       );
       const nextQuerySnapshot = await getDocs(nextQuery);
-  
+
       nextQuerySnapshot.forEach((doc) => {
         // Assuming doc.data() returns an object with text, date, and category
         setText(doc.data().text);
         setDate(doc.data().date);
         console.log("currentDoc", doc.data().date);
       });
-  
+
       if (nextQuerySnapshot.docs[0]) {
         setCurrentDoc(nextQuerySnapshot.docs[0]);
       }
-  
+
       // Check if the current document is the last one
 
       const nextNextQuery = query(
         collection(db, 'offerings'),
-        where('date', '>', currentDoc.data().date),  
-        orderBy('date', 'desc'), 
+        where('date', '>', currentDoc.data().date),
+        orderBy('date', 'desc'),
       );
- 
+
       const querySnapshot = await getDocs(nextNextQuery)
 
       if (querySnapshot.docs.length < 1) {
@@ -79,77 +82,81 @@ const ReadVPNowScreen = () => {
       }
     }
   };
-  
-    const handlePreviousText = async () => {
-      setAtLastDoc(false);
-      if (currentDoc) {
-        const currentTimestamp = currentDoc.data().processed;
-        console.log("currentTimestamp", currentTimestamp);
-        const prevQuery = query(
-          collection(db, 'offerings'), 
-          where('date', '>', currentTimestamp), 
-          orderBy('date', 'asc'), 
-          limit(1)
-        );
-        const prevQuerySnapshot = await getDocs(prevQuery);
-    
-        prevQuerySnapshot.forEach((doc) => {
-          // Assuming doc.data() returns an object with text, date, and title
-          setText(doc.data().text);
-          setDate(doc.data().date);
-          console.log("currentDoc", doc.data().processed);
-        });
-    
-        if (prevQuerySnapshot.docs[0]) {
-          setCurrentDoc(prevQuerySnapshot.docs[0]);
-        }
-    
-        const nextPrevQuery = query(
-          collection(db, 'offerings'),
-          where('date', '<', currentDoc.data().date),  
-          orderBy('date', 'desc'), 
-        );
-   
-        const querySnapshot = await getDocs(nextPrevQuery)
-  
-        if (querySnapshot.docs.length < 1) {
-          setAtFirstDoc(true);
-        } else {
-          setAtFirstDoc(false);
-        }
-      }
-    };
-    
-    if (isLoading) {
-      return <ActivityIndicator size="large" color="#ED4D4E" />;
-    }
 
-    return (
-      <View style={{ flex: 1 }}>
-        <ScrollView style={styles.container}>
-          <View style={styles.content}>
-            <Text style={styles.date}>{date}</Text>
-            <RenderHTML contentWidth={width} source={{ html: text }} />
-          </View>
-        </ScrollView>
-        <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'  }}>
-          <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
-            {!atFirstDoc && (
-              <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-                <Text style={styles.nextButtonText}>{'<'} PREV.</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <View style={{ flex: !atLastDoc ? 0 : 0 }}>
-            {!atLastDoc && (
-              <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-                <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+  const handlePreviousText = async () => {
+    setAtLastDoc(false);
+    if (currentDoc) {
+      const currentTimestamp = currentDoc.data().processed;
+      console.log("currentTimestamp", currentTimestamp);
+      const prevQuery = query(
+        collection(db, 'offerings'),
+        where('date', '>', currentTimestamp),
+        orderBy('date', 'asc'),
+        limit(1)
+      );
+      const prevQuerySnapshot = await getDocs(prevQuery);
+
+      prevQuerySnapshot.forEach((doc) => {
+        // Assuming doc.data() returns an object with text, date, and title
+        setText(doc.data().text);
+        setDate(doc.data().date);
+        console.log("currentDoc", doc.data().processed);
+      });
+
+      if (prevQuerySnapshot.docs[0]) {
+        setCurrentDoc(prevQuerySnapshot.docs[0]);
+      }
+
+      const nextPrevQuery = query(
+        collection(db, 'offerings'),
+        where('date', '<', currentDoc.data().date),
+        orderBy('date', 'desc'),
+      );
+
+      const querySnapshot = await getDocs(nextPrevQuery)
+
+      if (querySnapshot.docs.length < 1) {
+        setAtFirstDoc(true);
+      } else {
+        setAtFirstDoc(false);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#ED4D4E" />;
+  }
+
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.date}>{date}</Text>
+          <RenderHTML
+            contentWidth={contentWidth}
+            source={{ html: text }}
+            baseStyle={{ fontFamily: 'UbuntuRegular', fontSize: 20 }}
+          />
+        </View>
+      </ScrollView>
+      <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+          {!atFirstDoc && (
+            <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
+              <Text style={styles.nextButtonText}>{'<'} PREV.</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+          {!atLastDoc && (
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
+              <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
-    );
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -195,7 +202,7 @@ const styles = StyleSheet.create({
     color: '#E53935',
     padding: 10,
   },
-  
+
 });
 
 export default ReadVPNowScreen;

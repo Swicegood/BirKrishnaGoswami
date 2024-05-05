@@ -158,7 +158,7 @@ const LiveScreen = () => {
   console.log("live video video", video);
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
         {navigation.canGoBack() && (
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
@@ -188,7 +188,7 @@ const LiveScreen = () => {
           {isLoading && <ActivityIndicator size="large" color="#ED4D4E" />}
         </View>
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 
@@ -218,6 +218,7 @@ const shareYouTubeVideo = async (url) => {
 
 const styles = StyleSheet.create({
   safeArea: {
+    flex: 1,
     backgroundColor: '#993D39', // Use the same color as your header
   },
   header: {

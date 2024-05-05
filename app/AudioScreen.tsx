@@ -286,7 +286,7 @@ const AudioScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.downloadButton}
-                  onPress={togglePlayback}
+                  onPress={() => {}}
                   disabled={!sound}
                 >
                   <Icon name="get-app" size={40} color="#FFF" />
@@ -408,6 +408,9 @@ const styles = StyleSheet.create({
   },
   rightItem: {
     backgroundColor: 'transparent',
+  },
+  leftItem: {
+    zIndex: 1,
   },
   circle: {
     width: 30, // Or whatever size you want

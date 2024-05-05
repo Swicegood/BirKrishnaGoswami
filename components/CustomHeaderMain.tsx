@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -17,14 +17,9 @@ const CustomHeaderMain = ({ title }) => {
             <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
                 <View style={styles.header}>
                     {navigation.canGoBack() && (
-                        <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }, styles.leftItem]}>
+                        <TouchableOpacity style={styles.leftItem} onPress={() => navigation.goBack()}>
                             <FontAwesome name="angle-left" size={32} color="white" />
-                        </Pressable>
-                    )}
-                    {!navigation.canGoBack() && (
-                        <Pressable onPress={() => router.push('./(drawer)/BioScreen')} style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }, styles.leftItem]}>
-                            <Text>{'\u2630'}</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                     )}
                     <View style={styles.titleContainer}>
                         <Text style={styles.title}>{title}</Text>
