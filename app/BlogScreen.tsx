@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, 
-  ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
+import {
+  View, Text, StyleSheet,
+  ScrollView, Image, Dimensions, ActivityIndicator
+} from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import Swiper from 'react-native-swiper';
 import { db } from './api/firebase';
+import RenderHTML from 'react-native-render-html';
 
-
+const contentWidth = Dimensions.get('window').width;
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -39,7 +42,7 @@ const BlogScreen = () => {
         console.error('Error fetching blog entries:', error);
       }
     };
-  
+
     fetchBlogEntries();
   }, []);
 
@@ -54,11 +57,17 @@ const BlogScreen = () => {
     <Swiper loop={false}>
       {posts.map((post, index) => (
         <ScrollView style={styles.container} key={index}>
-           <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
-     
-           <Text style={styles.date}>{formatDate(post.date)}</Text>
-           <Text style={styles.title}>{post.title.toUpperCase()}</Text>
-           <Text style={styles.blogEntryText}>{post.text}</Text>
+          <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+
+          <Text style={styles.date}>{formatDate(post.date)}</Text>
+          <Text style={styles.title}>{post.title.toUpperCase()}</Text>
+          <View style={{padding: 20}}>
+          <RenderHTML
+            contentWidth={(contentWidth * 0.9)}
+            source={{ html: post.text }}
+            baseStyle={{ fontFamily: 'UbuntuRegular', fontSize: 20 }}
+          />
+          </View>
         </ScrollView>
       ))}
     </Swiper>
@@ -121,7 +130,7 @@ const styles = StyleSheet.create({
     color: '#E53935',
     padding: 10,
   },
-  
+
 });
 
 export default BlogScreen;
