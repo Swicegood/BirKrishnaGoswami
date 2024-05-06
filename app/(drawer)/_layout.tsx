@@ -5,7 +5,7 @@ import CustomHeader from '../../components/CustomHeader';
 import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';
 import React from 'react';
-import { View, Text, Dimensions, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, SafeAreaView, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -18,21 +18,29 @@ function CustomDrawerContent() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.drawerContent}>
         <View style={styles.header}>
-        <View style={styles.circle} />
+          <View />
+          <Image
+            style={styles.logo}
+            source={require('../../assets/images/drawer.png')}
+          />
           <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
         </View>
-        <View style={styles.content}><Link href="./BioScreen" asChild>
-          <Text style={styles.drawerText}>About</Text>
-        </Link>
+        <View style={styles.content}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Image source={require('../../assets/images/about.png')} style={styles.smalllogo} />
+            <Link href="./BioScreen" asChild>
+              <Text style={styles.aboutText}>    About</Text>
+            </Link>
+          </View>
           <Link href="./TravelScreen" asChild>
             <Text style={styles.drawerText}>
-            <MaterialCommunityIcons name='calendar-clock-outline' size={18} color='black' />    Travel Schedule
+              <MaterialCommunityIcons name='calendar-clock-outline' size={18} color='black' />    Travel Schedule
             </Text>
           </Link>
           <Link href="./NewsScreen" asChild>
             <Text style={styles.drawerText}>
               <Ionicons name='newspaper-outline' size={18} color='black' />    News
-              </Text>
+            </Text>
           </Link>
           <Link href="./downloads" asChild>
             <Text style={styles.drawerText}>
@@ -150,11 +158,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white', // Customize your color
   },
-  logo: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
-  },
   drawerText: {
     fontFamily: 'OblikBold', // Use the OblikBold font
     fontSize: 16,
@@ -162,12 +165,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 30,
   },
-  circle: {
-    width: 90, // Adjust as needed
-    height: 90, // Adjust as needed
-    borderRadius: 45, // Half of width and height
-    backgroundColor: '#fff', // Adjust as needed
-    alignSelf: 'center',
-    marginBottom: 20, // Adjust as needed
+  aboutText: {
+    fontFamily: 'OblikBold', // Use the OblikBold font
+    fontSize: 16,
+    color: '#3f3f3f', // Choose your color
+    marginBottom: 30,
+    marginTop: 32,
+  },
+  logo: {
+    width: 110,
+    height: 110,
+    resizeMode: 'contain',
+    marginBottom: 10,
+  },
+  smalllogo: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
   },
 });

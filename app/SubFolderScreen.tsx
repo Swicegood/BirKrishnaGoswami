@@ -5,17 +5,13 @@ import { useNavigationState } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 
-
-
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
-
-
 
 // Calculate the width of the screen
 const { width } = Dimensions.get('window');
 const itemWidth = (width - 32) / 2; // Assuming we want 16px padding on both sides
-
+const itemHeight = Dimensions.get('window').height / 3;
 
 interface SubCategory {
   key: string;
@@ -23,6 +19,12 @@ interface SubCategory {
   image: any;
   parents: any;
 }
+
+const images = {
+  Srimad_Bhagavatam: require('../assets/images/Srimad_Bhagavatam.png'),
+  category2: require('../assets/images/placeholder_portrait.png'),
+  // Add more categories as needed...
+};
 
 function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {
   const categories: string[] = [];
@@ -172,7 +174,9 @@ const SubFolderScreen = () => {
         asChild
       >
         <TouchableOpacity>
-          <Image source={item.image} style={styles.image} resizeMode="cover" />
+        <View style={styles.imageView}>
+          <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
+          </View>
         </TouchableOpacity>
       </Link>
       <Text style={styles.itemText}>{item.title.replaceAll('_', ' ')}</Text>
@@ -219,17 +223,34 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     width: itemWidth,
-    marginBottom: 16, // Space between rows
+    height: itemHeight,
+    borderWidth: .25, // This sets the width of the border
+    borderColor: 'lightgray', // This sets the color of the border
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
   image: {
-    width: '100%',
+    width: '50%',
     height: undefined,
-    aspectRatio: 1, // Your images are square
-    borderRadius: 10, // Optional: if you want rounded corners
+    aspectRatio: .673, // Your images are square
+  },
+  imageView: {
+    width: '100%',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: -10,
+      height: 10,
+    },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 20,
   },
   itemText: {
-    marginTop: 8,
-    textAlign: 'center',
+    position: 'absolute',
+    bottom: 10,
+    fontFamily: 'OblikBold',
+    color: 'maroon',
   },
 });
 
