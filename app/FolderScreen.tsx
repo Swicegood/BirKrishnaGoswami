@@ -23,7 +23,14 @@ interface File {
 
 const images = {
   Srimad_Bhagavatam: require('../assets/images/Srimad_Bhagavatam.png'),
-  category2: require('../assets/images/placeholder_portrait.png'),
+  Audio_Books: require('../assets/images/Audio_Books.png'),
+  Bhagavad_Gita: require('../assets/images/Bhagavad_Gita.png'),
+  Chaitanya_Charitamrita: require('../assets/images/Chaitanya_Charitamrita.png'),
+  Nectar_of_Devotion: require('../assets/images/Nectar_of_Devotion.png'),
+  Nectar_of_Instruction: require('../assets/images/Nectar_of_Instruction.png'),
+  Krishna_Book: require('../assets/images/Krishna_Book.png'),
+  Festivals: require('../assets/images/Festivals.png'),
+  Various: require('../assets/images/Various.png'),
   // Add more categories as needed...
 };
 

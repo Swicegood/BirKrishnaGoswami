@@ -213,7 +213,7 @@ export default function TabOneScireen() {
         <Link href="./QuoteScreen" asChild>
             <TouchableOpacity style={styles.buttonContainer}> 
                 <Image
-                  source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
+                  source={require('../../assets/images/quotes.png')} // Replace with your local or network image
                   style={styles.buttonImage}
                 />
                 <Text style={styles.buttonText}>QUOTES</Text>
@@ -360,6 +360,7 @@ const styles = StyleSheet.create<Styles>({
     width: 178, // Set your desired image width
     height: 100, // Set your desired image height
     marginBottom: 8, // Space between image and text
+    borderRadius: 5, // Adjust this value as needed
   },
   buttonText: {
     color: '#7e2b18',

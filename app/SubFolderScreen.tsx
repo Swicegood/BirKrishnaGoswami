@@ -22,7 +22,17 @@ interface SubCategory {
 
 const images = {
   Srimad_Bhagavatam: require('../assets/images/Srimad_Bhagavatam.png'),
-  category2: require('../assets/images/placeholder_portrait.png'),
+  Bhagavad_Gita: require('../assets/images/Bhagavad_Gita.png'),
+  Chaitanya_Charitamrita: require('../assets/images/Chaitanya_Charitamrita.png'),
+  Nectar_of_Devotion: require('../assets/images/Nectar_of_Devotion.png'),
+  Gita: require('../assets/images/Bhagavad_Gita.png'),
+  Festivals: require('../assets/images/Festivals.png'),
+  How_to_Execute_Devotional_Service: require('../assets/images/Devotional_Service.png'),
+  How_to_be_connected_to_Krishna_Consciousness: require('../assets/images/Devotional_Service.png'),
+  The_Nine_Process_of_Bhakti: require('../assets/images/Devotional_Service.png'),
+  Empathic_Communications: require('../assets/images/Empathic_Communication.jpg'),
+  Realizing_our_Empathic_Nature: require('../assets/images/Empathic_Communication.jpg'),
+  Brahma_Samhita: require('../assets/images/Brahma_Samhita.png'),
   // Add more categories as needed...
 };
 
@@ -175,7 +185,7 @@ const SubFolderScreen = () => {
       >
         <TouchableOpacity>
         <View style={styles.imageView}>
-          <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
+          <Image source={images[item.title] || item.image} style={styles.image} resizeMode="cover" />
           </View>
         </TouchableOpacity>
       </Link>
