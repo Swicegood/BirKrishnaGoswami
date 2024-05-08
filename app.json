@@ -17,6 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "userInterfaceStyle": "light",
       "requireFullScreen": true,
       "bundleIdentifier": "com.isckon.birkrishnagoswami",
       "infoPlist": {
@@ -28,7 +29,8 @@
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "versionCode" : 15,    
+      "versionCode" : 15, 
+      "userInterfaceStyle": "light",   
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
