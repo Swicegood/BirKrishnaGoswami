@@ -184,13 +184,13 @@ async function getVideoWidth() {
   
     if (isLastPage) {
       return (
-        <View style={{ height: videoHeight, width: videoWidth }}>
+        <View style={{ height: (videoHeight+50), width: videoWidth }}>
           <Text>No more videos to load</Text>
         </View>
       );
     }
     return (
-      <View style={{ height: videoHeight, width: videoWidth }}>
+      <View style={{ height: (videoHeight+100), width: videoWidth }}>
         {/* Render your footer content here */}
         <TouchableOpacity onPress={loadMoreVideos}>
           <Text>Show More</Text>

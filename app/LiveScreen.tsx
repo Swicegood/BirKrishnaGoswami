@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
+import { StatusBar } from 'expo-status-bar';
 
 
 interface GetYouTubeVideosRequest {
@@ -126,7 +127,9 @@ const LiveScreen = () => {
   if (error || !video) {
     return (
       <>
-        <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
+      <StatusBar style="light" />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <View style={{ backgroundColor: 'white', height: Dimensions.get('window').height }}>
           <View style={styles.header}>
             {navigation.canGoBack() && (
               <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
@@ -144,13 +147,13 @@ const LiveScreen = () => {
               </View>
             </View>
           </View>
-
-        </SafeAreaView>
-        <Image source={require('../assets/images/video-monetiztion-not-available.jpg')} style={{ width: Dimensions.get('window').width, height: 200 }} />
-        <View style={styles.subTextContainer}>
-          <Text style={styles.subText}>Live Streaming is not available right now!</Text>
-          <Text style={styles.subText}> Please try again later. </Text>
+          <Image source={require('../assets/images/video-monetiztion-not-available.jpg')} style={{ width: Dimensions.get('window').width, height: 200 }} />
+          <View style={styles.subTextContainer}>
+            <Text style={styles.subText}>Live Streaming is not available right now!</Text>
+            <Text style={styles.subText}> Please try again later. </Text>
+          </View>
         </View>
+      </SafeAreaView>
       </>
     );
   }
@@ -220,6 +223,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#993D39', // Use the same color as your header
+    height: 60
   },
   header: {
     height: 60,
