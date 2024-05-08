@@ -262,6 +262,7 @@ const SubFolderScreen = () => {
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
           contentContainerStyle={styles.contentContainer}
+          ListFooterComponent={<View style={{ height: 120 }} />} // Add this line
         />
       </View>
     </>

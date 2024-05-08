@@ -60,7 +60,7 @@ function extractHierarchyFromUrl(url: string) {
     }
     currentLevel = currentLevel[part];
   }
-  
+
   return hierarchy;
 }
 
@@ -114,11 +114,13 @@ const FolderScreen = () => {
 
   const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => (
     <View style={styles.itemContainer}>
-      <Link href={{ pathname: "SubFolderScreen",
-        params: { category: item.category, hierarchy: JSON.stringify(hierarchy) }}} asChild>
+      <Link href={{
+        pathname: "SubFolderScreen",
+        params: { category: item.category, hierarchy: JSON.stringify(hierarchy) }
+      }} asChild>
         <TouchableOpacity>
           <View style={styles.imageView}>
-          <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
+            <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
           </View>
         </TouchableOpacity>
       </Link>
@@ -126,25 +128,26 @@ const FolderScreen = () => {
     </View>
   );
 
-if (isLoading){
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color="#ED4D4E" />
-    </View>)
-}
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ED4D4E" />
+      </View>)
+  }
 
   return (
     <HierarchyContext.Provider value={deserializedHierarchy}>
-        <View>
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.key}
-            numColumns={2}
-            columnWrapperStyle={styles.columnWrapper}
-            contentContainerStyle={styles.contentContainer}
-          />
-        </View>
+      <View>
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.key}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={styles.contentContainer}
+          ListFooterComponent={<View style={{ height: 20 }} />} // Add this line
+        />
+      </View>
     </HierarchyContext.Provider>
   );
 };
