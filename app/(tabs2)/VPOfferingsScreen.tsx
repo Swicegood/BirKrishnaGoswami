@@ -59,13 +59,13 @@ const BlogScreen = () => {
     <FlatList
       data={posts}
       keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => (
+      renderItem={({ item, index }) => (
         <View style={styles.content}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.date}>{formatDate(item.date)} | {item.location}</Text>
           </View>
-          <Link href={{ pathname: "../ReadVPScreen", params: { offeringDate: item.date } }} asChild>
+          <Link href={{ pathname: "../ReadVPScreen", params: { index: String(index), offeringDate: item.date } }} asChild>
             <TouchableOpacity style={styles.button}>
               <Text style={styles.buttonText}>READ NOW</Text>
             </TouchableOpacity>
