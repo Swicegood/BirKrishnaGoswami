@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { View, Text, TouchableOpacity,StyleSheet, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -25,26 +25,28 @@ const MonthScreen = () => {
 
   return (
     <ScrollView>
-    <View>
-    {Object.keys(data).sort((a, b) => Number(a.slice(0, 2)) - Number(b.slice(0, 2))).map((month) => (
-        <View key={month} style={styles.container}>
-          <Link href={{ pathname: './DayScreen', params: { year: year, month: month, dataString: JSON.stringify(data[month]) } }} asChild>
-            <TouchableOpacity style={styles.playButton}>
+      <View>
+        {Object.keys(data).sort((a, b) => Number(a.slice(0, 2)) - Number(b.slice(0, 2))).map((month) => (
+          <TouchableOpacity 
+            style={styles.container} 
+            key={month}
+            onPress={() => router.push(`DayScreen?year=${year}&month=${month}&dataString=${JSON.stringify(data[month])}`)}
+          >
+            <View style={styles.playButton}>
               {/* Replace with your play icon */}
               <Image source={require('../assets/images/folder.png')} style={styles.playIcon} />
-            </TouchableOpacity>
-          </Link>
-          <View style={styles.textContainer}>
-            <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>{month}</Text>
-          </View>
-          <Text style={styles.countText}>{data[month]?.length}</Text>
-        </View>
-      ))}
-    </View>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>{month}</Text>
+            </View>
+            <Text style={styles.countText}>{data[month]?.length}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </ScrollView>
   );
-};
 
+}
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',

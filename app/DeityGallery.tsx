@@ -60,7 +60,7 @@ const GalleryComponent = () => {
  
   return (
     <FlatList
-      data={chunkArray(images, 1)}
+      data={chunkArray(images, 15)}
       numColumns={numColumns}
       key={numColumns} // Add this line
       keyExtractor={(item, index) => index.toString()}

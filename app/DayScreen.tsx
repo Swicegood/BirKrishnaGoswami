@@ -8,7 +8,7 @@ function customDecodeURI(str) {
 }
 
 const DayScreen = () => {
-  const { year, month, dataString } = useGlobalSearchParams();  
+  const { year, month, dataString } = useGlobalSearchParams();
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -18,33 +18,33 @@ const DayScreen = () => {
     const parsedData = JSON.parse(dataString);
     const dataWithTitles = parsedData.map((url: string) => {
       const title = customDecodeURI(url)?.split('/').pop() || ''; // Extract basename from URL
-      return { url, title, month, year};
+      return { url, title, month, year };
     });
     setData(dataWithTitles);
   }, [dataString]);
 
   return (
     <ScrollView>
-    <View>
-      {data.map((item, index) => (
-          <View style={styles.container}>
-    <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
-    <TouchableOpacity style={styles.playButton}>
-      {/* Replace with your play icon */}
-      <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
-    </TouchableOpacity>
-    </Link>
-    <View style={styles.textContainer}>
-    <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>
-     {item.title.split('.')[0].replaceAll("_"," ")}
-    </Text>
-    <Text>      
-    </Text>
-    <Text style={styles.dateText}>{item.month.slice(2)}/{item.year}</Text>
-    </View>
-  </View>
-      ))}
-    </View>
+      <View>
+        {data.map((item, index) => (
+          <View style={styles.container} key={index}>
+            <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
+              <TouchableOpacity style={styles.playButton}>
+                {/* Replace with your play icon */}
+                <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
+              </TouchableOpacity>
+            </Link>
+            <View style={styles.textContainer}>
+              <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>
+                {item.title.split('.')[0].replaceAll("_", " ")}
+              </Text>
+              <Text>
+              </Text>
+              <Text style={styles.dateText}>{item.month.slice(2)}/{item.year}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };

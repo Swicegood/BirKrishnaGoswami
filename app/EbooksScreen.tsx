@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity,
-   ActivityIndicator, FlatList, SafeAreaView, Dimensions } from 'react-native';
+import {
+  View, Text, StyleSheet, Image, TouchableOpacity,
+  ActivityIndicator, FlatList, SafeAreaView, Dimensions
+} from 'react-native';
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 import { Link } from 'expo-router';
@@ -31,19 +33,19 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
       const q = query(collection(db, 'ebooks'), orderBy('renderorder', 'asc'));
       const querySnapshot = await getDocs(q);
       const result = querySnapshot.docs
-      .map((doc) => {
-        const data = doc.data();
-        if (!vponly || (vponly && data.renderorder > 99)) {
-          let modifiedUrl = data.imgurl.replace('.png', '.jpg');
-          return { ...data, imgurl: modifiedUrl, key: doc.id };
-        }
-        return null;  // Return null when the condition is not met
-      })
-      .filter(item => item !== null);  // Filter out null values
+        .map((doc) => {
+          const data = doc.data();
+          if (!vponly || (vponly && data.renderorder > 99)) {
+            let modifiedUrl = data.imgurl.replace('.png', '.jpg');
+            return { ...data, imgurl: modifiedUrl, key: doc.id };
+          }
+          return null;  // Return null when the condition is not met
+        })
+        .filter(item => item !== null);  // Filter out null values
       setData(result as EBook[]);
       setIsLoading(false);
     }
-  
+
     fetchBooks();
   }, []);
 
@@ -57,14 +59,14 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
   interface BookItemProps {
     item: EBook;
   }
-  
+
   const BookItem: React.FC<BookItemProps> = ({ item }) => {
-   
+
     const [isImageLoaded, setIsImageLoaded] = useState(false);
 
     return (
       <View style={styles.itemContainer}>
-        <Link href={{ pathname: "./PdfViewScreen", params: { url: item.contenturl }   }} asChild>
+        <Link href={{ pathname: "./PdfViewScreen", params: { url: item.contenturl } }} asChild>
           <TouchableOpacity>
             <Image
               source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
@@ -74,7 +76,13 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
           </TouchableOpacity>
         </Link>
         <Text style={styles.itemText}>{item.title}</Text>
-        <Link href={{ pathname: "./PdfViewScreen", params: { url: item.contenturl }  }} asChild>
+        <Link
+          href={{
+            pathname: "./PdfViewScreen",
+            params: { url: item.contenturl, key: Date.now() }
+          }}
+          asChild
+        >
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>READ NOW</Text>
           </TouchableOpacity>
@@ -116,7 +124,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Center children horizontally
     justifyContent: 'center', // Center children vertically
   },
-  
+
   columnWrapper: {
     justifyContent: 'space-between',
   },
@@ -131,7 +139,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: undefined,
-    aspectRatio: 1/1.5, // Your images are square
+    aspectRatio: 1 / 1.5, // Your images are square
     borderRadius: 10, // Optional: if you want rounded corners
   },
   itemText: {
@@ -151,7 +159,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 20,
     marginTop: 10,
-    width: itemWidth-16,
+    width: itemWidth - 16,
     alignItems: 'center',
     marginLeft: 8,
   },

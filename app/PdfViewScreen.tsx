@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useLocalSearchParams } from 'expo-router';
@@ -6,8 +6,19 @@ import * as Progress from 'react-native-progress';
 
 const PdfViewScreen = () => {
   const [progress, setProgress] = useState(0);
-  const { url } = useLocalSearchParams<{ url: string }>();
+  const { key, url } = useLocalSearchParams<{ key: string, url: string }>();
   console.log(url);
+
+useEffect(() => {
+    console.log("useEffect");
+    console.log(url);
+    console.log(key);
+    return () => {
+      console.log("cleanup");
+    };
+  }
+, []);
+
 
   return (
     <View style={styles.container}>
