@@ -120,24 +120,30 @@ const SearchYoutubeVideosScreen = () => {
       </View>
     ) : (
       <View style={styles.container}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search any topic"
-          value={searchTerm}
-          onChangeText={setSearchTerm} // Update searchTerm state on input change
-        />
-        <View style={styles.searchButton}>
-          <AntDesign 
-            name="search1" size={40} color="gray"
-            onPress={fetchVideos} // Fetch videos on button press
+        <View style={{height: 60}}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search any topic"
+            value={searchTerm}
+            onChangeText={setSearchTerm} // Update searchTerm state on input change
+          />
+          <View style={styles.searchButton}>
+            <AntDesign
+              name="search1" size={40} color="gray"
+              onPress={fetchVideos} // Fetch videos on button press
+            />
+          </View>
+        </View>
+        <View style={styles.containerList}>
+          <FlatList
+            data={videos}
+            renderItem={({ item }) => <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />} // Pass video item props to VideoItem
+            keyExtractor={item => item.id}
+            ListEmptyComponent={hasSearched ? <Text style={styles.text}>No videos found</Text> : null}
+            ListFooterComponent={<View style={{ height: 100 }} />} // Add this line
+
           />
         </View>
-        <FlatList
-          data={videos}
-          renderItem={({ item }) => <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />} // Pass video item props to VideoItem
-          keyExtractor={item => item.id}
-          ListEmptyComponent={hasSearched ? <Text style={styles.text}>No videos found</Text> : null}
-        />
       </View>
     )
   );
@@ -147,6 +153,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  containerList: {
+    backgroundColor: '#fff',
+    padding: -10,
   },
   searchInput: {
     margin: 10,

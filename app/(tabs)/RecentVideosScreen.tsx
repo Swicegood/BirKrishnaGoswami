@@ -102,6 +102,7 @@ useFocusEffect(
         renderItem={renderItem}
         keyExtractor={item => item.id}
         // If you want to add a header or footer, you can use ListHeaderComponent and ListFooterComponent props
+        ListFooterComponent={<View style={{ height: 20 }} />} // Add this line
       />
     </View>
   );

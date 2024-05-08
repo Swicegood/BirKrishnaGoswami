@@ -105,6 +105,7 @@ interface FirebaseFunctionError {
         data={videos}
         renderItem={({ item }) => <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />} // Pass video item props to VideoItem
         keyExtractor={item => item.id}
+        ListFooterComponent={<View style={{ height: 20 }} />} // Add this line
       />
       </View>
     );
