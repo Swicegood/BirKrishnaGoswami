@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { FlatList, SafeAreaView, Dimensions, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
 
@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
   },
   imageView: {
     width: '100%',
+    backgroundColor: '#fff',
     shadowColor: "#000",
     shadowOffset: {
       width: -10,
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.7,
     shadowRadius: 10,
-    elevation: 20,
+    elevation: 15,
   },
   itemText: {
     position: 'absolute',

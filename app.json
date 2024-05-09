@@ -2,9 +2,9 @@
   "expo": {
     "name": "Bir Krishna Goswami",
     "slug": "bir-krishna-goswami",
-    "version": "0.7.7",
+    "version": "0.7.9",
     "orientation": "default",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/bkgsquare.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -25,7 +25,7 @@
           "audio"
         ]
       },
-      "buildNumber": "5",
+      "buildNumber": "6",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
