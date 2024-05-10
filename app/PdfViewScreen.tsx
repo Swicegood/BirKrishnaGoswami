@@ -9,7 +9,7 @@ const PdfViewScreen = () => {
   const { key, url } = useLocalSearchParams<{ key: string, url: string }>();
   console.log(url);
 
-useEffect(() => {
+  useEffect(() => {
     console.log("useEffect");
     console.log(url);
     console.log(key);
@@ -17,17 +17,17 @@ useEffect(() => {
       console.log("cleanup");
     };
   }
-, []);
+    , []);
 
 
   return (
     <View style={styles.container}>
       <WebView
+        originWhitelist={['*']}
         source={{ uri: 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) }}
         onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
         style={styles.webView}
         domStorageEnabled={true}
-        javaScriptEnabled={true}
       />
       {progress < 1 && (
         <View style={styles.progressBarContainer}>
