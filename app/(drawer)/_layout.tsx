@@ -1,19 +1,28 @@
 
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, useWindowDimensions } from 'react-native';
 import CustomHeader from '../../components/CustomHeader';
 import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';
-import React from 'react';
-import { View, Text, Dimensions, StyleSheet, SafeAreaView, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Dimensions, StyleSheet, SafeAreaView, Image, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-
 
 
 const windowHeight = Dimensions.get('window').height;
 
 function CustomDrawerContent() {
+  const windowDimensions = useWindowDimensions();
+  const isLandscape = windowDimensions.width > windowDimensions.height;
+
+  const [orientation, setOrientation] = useState(isLandscape ? 'LANDSCAPE' : 'PORTRAIT');
+
+  useEffect(() => {
+    setOrientation(isLandscape ? 'LANDSCAPE' : 'PORTRAIT');
+  }, [isLandscape]); 
+
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.drawerContent}>
@@ -25,29 +34,56 @@ function CustomDrawerContent() {
           />
           <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
         </View>
-        <View style={styles.content}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Image source={require('../../assets/images/about.png')} style={styles.smalllogo} />
-            <Link href="./BioScreen" asChild>
-              <Text style={styles.aboutText}>    About</Text>
+        {orientation === 'PORTRAIT' ? (
+          <View style={styles.content}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image source={require('../../assets/images/about.png')} style={styles.smalllogo} />
+              <Link href="./BioScreen" asChild>
+                <Text style={styles.aboutText}>    About</Text>
+              </Link>
+            </View>
+            <Link href="./TravelScreen" asChild>
+              <Text style={styles.drawerText}>
+                <MaterialCommunityIcons name='calendar-clock-outline' size={18} color='black' />    Travel Schedule
+              </Text>
+            </Link>
+            <Link href="./NewsScreen" asChild>
+              <Text style={styles.drawerText}>
+                <Ionicons name='newspaper-outline' size={18} color='black' />    News
+              </Text>
+            </Link>
+            <Link href="./downloads" asChild>
+              <Text style={styles.drawerText}>
+                <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
+              </Text>
             </Link>
           </View>
-          <Link href="./TravelScreen" asChild>
-            <Text style={styles.drawerText}>
-              <MaterialCommunityIcons name='calendar-clock-outline' size={18} color='black' />    Travel Schedule
-            </Text>
-          </Link>
-          <Link href="./NewsScreen" asChild>
-            <Text style={styles.drawerText}>
-              <Ionicons name='newspaper-outline' size={18} color='black' />    News
-            </Text>
-          </Link>
-          <Link href="./downloads" asChild>
-            <Text style={styles.drawerText}>
-              <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
-            </Text>
-          </Link>
-        </View>
+        ) : (
+          <View style={styles.content}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image source={require('../../assets/images/about.png')} style={styles.smalllogo} />
+              <Link href="./BioScreen" asChild>
+                <Text style={styles.aboutText}>    About        </Text>
+              </Link>
+            <Link href="./TravelScreen" asChild>
+              <Text style={styles.aboutText}>
+                <MaterialCommunityIcons name='calendar-clock-outline' size={18} color='black' />    Travel Schedule
+              </Text>
+            </Link>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Link href="./NewsScreen" asChild>
+              <Text style={styles.drawerText}>
+                <Ionicons name='newspaper-outline' size={18} color='black' />    News         </Text>
+            </Link>
+            <Link href="./downloads" asChild>
+              <Text style={styles.drawerText}>
+                <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
+              </Text>
+            </Link>
+            </View>
+          </View>
+        )}
         <View style={styles.footer}>
         </View>
       </View>
