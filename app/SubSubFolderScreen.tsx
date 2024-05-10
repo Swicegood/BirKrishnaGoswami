@@ -44,6 +44,13 @@ const images = {
   Adi_Lila: require('../assets/images/Adi_Lila.jpg'),
   Madhya_Lila: require('../assets/images/Madhya_Lila.jpg'),
   Antya_Lila: require('../assets/images/Antya_Lila.jpg'),
+  "2014": require('../assets/images/Nectar_of_Instruction.png'),
+  "2022": require('../assets/images/Nectar_of_Instruction.png'),
+  "2012": require('../assets/images/Empathic_Communication.jpg'),
+  "2018": require('../assets/images/Empathic_Communication.jpg'),
+  "July_2013": require('../assets/images/Health.png'),
+  "June_2013": require('../assets/images/Health.png'),
+
 };
 
 function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {
