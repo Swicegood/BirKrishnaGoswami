@@ -12,7 +12,6 @@ const BioScreen = () => {
           <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
       </View>
       <View style={styles.content}>
-          <Text style={styles.date}>Year of Appearance: 1949</Text>
           <Text style={styles.bodyText}>
   Bir Krishna Goswami is one of the spiritual leaders of the International Society for Krishna Consciousness. He has a special status of being among the first Western-born members of the authorized chain of disciplic succession descending from the Supreme Lord, Krishna. In modern times, the most essential task of Krishna conscious spiritual masters is to publish the Vedic scriptures of ancient India and distribute them throughout the world. Bir Krishna Goswami has made this mission his life and soul.{'\n\n'}
 
@@ -34,16 +33,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: '#E53935',
     padding: 10,
   },
   headerText: {
-    color: 'white',
-    fontSize: 24,
+    color: '#A91D15',
+    fontSize: 22,
     textAlign: 'center',
+    fontFamily: 'PacificoRegular',
   },
   content: {
-    margin: 20,
+    marginLeft: 20,
+    marginRight: 20,
   },
   date: {
     fontSize: 28,
