@@ -11,7 +11,6 @@ interface VideoItemProps {
 
 const VideoItem: React.FC<VideoItemProps> = ({ title, lastModified, thumbnail, id }) => {
   return (
-    <Link href={{pathname: '/YoutubePlayer', params:{id: id}}}> {/* This is the link to the PlaylistScreen */}
     <View style={styles.item}>
       <Image style={styles.image} source={{ uri: thumbnail }} />
       <View style={styles.textContainer}>
@@ -20,7 +19,6 @@ const VideoItem: React.FC<VideoItemProps> = ({ title, lastModified, thumbnail, i
         <Text style={styles.lastModified}>{lastModified.split("T")[1].split(":").slice(0, -1).join(":")}</Text>
       </View>
     </View>
-    </Link>
   );
 };
 

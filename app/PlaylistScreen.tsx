@@ -8,9 +8,10 @@ import {
 } from 'react-native';
 import VideoItem from '../components/VideoItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, Link } from 'expo-router';
 import { functions } from './api/firebase';
 import { View } from '../components/Themed';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 const NAVBAR_HEIGHT = 44;
 
@@ -139,41 +140,52 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
   }
 
   async function getVideoHeight() {
-    const orientation = await ScreenOrientation.getOrientationAsync();
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
-
-    if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
-      // In portrait mode, set height based on screen width and aspect ratio
-      return screenWidth * 9 / 16;
-    } else {
-      // In landscape mode, set height to screen height
-      return screenHeight - NAVBAR_HEIGHT;
+    try {
+      const orientation = await ScreenOrientation.getOrientationAsync();
+      const screenWidth = Dimensions.get('window').width;
+      const screenHeight = Dimensions.get('window').height;
+  
+      if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+        // In portrait mode, set height based on screen width and aspect ratio
+        return screenWidth * 9 / 16;
+      } else {
+        // In landscape mode, set height to screen height
+        return screenHeight - NAVBAR_HEIGHT;
+      }
+    } catch (error) {
+      console.error('Failed to get video height:', error);
     }
   }
-
+  
   async function getVideoWidth() {
-    const orientation = await ScreenOrientation.getOrientationAsync();
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
-
-    if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
-      // In portrait mode, set height based on screen width and aspect ratio
-      return screenWidth;
-    } else {
-      // In landscape mode, set height to screen height
-      return (screenHeight - NAVBAR_HEIGHT) * 16 / 9;
+    try {
+      const orientation = await ScreenOrientation.getOrientationAsync();
+      const screenWidth = Dimensions.get('window').width;
+      const screenHeight = Dimensions.get('window').height;
+  
+      if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+        // In portrait mode, set height based on screen width and aspect ratio
+        return screenWidth;
+      } else {
+        // In landscape mode, set height to screen height
+        return (screenHeight - NAVBAR_HEIGHT) * 16 / 9;
+      }
+    } catch (error) {
+      console.error('Failed to get video width:', error);
     }
   }
 
   const renderItem = ({ item }) => (
+
+    <Link href={{pathname: '/YoutubePlayer', params:{id: item.id}}}> {/* This is the link to the PlaylistScreen */}
     <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
+    </Link>
   );
 
   const renderHeader = () => {
 
     return (
-      <View style={{ height: videoHeight, width: videoWidth }}>
+      <View style={{ height: 0, width: videoWidth }}>
         {/* Render your header content here */}
       </View>
     );

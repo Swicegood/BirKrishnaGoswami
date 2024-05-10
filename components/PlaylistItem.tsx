@@ -13,7 +13,6 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({ title, lastModified, thumbn
 
 
   return (
-    <Link href={{pathname: '/PlaylistScreen', params:{id: id}}}> {/* This is the link to the PlaylistScreen */}
     <View style={styles.item}>
         <Image style={styles.image} source={{ uri: thumbnail }} />
       <View style={styles.textContainer}>
@@ -22,7 +21,6 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({ title, lastModified, thumbn
         <Text style={styles.lastModified}>{lastModified.split("T")[1].split(":").slice(0, -1).join(":")}</Text>
       </View>
     </View>
-    </Link>
   );
 };
 

@@ -5,7 +5,7 @@ import { httpsCallable } from 'firebase/functions';
 import { View, FlatList, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import PlaylistItem from '../../components/PlaylistItem'; // Import the PlaylistItem component
 import React, { useEffect, useState } from 'react';
-import { useFocusEffect } from 'expo-router'
+import { useFocusEffect, Link } from 'expo-router'
 import { functions } from '../api/firebase';
 
 
@@ -84,7 +84,10 @@ useFocusEffect(
 );
 
   const renderItem = ({ item }) => (
+
+    <Link href={{pathname: '../PlaylistScreen', params:{id: item.id}}}> {/* This is the link to the PlaylistScreen */}
     <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
+    </Link>
   );
 
   if (isLoading) {

@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TextInput, Image, Text, ActivityIndicator } from 'react-native';
 import { functions } from './api/firebase';
 import { AntDesign } from '@expo/vector-icons';
+import { Link } from 'expo-router';
 
 
 interface GetYouTubeVideosRequest {
@@ -113,6 +114,12 @@ const SearchYoutubeVideosScreen = () => {
       </View>)
   }
 
+  const renderItem = ({ item }) => (
+    <Link href={{ pathname: './YoutubePlayer', params: { id: item.id } }}> {/* This is the link to the PlaylistScreen */}
+    <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
+    </Link>
+  );
+
   return (
     !videos || videos.length === 0 ? (
       <View style={styles.noVideosContainer}>
@@ -137,7 +144,7 @@ const SearchYoutubeVideosScreen = () => {
         <View style={styles.containerList}>
           <FlatList
             data={videos}
-            renderItem={({ item }) => <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />} // Pass video item props to VideoItem
+            renderItem={renderItem}
             keyExtractor={item => item.id}
             ListEmptyComponent={hasSearched ? <Text style={styles.text}>No videos found</Text> : null}
             ListFooterComponent={<View style={{ height: 100 }} />} // Add this line
