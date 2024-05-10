@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: '#A91D15',
-    fontSize: 22,
+    fontSize: 20,
     textAlign: 'center',
     fontFamily: 'PacificoRegular',
   },
