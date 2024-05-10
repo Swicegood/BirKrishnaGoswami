@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: 20,
     marginTop: 10,
+    fontFamily: 'UbuntuRegular',
   },
   category: {
     fontSize: 16,
