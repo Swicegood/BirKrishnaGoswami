@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, 
-  ScrollView, Image, Dimensions } from 'react-native';
+import {
+  View, Text, StyleSheet,
+  ScrollView, Image, Dimensions
+} from 'react-native';
 import Swiper from 'react-native-swiper';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, Link } from 'expo-router';
+import YouTubePlayer from './YoutubePlayer'
 
 
 
@@ -22,7 +25,7 @@ function formatDate(dateString) {
   return `${month} ${day}, ${year}`;
 }
 
-const BlogScreen = () => {
+const NewsItemScreen = () => {
   const { newsItem } = useLocalSearchParams<{ newsItem: string }>();
   const parsedNewsItem = JSON.parse(newsItem);
 
@@ -30,12 +33,15 @@ const BlogScreen = () => {
 
   return (
     <Swiper loop={false}>
-        <ScrollView style={styles.container}>
+      <ScrollView style={styles.container}>
         <Image source={{ uri: parsedNewsItem.url }} style={{ width: Dimensions.get("screen").width, height: 200, alignSelf: 'center' }} />
         <Text style={styles.date}>{formatDate(parsedNewsItem.date)}</Text>
-           <Text style={styles.title}>{parsedNewsItem.headline.toUpperCase()}</Text>
-           <Text style={styles.blogEntryText}>{parsedNewsItem.text}</Text>
-        </ScrollView>
+        <Text style={styles.title}>{parsedNewsItem.headline.toUpperCase()}</Text>
+        <Text style={styles.blogEntryText}>{parsedNewsItem.text}</Text>
+        <Link href={{ pathname: './YoutubePlayer', params: { id: parsedNewsItem.youTubeId } }} style={styles.category}>
+          <Text>Category: {parsedNewsItem.category}</Text>
+        </Link>
+      </ScrollView>
     </Swiper>
   );
 };
@@ -71,12 +77,12 @@ const styles = StyleSheet.create({
   },
   blogEntryText: {
     fontSize: 20,
-    marginTop: 10,
+    margin: 10,
   },
   category: {
     fontSize: 16,
     color: 'blue',
-    marginTop: 10,
+    marginLeft: 10,
   },
   nextButton: {
     backgroundColor: 'transparent',
@@ -89,7 +95,7 @@ const styles = StyleSheet.create({
     color: '#E53935',
     padding: 10,
   },
-  
+
 });
 
-export default BlogScreen;
+export default NewsItemScreen;

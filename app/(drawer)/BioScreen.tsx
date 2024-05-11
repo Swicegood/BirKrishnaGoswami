@@ -54,7 +54,8 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: 20,
     marginTop: 10,
-    fontFamily: 'UbuntuRegular',
+    fontFamily: 'OblikBold',
+    color: '#454545'
   },
   category: {
     fontSize: 16,

@@ -34,6 +34,8 @@ const GalleryComponent = () => {
             headline: data.headline,
             text: data.text,
             date: data.date,
+            youTubeId: data.youTubeId,
+            category: data.category,
           });
         });
         setImages(newImages);

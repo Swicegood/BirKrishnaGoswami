@@ -82,6 +82,23 @@ function buildCategoryList(hierarchy: Record<string, any>, level: number): strin
   return categories;
 }
 
+function buildListFromParent (hierarchy: Record<string, any>, parent: string): string[] {
+  const categories: string[] = [];
+  const traverse = (node: Record<string, any> | null, currentParent: string) => {
+    if (currentParent === parent) {
+      categories.push(...Object.keys(node));
+    } else {
+      for (const [key, value] of Object.entries(node)) {
+        traverse(value, key);
+      }
+    }
+  };
+
+  traverse(hierarchy, '');
+  return categories;
+}
+
+
 const FolderScreen = () => {
   const [folders, setFolders] = useState<string[]>([]);
   const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);// Correct the spelling here
@@ -115,7 +132,7 @@ const FolderScreen = () => {
   const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => (
     <View style={styles.itemContainer}>
       <Link href={{
-        pathname: "SubFolderScreen",
+        pathname: buildListFromParent(deserializedHierarchy, item.category).length === 0 ? "FilesScreen" : "SubFolderScreen",
         params: { category: item.category, hierarchy: JSON.stringify(hierarchy) }
       }} asChild>
         <TouchableOpacity>

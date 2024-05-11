@@ -8,7 +8,8 @@ import {
   TextStyle,
   ImageStyle,
   Dimensions,
-  Linking
+  Linking,
+  useWindowDimensions,
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
@@ -16,7 +17,6 @@ import { useState, forwardRef, useEffect } from 'react';
 import { Link } from 'expo-router';
 import { collection, query, getDocs } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
-import * as ScreenOrientation from 'expo-screen-orientation';
 import { db } from '../api/firebase'; 
 
 const ENTRIES = [
@@ -45,17 +45,15 @@ export default function TabOneScireen() {
   const [activeSlide, setActiveSlide] = useState(0); // Add this state variable
   const [whatsAppUrl, setWhatsAppUrl] = useState('https://chat.whatsapp.com/FaPXfrT3qBLBSxd04TZr9X');
   const expoPushToken = NotificationHandler();
-  const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
+  const windowDimensions = useWindowDimensions();
+
+  const isLandscape = windowDimensions.width > windowDimensions.height;
+  const [orientation, setOrientation] = useState(isLandscape ? 'LANDSCAPE' : 'PORTRAIT');
 
   useEffect(() => {
-    const subscription = ScreenOrientation.addOrientationChangeListener(({ orientationInfo }) => {
-      setOrientation(orientationInfo.orientation);
-    });
-  
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+    setOrientation(isLandscape ? 'LANDSCAPE' : 'PORTRAIT');
+  }, [isLandscape]); 
+
 
   useEffect(() => {
     const fetchWhatsAppUrl = async () => {
@@ -76,7 +74,7 @@ export default function TabOneScireen() {
     <SafeAreaView style={styles.safeArea}>
 
     <View style={styles.carousel}>
-    {orientation === ScreenOrientation.Orientation.PORTRAIT_UP && (
+    {orientation === 'PORTRAIT' && (
           <>
       <Carousel
               data={ENTRIES}

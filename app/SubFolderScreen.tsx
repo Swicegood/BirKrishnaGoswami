@@ -44,6 +44,8 @@ const images = {
   Lalita_Madhava: require('../assets/images/Lalita_Madhava.jpg'),
   Gopal_Champu: require('../assets/images/Gopal_Champu.jpg'),
   Mukta_Carita: require('../assets/images/Mukta_Carita.jpg'),
+  "2014": require('../assets/images/Nectar_of_Instruction.png'),
+  "2022": require('../assets/images/Nectar_of_Instruction.png'),
   Krishnanika_Kaumudi: require('../assets/images/Krishnanika_Kaumudi.jpg'),
   Vilapa_Kusumanjali: require('../assets/images/Vilapa_Kusumanjali.jpg'),
   Connecting_to_Krishna: require('../assets/images/Devotional_Service.png'),
@@ -67,6 +69,14 @@ const images = {
   "2019": require('../assets/images/Ramayan.jpg'),
   "2020": require('../assets/images/Ramayan.jpg'),
   "2021": require('../assets/images/Ramayan.jpg'),
+  Harinama_Cintamani: require('../assets/images/Harinama_Cintamani.jpg'),
+  Manah_Siksa: require('../assets/images/Manah_Siksa.jpg'),
+  "Srimati_Radharani's_Pastimes": require('../assets/images/Srimati_Radharanis_Pastimes.jpg'),
+  Vraja_Mandal_Parikrama: require('../assets/images/Vraja_Mandal_Parikrama.png'),
+  Etiquette: require('../assets/images/Etiquette.jpg'),
+  The_Qualities_of_Vaishnavas: require('../assets/images/The_Qualities_of_Vaishnavas.png'),
+  Disciple_Course: require('../assets/images/Disciple_Course.png'),
+  Raising_Children_or_Brahmacaris: require('../assets/images/Raising_Children_or_Brahmacaris.png'),
 };
 
 function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {
