@@ -6,7 +6,7 @@ import { View, Image, Dimensions } from 'react-native';
 export default function TabLayout() {
   return (
     <View style={{ flex: 1 }}>
-    <Image source={require('../../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+    <Image source={require('../../assets/images/Memories.png')} style={{ width: Dimensions.get("screen").width, height: 150, resizeMode: 'cover'}}/>
     <View style={{ flex: 1 }}>
     <Tabs screenOptions={{ tabBarActiveTintColor: 'red' }}>
       <Tabs.Screen 
@@ -21,7 +21,7 @@ export default function TabLayout() {
         name="SPPlaylistScreen" 
         options={{
           title: 'Playlist',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="youtube" color={color} />,
+          tabBarIcon: () => false,
           headerShown: false,
         }} 
       />

@@ -24,7 +24,7 @@ const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/Thought_of_the_Day.png'), link: '../QuoteScreen' },
   { title: 'Slide 2', image: require('../../assets/images/News.png'), link: './NewsScreen' },
   { title: 'Slide 3', image: require('../../assets/images/Memories.png'), link: './MemoriesScreen' },
-  { title: 'Slide 4', image: require('../../assets/images/books_placeholder_355x120.png'), link: '../BooksScreen' },
+  { title: 'Slide 4', image: require('../../assets/images/Books_and_Ebooks.png'), link: '../BooksScreen' },
   { title: 'Slide 5', image: require('../../assets/images/Vyasa_Puja.png'), link: '../(tabs3)/VPPlaylistScreen' },
   // Add more entries here
 ];

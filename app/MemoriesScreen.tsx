@@ -12,12 +12,12 @@ const BooksScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: windowWidth, alignSelf: 'center' }} />
+        <Image source={require('../assets/images/Memories.png')} style={{ width: windowWidth, height: 150, resizeMode: 'cover' }} />
         <View style={styles.content}>
           <Link href="./(tabs2)/SPPlaylistScreen" asChild>
           <TouchableOpacity style={styles.card}>
             <Image
-              source={require('../assets/images/placeholder_355_200.png')}
+              source={require('../assets/images/Prabhupada_Playlist.png')}
               resizeMode="cover"
               style={styles.cardImage}
             />
@@ -27,7 +27,7 @@ const BooksScreen: React.FC = () => {
           <Link href="./(tabs2)/VPOfferingsScreen" asChild>
             <TouchableOpacity style={styles.card}>
                 <Image
-                source={require('../assets/images/placeholder_355_200.png')}
+                source={require('../assets/images/Prabhupada_Offerings.png')}
                 resizeMode="cover"
                 style={styles.cardImage}
                 />
@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 10,
     fontSize: 18,
+    color: 'maroon',
   },
 });
 

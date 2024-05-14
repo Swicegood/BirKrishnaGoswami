@@ -32,7 +32,7 @@ const chanting: React.FC = () => {
           <Link href={{ pathname: "AudioScreen", params: { url: track, title: "Chanting Japa" } }} asChild>
           <TouchableOpacity style={styles.card}>
             <Image
-              source={require('../assets/images/placeholder_355_200.png')}
+              source={require('../assets/images/Chanting_Japa.png')}
               resizeMode="cover"
               style={styles.cardImage}
             />
@@ -83,15 +83,18 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: '100%',
-    height: 150,
-    borderTopLeftRadius: 8,
+    height: 180,
+    borderTopLeftRadius: 15,
     borderTopRightRadius: 8,
+    resizeMode: 'contain',
   },
   cardText: {
     fontWeight: 'bold',
     textAlign: 'center',
     padding: 10,
     fontSize: 18,
+    fontFamily: 'OblikBold',
+    color: '#7e2b18',
   },
 });
 

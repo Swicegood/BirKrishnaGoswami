@@ -6,11 +6,11 @@ const BioScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <Image source={require('../../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+        <Image source={require('../../assets/images/About_Bio.png')} style={{ width: Dimensions.get("screen").width, height: 260 }} />
         <View style={styles.header}>
           <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
       </View>
+      <ScrollView>
       <View style={styles.content}>
           <Text style={styles.bodyText}>
   Bir Krishna Goswami is one of the spiritual leaders of the International Society for Krishna Consciousness. He has a special status of being among the first Western-born members of the authorized chain of disciplic succession descending from the Supreme Lord, Krishna. In modern times, the most essential task of Krishna conscious spiritual masters is to publish the Vedic scriptures of ancient India and distribute them throughout the world. Bir Krishna Goswami has made this mission his life and soul.{'\n\n'}
