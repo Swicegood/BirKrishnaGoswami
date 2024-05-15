@@ -23,7 +23,7 @@ const DonationScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView>
       <View style={styles.container}>
-        <Image source={require('../assets/images/placeholder_355_160.png')} style={{ width: windowWidth, alignSelf: 'center' }} />
+        <Image source={require('../assets/images/Donate.png')} style={{ width: windowWidth, height: 160, resizeMode: 'cover' }} />
         <View style={styles.content}>
             <Text style={styles.headerText}>Hare Krishna!</Text>
             <Text style={styles.cardText}>Thank you for considering donating to the mission of Srila Bir Krishna Goswami Maharaja. 

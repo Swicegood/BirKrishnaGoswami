@@ -1,4 +1,5 @@
 import React from 'react';
+import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { View, Image, Dimensions } from 'react-native';
@@ -12,7 +13,7 @@ export default function TabLayout() {
       <Tabs.Screen 
         name="VPOfferingsScreen" 
         options={{
-          title: 'Vyasa Puja Offerings',
+          title: 'Offerings',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="book" color={color} />,
           headerShown: false,
         }} 
@@ -21,7 +22,7 @@ export default function TabLayout() {
         name="SPPlaylistScreen" 
         options={{
           title: 'Playlist',
-          tabBarIcon: () => false,
+          tabBarIcon: ({color}) => <Entypo size={28} name="youtube" color={color} />,
           headerShown: false,
         }} 
       />

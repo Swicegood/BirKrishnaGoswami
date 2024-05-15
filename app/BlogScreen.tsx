@@ -56,9 +56,9 @@ const BlogScreen = () => {
   return (
     <Swiper loop={false}>
       {posts.map((post, index) => (
+        <>
+          <Image source={require('../assets/images/Blog_Puppets.png')} style={{ width: Dimensions.get("screen").width, height: 250, resizeMode: 'cover'}} />
         <ScrollView style={styles.container} key={index}>
-          <Image source={require('../assets/images/placeholder_355_200.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
-
           <Text style={styles.date}>{formatDate(post.date)}</Text>
           <Text style={styles.title}>{post.title.toUpperCase()}</Text>
           <View style={{padding: 20}}>
@@ -69,6 +69,7 @@ const BlogScreen = () => {
           />
           </View>
         </ScrollView>
+        </>
       ))}
     </Swiper>
 

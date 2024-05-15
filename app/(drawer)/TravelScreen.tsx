@@ -138,7 +138,7 @@ const TravelScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Image source={require('../../assets/images/placeholder_355_240.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+        <Image source={require('../../assets/images/Trave_Plane.png')} style={{ width: Dimensions.get("screen").width, height: 250, resizeMode: 'cover' }} />
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
           <Text style={styles.textText}>{text}</Text>

@@ -12,14 +12,14 @@ const AudioScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Audio Lectures</Text>
+        <View>
+          <Image source={require('../assets/images/Audio_Lectures.png')} style={{ width: Dimensions.get('window').width, height: 160, resizeMode: 'cover'}}/>
         </View>
         <View style={styles.content}>
           <Link href="./YearScreen" asChild>
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require('../assets/images/placeholder_355_200.png')}
+                source={require('../assets/images/By-Year.png')}
                 resizeMode="cover"
                 style={styles.cardImage}
               />
@@ -29,7 +29,7 @@ const AudioScreen: React.FC = () => {
           <Link href="./FolderScreen" asChild>
             <TouchableOpacity style={styles.card}>
                 <Image
-                source={require('../assets/images/placeholder_355_200.png')}
+                source={require('../assets/images/By-Book.png')}
                 resizeMode="cover"
                 style={styles.cardImage}
                 />
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 10,
     fontSize: 18,
+    color: 'maroon',
   },
 });
 

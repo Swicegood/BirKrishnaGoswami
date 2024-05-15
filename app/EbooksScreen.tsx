@@ -78,7 +78,7 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
         <Text style={styles.itemText}>{item.title}</Text>
         <Link
           href={{
-            pathname: "./PdfViewScreen",
+            pathname: "/PdfViewScreen",
             params: { url: item.contenturl, key: Date.now() }
           }}
           asChild

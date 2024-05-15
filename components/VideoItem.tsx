@@ -25,9 +25,9 @@ const VideoItem: React.FC<VideoItemProps> = ({ title, lastModified, thumbnail, i
 const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
-    padding: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
     alignItems: 'center',
-    marginVertical: -12,
   },
   image: {
     width: Dimensions.get('window').width / 2.2,

@@ -217,7 +217,7 @@ const QuoteScreen = () => {
   return (
     <View style={{flex: 1}}>
       <View style={styles.quoteContainer}>
-        <Image source={require('../assets/images/placeholder_355_240.png')} style={{ width: Dimensions.get("screen").width, alignSelf: 'center' }} />
+        <Image source={require('../assets/images/Quote.png')} style={{ width: Dimensions.get("screen").width, height: 260, resizeMode: 'cover'}} />
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
           <Text style={styles.quoteText}>{quote}</Text>
