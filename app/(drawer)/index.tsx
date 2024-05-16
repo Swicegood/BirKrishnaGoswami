@@ -73,7 +73,6 @@ export default function TabOneScireen() {
   return (
     <>
       <SafeAreaView style={styles.safeArea}>
-
         <View style={styles.carousel}>
           {orientation === 'PORTRAIT' && (
             <>
@@ -270,26 +269,6 @@ export default function TabOneScireen() {
 
   );
 }
-
-type ButtonProps = {
-  title: string;
-  onPress: () => void;
-};
-
-const Button = forwardRef((props: ButtonProps, ref: React.Ref<any>) => (
-  <TouchableOpacity style={styles.buttonContainer} >
-    <Image
-      source={require('../../assets/images/placeholder_355_200.png')} // Replace with your local or network image
-      style={styles.buttonImage}
-      ref={ref}
-    />
-    <Text style={styles.buttonText}>{props.title}</Text>
-  </TouchableOpacity>
-));
-
-
-
-
 
 // Style definitions
 interface Styles {

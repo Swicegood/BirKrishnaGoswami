@@ -1,5 +1,5 @@
 import { Text, View } from './Themed';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -21,6 +21,7 @@ function CustomHeader() {
           <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
             <Text style={styles.menuText}>☰</Text>
           </TouchableOpacity>
+          <Image source={require('../assets/images/Crown.png')} style={{ width: 100, height: 85 ,position: 'absolute', top: 0 , left: (Dimensions.get('window').width / 2) - 50, zIndex: 1, resizeMode: 'contain' }} />
           <Text style={styles.headerText}></Text>
         </View>
       </SafeAreaView>
