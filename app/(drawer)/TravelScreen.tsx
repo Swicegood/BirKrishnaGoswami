@@ -60,33 +60,59 @@ const TravelScreen = () => {
         orderBy('date', 'desc'),
         limit(1)
       );
-      const nextQuerySnapshot = await getDocs(nextQuery);
+      let nextdoc = null;
+      let newText = text;
+      let newDate = date;
 
-      nextQuerySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and category
-        setText(doc.data().text);
-        setDate(doc.data().date);
-        console.log("currentDoc", doc.data().date);
-      });
+      try {
+        const nextQuerySnapshot = await getDocs(nextQuery);
+        // rest of your code
 
-      if (nextQuerySnapshot.docs[0]) {
-        setCurrentDoc(nextQuerySnapshot.docs[0]);
+        nextQuerySnapshot.forEach((doc) => {
+          newText = doc.data().text;
+          newDate = doc.data().date;
+          console.log("nextDate", newDate);
+          nextdoc = doc;
+        });
+
+        if (newText !== text) {
+          setText(newText);
+        }
+
+        if (newDate !== date) {
+          setDate(newDate);
+        }
+
+        if (nextdoc) {
+          setCurrentDoc(nextdoc);
+        }
+      } catch (error) {
+        console.error("Failed to get documents:", error);
+        // handle the error as needed
       }
-
       // Check if the current document is the last one
+      try {
+        if (nextdoc) {
+          console.log("currentDocNextQuery", nextdoc.date);
+          const nextNextQuery = query(
+            collection(db, 'travel-schedule'),
+            where('date', '<', nextdoc.data().date),
+            orderBy('date', 'desc'),
+          );
 
-      const nextNextQuery = query(
-        collection(db, 'travel-schedule'),
-        where('date', '>', currentDoc.data().date),
-        orderBy('date', 'desc'),
-      );
-
-      const querySnapshot = await getDocs(nextNextQuery)
-
-      if (querySnapshot.docs.length < 1) {
-        setAtLastDoc(true);
-      } else {
-        setAtLastDoc(false);
+          const querySnapshot = await getDocs(nextNextQuery)
+          console.log("querySnapshot", querySnapshot.docs.length);
+          if (querySnapshot.docs.length < 1) {
+            setAtLastDoc(true);
+          } else {
+            setAtLastDoc(false);
+          }
+        } else {
+          setAtLastDoc(true);
+        }
+      } catch (error) {
+        console.error("Failed to get documents:", error);
+        // handle the error as needed
       }
     }
   };
@@ -94,41 +120,62 @@ const TravelScreen = () => {
   const handlePreviousText = async () => {
     setAtLastDoc(false);
     if (currentDoc) {
-      const currentTimestamp = currentDoc.data().processed;
-      console.log("currentTimestamp", currentTimestamp);
+      const currentDate = currentDoc.data().date;
+      console.log("currentTimestamp", currentDate);
       const prevQuery = query(
         collection(db, 'travel-schedule'),
-        where('processed', '>', currentTimestamp),
-        orderBy('processed', 'asc'),
+        where('date', '>', currentDate),
+        orderBy('date', 'asc'),
         limit(1)
       );
       const prevQuerySnapshot = await getDocs(prevQuery);
 
+      let newText = text;
+      let newDate = date;
+      let prevDoc = null;
+
       prevQuerySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and title
-        setText(doc.data().text);
-        setDate(doc.data().date);
-        console.log("currentDoc", doc.data().processed);
+        const newData = doc.data();
+        newText = newData.text;
+        newDate = newData.date;
+        prevDoc = doc;
+
+        if (newText !== text) {
+          setText(newText);
+        }
+
+        if (newDate !== date) {
+          setDate(newDate);
+        }
+
+        console.log("currentDoc", newDate);
       });
 
       if (prevQuerySnapshot.docs[0]) {
         setCurrentDoc(prevQuerySnapshot.docs[0]);
       }
+      if (prevDoc) {
+        console.log("currentDocPrevQuery", prevDoc.data().date);
 
-      const nextPrevQuery = query(
-        collection(db, 'travel-schedule'),
-        where('date', '<', currentDoc.data().date),
-        orderBy('date', 'desc'),
-      );
+        const nextPrevQuery = query(
+          collection(db, 'travel-schedule'),
+          where('date', '>', prevDoc.data().date),
+          orderBy('date', 'desc'),
+        );
 
-      const querySnapshot = await getDocs(nextPrevQuery)
+        const querySnapshot = await getDocs(nextPrevQuery)
 
-      if (querySnapshot.docs.length < 1) {
-        setAtFirstDoc(true);
+        if (querySnapshot.docs.length < 1) {
+          setAtFirstDoc(true);
+        } else {
+          setAtFirstDoc(false);
+        }
       } else {
-        setAtFirstDoc(false);
+        setAtFirstDoc(true);
+
       }
-    }
+    };
+
   };
 
   if (isLoading) {
