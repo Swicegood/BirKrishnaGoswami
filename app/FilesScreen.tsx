@@ -8,6 +8,7 @@ import CustomHeaderMain from '../components/CustomHeaderMain';
 
 interface File {
   category: string;
+  parentFolder?: string;
   title: string;
   url: string;
   date: string;
@@ -42,14 +43,32 @@ const FilesScreen = () => {
       // Populate file.category with the name of the immediate parent folder derived from each url
       const categorizedFiles = allFiles.map(file => {
         const urlParts = file.url.split('/');
-        const parentFolder = urlParts[urlParts.length - 2]; // Get the second last element
-        return { ...file, category: parentFolder };
+        const folder = urlParts[urlParts.length - 2]; // Get second last element
+        if (urlParts.length < 3) {
+          return { ...file, category: folder };
+        }
+        const parentFolder = urlParts[urlParts.length - 3]; // Get the third last element
+        return { ...file, category: folder, parentFolder};
       });
   
       // add dates from matched urls from firestore
 
       // Filter files to only include those that belong to the current folder
-      const folderFiles = categorizedFiles.filter(file => file.category === category);
+      const folderFiles = categorizedFiles.filter(file => {
+        // If category ends with "_"
+        if (category.endsWith('_')) {
+          const parts = category.split('_');
+          const lastPart = parts[parts.length - 2];
+          const firstPart = parts.slice(0, -2).join('_');
+      
+          // Accept the file if the last part of category before "_" === file.category
+          // and the whole first part up until the second to last "_" === file.parentFolder
+          return lastPart === file.category && firstPart === file.parentFolder;
+        }
+      
+        // Otherwise, accept the file if file.category === category
+        return file.category === category;
+      });
       const folderFilesWithDate = await Promise.all(folderFiles.map(async file => {
         let docData;
         const q = query(collection(db, "audio-tracks"), where("url", "==", file.url));

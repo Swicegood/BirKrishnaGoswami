@@ -112,12 +112,32 @@ const FolderScreen = () => {
     image: placeholderImage,
   }));
 
+  const disambiguate = (hierarchy: Record<string, any>, parentName = '') => {
+    return Object.entries(hierarchy).reduce((acc, [key, value]) => {
+      // Check if the key is a simple number
+      const isNumber = !isNaN(Number(key));
+  
+      // Generate a unique name for the child node if its name is a simple number
+      const uniqueName = isNumber ? `${parentName}_${key}_` : key;
+  
+      // If the child node is an object, recursively disambiguate its child nodes
+      if (typeof value === 'object' && value !== null) {
+        acc[uniqueName] = disambiguate(value, uniqueName);
+      } else {
+        acc[uniqueName] = value;
+      }
+  
+      return acc;
+    }, {} as Record<string, any>);
+  };
+
+
   useEffect(() => {
     (async () => {
       const files: File[] = (await getAllFiles('audioFilesList', 'mp3Files')).map(url => ({ url }));
       const hierarchy = files.map(file => {
         const hierarchyFromUrl = extractHierarchyFromUrl(file.url);
-        return hierarchyFromUrl;
+        return disambiguate(hierarchyFromUrl);
       });
       console.log("Hierarchy", hierarchy[40]);
       setHierarchy(hierarchy);
