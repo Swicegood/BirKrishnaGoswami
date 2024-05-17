@@ -9,7 +9,7 @@ export default function NotFoundScreen() {
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
       <View style={styles.noVideosContainer}>
-        <Image source={require('../assets/images/no_videos.png')} style={styles.noVideosImage} />
+        <Image source={require('../assets/images/Sorry_Nothing_Found.png')} style={styles.noVideosImage} />
       </View>
     </>
   );

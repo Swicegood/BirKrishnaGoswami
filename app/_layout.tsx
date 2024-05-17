@@ -91,6 +91,7 @@ function RootLayoutNav() {
         <Stack.Screen name="YearScreen" options={{ header: () => <CustomHeaderMain title='VIDEOS' /> }} />
         <Stack.Screen name="(tabs2)" options={{ header: () => <CustomHeaderMain title='MEMORIES' /> }} />
         <Stack.Screen name="(tabs3)" options={{ header: () => <CustomHeaderMain title='VYASA PUJA' /> }} />
+        <Stack.Screen name="[...missing]" options={{ header: () => <CustomHeaderMain title='Oops!' /> }} />
       </Stack>
     </>
   );
