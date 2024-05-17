@@ -142,11 +142,14 @@ exports.getLiveVideo = functions.https.onRequest(async (req, res) => {
 });
 
 const admin = require('firebase-admin');
+const xml2js = require('xml2js');
+const {Expo} = require('expo-server-sdk');
+
 admin.initializeApp();
 
 exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) => {
   // Check if this is a subscription verification request
-  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.challenge']) {
+  if (req.query['hub.mode'] === 'subscribe' || req.query['hub.mode'] === 'unsubscribe' && req.query['hub.challenge']) {
     // Respond with the hub.challenge value to verify the subscription
     const challenge = req.query['hub.challenge'];
     console.log('Verifying subscription');
@@ -154,16 +157,12 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
   } else {
     // Handle other notifications (e.g., video upload notifications)
     console.log('Received a notification');
-    // Process the notification here
 
     // Respond to indicate successful receipt of the notification
     res.status(200).send('OK');
 
-    // Log the entire request body
-    const xml2js = require('xml2js');
-
     // Convert the Buffer to a string and parse the XML
-    xml2js.parseString(req.body.toString(), (err, result) => {
+    xml2js.parseString(req.body.toString(), async (err, result) => {
       if (err) {
         console.error('Failed to parse XML:', err);
         return;
@@ -178,17 +177,11 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
       console.log(`New video: ${videoTitle} at ${videoUrl}`);
 
       /**
-       * Retrieves user tokens.
-       *
-       * @async
-       * @function getUserTokens
-       * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
-       */
+      /* Handles notifications.
+      /*
+      /* @return {Promise<void>} A promise that resolves when the function has completed.
+      /*/
       async function handleNotification() {
-        // Get Expo SDK
-        const {Expo} = require('expo-server-sdk');
-
-        // Get user tokens
         const userTokens = await getUserTokens();
 
         // Create an array of promises
@@ -205,33 +198,54 @@ exports.handleYouTubeNotification = functions.https.onRequest(async (req, res) =
             body: `A new video has been posted on BKGoswami YouTube entitled ${videoTitle}.`,
             data: {link: videoUrl},
           };
-          // Create a new Expo SDK client
-          const expo = new Expo();
 
-          // Send the notification
-          try {
-            const ticket = await expo.sendPushNotificationsAsync([message]);
-            console.log(ticket);
-          } catch (error) {
-            console.error(`Failed to send push notification: ${error}`);
-          }
+          const expo = new Expo();
+          await sendPushNotificationWithRetry(expo, message);
         });
+
         // Wait for all notifications to be sent
         await Promise.all(notifications);
       }
+      /**
+      /* Handles notifications.
+      /*
+       * @param {Object} expo - The Expo SDK instance.
+       * @param {Object} message - The message to be sent.
+       * @param {number} [retries=3] - The number of times to retry sending the notification.
+       * @param {number} [delay=1000] - The delay between retries in milliseconds.
+      /* @return {Promise<void>} A promise that resolves when the function has completed.
+      /*/
+      async function sendPushNotificationWithRetry(expo, message, retries = 3, delay = 1000) {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+          try {
+            const ticket = await expo.sendPushNotificationsAsync([message]);
+            console.log(ticket);
+            return;
+          } catch (error) {
+            console.error(`Failed to send push notification on attempt ${attempt}: ${error}`);
+            if (attempt < retries) {
+              await new Promise((resolve) => setTimeout(resolve, delay));
+              delay *= 2; // Exponential backoff
+            } else {
+              throw error;
+            }
+          }
+        }
+      }
+
+      /**
+       * Fetches the user tokens from the database.
+       * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
+       */
+      async function getUserTokens() {
+        const db = admin.firestore();
+        const tokensCollection = db.collection('push-tokens');
+        const snapshot = await tokensCollection.get();
+        return snapshot.docs.map((doc) => doc.data().token);
+      }
+
       handleNotification();
     });
-  }
-  /**
-  * Fetches the user tokens from the database.
-  * @return {Promise<Array<string>>} A promise that resolves to an array of user tokens.
-  */
-  async function getUserTokens() {
-    const db = admin.firestore();
-    const tokensCollection = db.collection('push-tokens');
-    const snapshot = await tokensCollection.get();
-    const tokens = snapshot.docs.map((doc) => doc.data().token);
-    return tokens;
   }
 });
 
@@ -241,7 +255,7 @@ exports.subscribeToPubSub = functions.https.onRequest(async (req, res) => {
   console.log('Attempt Subscribing to PubSub');
   const data = {
     'hub.mode': 'subscribe',
-    'hub.topic': 'https://www.youtube.com/feeds/videos.xml?channel_id=UCLiuTwQ-ap30PbKzprrN2Hg',
+    'hub.topic': 'https://www.youtube.com/xml/feeds/videos.xml?channel_id=UCLiuTwQ-ap30PbKzprrN2Hg',
     'hub.callback': 'https://us-central1-birkrishnagoswami-b7360.cloudfunctions.net/handleYouTubeNotification',
     'hub.verify': 'sync',
     'hub.lease_seconds': '864000',
@@ -256,7 +270,7 @@ exports.subscribeToPubSub = functions.https.onRequest(async (req, res) => {
     console.log(`Status: ${response.status}`);
     console.log('Headers: ', response.headers);
     console.log('Data: ', response.data);
-    res.status(200).send('Subscribed to PubSub');
+    res.status(200).json({data: 'Subscribed to PubSub'});
   } catch (error) {
     console.error(`Error: ${error.message}`);
     console.error(error.stack);

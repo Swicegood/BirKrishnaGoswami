@@ -13,7 +13,7 @@ function formatDate(dateString) {
   }
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dateParts = dateString.split('/');
-  const date = new Date(`20${dateParts[2]}`, dateParts[0] - 1, dateParts[1]);
+  const date = new Date(`20${dateParts[0]}`, dateParts[1] -1, dateParts[2]);
 
   const month = months[date.getMonth()];
   const day = String(date.getDate());
