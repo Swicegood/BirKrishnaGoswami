@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
-import { useState, forwardRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'expo-router';
 import { collection, query, getDocs } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
@@ -84,6 +84,7 @@ export default function TabOneScireen() {
                 autoplay={true}
                 autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
                 loop={true}
+                loopClonesPerSide={5}
                 onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
               />
               <View style={{ position: 'absolute', top: sliderHeight- 30, left: windowWidth / 3 , backgroundColor: 'transparent' }}>
