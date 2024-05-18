@@ -19,6 +19,23 @@ function formatDate(dateString) {
   return `${month} ${day}`;
 }
 
+function dateToDayNumber(dateString) {
+  if (!dateString || dateString.split('/').length !== 3) {
+    return 0;
+  }
+  const dateParts = dateString.split('/');
+  const date = new Date(`20${dateParts[2]}`, dateParts[0] - 1, dateParts[1]);
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const day = Math.floor(diff / oneDay);
+  console.log("dateString", dateString );
+  console.log("date", date);
+  console.log("day", day);
+  return day;
+}
+
+
 const QuoteScreen = () => {
   const [quote, setQuote] = useState('');
   const [date, setDate] = useState('');
@@ -215,15 +232,21 @@ const QuoteScreen = () => {
   }
   // Button labels PREVIOUS AND NEXT are backwards for user clarity
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <View style={styles.quoteContainer}>
-        <Image source={require('../assets/images/Quote.png')} style={{ width: Dimensions.get("screen").width, height: 260, resizeMode: 'cover'}} />
+        <Image source={{ uri: `https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/quotes/${dateToDayNumber(date)}.png` }}
+          style={{
+            width: Dimensions.get("screen").width,
+            height: 260,
+            resizeMode: 'cover'
+          }}
+        />
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
           <Text style={styles.quoteText}>{quote}</Text>
         </View>
       </View>
-      <View style={{  justifyContent: 'space-between'}}>
+      <View style={{ justifyContent: 'space-between' }}>
 
         <View style={{ padding: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
