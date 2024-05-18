@@ -4,8 +4,6 @@ import {
     ActivityIndicator, Dimensions
 } from 'react-native';
 import { Link, useLocalSearchParams, useFocusEffect, router } from 'expo-router';
-import { useNavigationState } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
@@ -24,36 +22,8 @@ interface SubCategory {
 }
 
 const images = {
-    "01_-_Purva_Campu": require('../assets/images/Gopal_Champu.jpg'),
-    "02_-_Uttara_Campu": require('../assets/images/Gopal_Champu.jpg'),
-    "Chapter-01": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-02": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-03": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-04": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-05": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-06": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-07": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-08": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-09": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-10": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-11": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-12": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-13": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-14": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-15": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-16": require('../assets/images/Bhagavad_Gita.png'),
-    "Chapter-17": require('../assets/images/Bhagavad_Gita.png'),
-    Adi_Lila: require('../assets/images/Adi_Lila.jpg'),
-    Madhya_Lila: require('../assets/images/Madhya_Lila.jpg'),
-    Antya_Lila: require('../assets/images/Antya_Lila.jpg'),
-    "Empathic_Communications_2012_": require('../assets/images/Empathic_Communication.jpg'),
-    "Empathic_Communications_2018_": require('../assets/images/Empathic_Communication.jpg'),
-    "Empathic_Communications_2021_": require('../assets/images/Empathic_Communication.jpg'),
-    "July_2013": require('../assets/images/Health.png'),
-    "June_2013": require('../assets/images/Health.png'),
-    "Disciple_Course_01_": require('../assets/images/Disciple_Course.png'),
-    "Disciple_Course_02_": require('../assets/images/Disciple_Course.png'),
-    "Disciple_Course_03_": require('../assets/images/Disciple_Course.png'),
+    Croatia: require('../assets/images/Health.png'),
+    Serbian_Camp: require('../assets/images/Health.png'),
 
 };
 
@@ -78,7 +48,6 @@ function buildCategoryList(hierarchy: Record<string, any>, parent: string): stri
 const SubSubFolderScreen = () => {
     const { hierarchy: localHierarchy, category } = useLocalSearchParams<{ category: string; hierarchy: string }>();
     const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
-    const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -91,7 +60,6 @@ const SubSubFolderScreen = () => {
             console.log("Hierarchy Failed");
             return;
         }
-        setDeserializedHierarchy(deserializedHierarchy);
         let subcategories: SubCategory[] = [];
         if (category !== null && deserializedHierarchy !== null) {
             subcategories = buildCategoryList(deserializedHierarchy, category).map((subcategory, index): SubCategory => ({
@@ -125,10 +93,9 @@ const SubSubFolderScreen = () => {
         <View style={styles.itemContainer}>
             <Link
                 href={{
-                    pathname: buildCategoryList(deserializedHierarchy, item.title).length === 0 ? "FilesScreen" : "Subx3FolderScreen",
+                    pathname: "FilesScreen",
                     params: {
                         category: item.title,
-                        hierarchy: JSON.stringify(deserializedHierarchy) // Serialize the hierarchy here
                     }
                 }}
                 asChild
