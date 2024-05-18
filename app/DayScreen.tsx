@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useGlobalSearchParams, Link } from 'expo-router';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function customDecodeURI(str) {
   return decodeURIComponent(str.replace(/%27/g, "'").replace(/%28/g, "(").replace(/%29/g, ")"));
@@ -24,6 +25,7 @@ const DayScreen = () => {
   }, [dataString]);
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ScrollView>
       <View>
         {data.map((item, index) => (
@@ -46,6 +48,7 @@ const DayScreen = () => {
         ))}
       </View>
     </ScrollView>
+    </GestureHandlerRootView>
   );
 };
 

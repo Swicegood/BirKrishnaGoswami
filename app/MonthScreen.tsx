@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { View, Text, TouchableOpacity,StyleSheet, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const MonthScreen = () => {
   const { year, dataString }: { year: string; dataString: string } = useLocalSearchParams();
@@ -24,6 +25,7 @@ const MonthScreen = () => {
 
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ScrollView>
       <View>
         {Object.keys(data).sort((a, b) => Number(a.slice(0, 2)) - Number(b.slice(0, 2))).map((month) => (
@@ -44,6 +46,7 @@ const MonthScreen = () => {
         ))}
       </View>
     </ScrollView>
+    </GestureHandlerRootView>
   );
 
 }

@@ -3,6 +3,7 @@ import { Link, router } from 'expo-router';
 import { collection, query, getDocs } from "firebase/firestore";
 import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { db } from './api/firebase';
 
 
@@ -52,6 +53,7 @@ const YearScreen = () => {
   }
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ScrollView>
       <View>
         {Object.keys(data).sort((a, b) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : Number(a) - Number(b)).map((year) => (
@@ -72,6 +74,7 @@ const YearScreen = () => {
         ))}
       </View>
     </ScrollView>
+    </GestureHandlerRootView>
   );
 }
 const styles = StyleSheet.create({
