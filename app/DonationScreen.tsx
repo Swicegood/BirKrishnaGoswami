@@ -21,9 +21,10 @@ const DonationScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView>
       <View style={styles.container}>
         <Image source={require('../assets/images/Donate.png')} style={{ width: windowWidth, height: 160, resizeMode: 'cover' }} />
+      </View>
+      <ScrollView>
         <View style={styles.content}>
             <Text style={styles.headerText}>Hare Krishna!</Text>
             <Text style={styles.cardText}>Thank you for considering donating to the mission of Srila Bir Krishna Goswami Maharaja. 
@@ -36,7 +37,6 @@ const DonationScreen = () => {
                 renderItem={renderItem}
             />
         </View>
-      </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   container: {
-    flex: 1,
   },
   header: {
     backgroundColor: '#ED4D4E',
