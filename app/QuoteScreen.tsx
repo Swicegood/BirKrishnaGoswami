@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from './api/firebase';
+const defaultImage = require('../assets/images/Quote.png');
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -29,7 +30,7 @@ function dateToDayNumber(dateString) {
   const diff = date - start;
   const oneDay = 1000 * 60 * 60 * 24;
   const day = Math.floor(diff / oneDay);
-  console.log("dateString", dateString );
+  console.log("dateString", dateString);
   console.log("date", date);
   console.log("day", day);
   return day;
@@ -43,6 +44,18 @@ const QuoteScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [atFirstDoc, setAtFirstDoc] = useState(true);
   const [atLastDoc, setAtLastDoc] = useState(false);
+  const [image, setImage] = useState(`https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/quotes/${dateToDayNumber(date)}.png`);
+
+  const getImageSource = (image) => {
+    if (typeof image === 'string' && image.startsWith('http')) {
+      return { uri: image };
+    }
+    return image;
+  };
+
+  useEffect(() => {
+    setImage(`https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/quotes/${dateToDayNumber(date)}.png`);
+  }, [date]);
 
   useEffect(() => {
     const fetchQuote = async () => {
@@ -234,12 +247,13 @@ const QuoteScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.quoteContainer}>
-        <Image source={{ uri: `https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/quotes/${dateToDayNumber(date)}.png` }}
-          style={{
-            width: Dimensions.get("screen").width,
-            height: 260,
-            resizeMode: 'cover'
+        <Image
+          source={getImageSource(image)}
+          onError={(error) => {
+            console.log('Failed to load image', error);
+            setImage(defaultImage);
           }}
+          style={{ width: Dimensions.get("screen").width, height: 260, resizeMode: 'cover' }}
         />
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
