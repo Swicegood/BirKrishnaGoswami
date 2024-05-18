@@ -1,0 +1,40 @@
+diff --git a/node_modules/react-native-image-gallery/src/Gallery.js b/node_modules/react-native-image-gallery/src/Gallery.js
+index 5cc4835..06cc32d 100644
+--- a/node_modules/react-native-image-gallery/src/Gallery.js
++++ b/node_modules/react-native-image-gallery/src/Gallery.js
+@@ -1,5 +1,6 @@
+ import React, { PureComponent } from 'react';
+-import { View, ViewPropTypes } from 'react-native';
++import { View } from 'react-native';
++import { ViewPropTypes } from 'deprecated-react-native-prop-types';
+ import PropTypes from 'prop-types';
+ import { createResponder } from './libraries/GestureResponder';
+ import TransformableImage from './libraries/TransformableImage';
+diff --git a/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js b/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js
+index 8ff8469..7044bf1 100644
+--- a/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js
++++ b/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js
+@@ -1,5 +1,6 @@
+ import React, { PureComponent } from 'react';
+-import { View, Text, Image, ViewPropTypes } from 'react-native';
++import { View, Text, Image } from 'react-native';
++import { ViewPropTypes } from 'deprecated-react-native-prop-types';
+ import PropTypes from 'prop-types';
+ import ViewTransformer from '../ViewTransformer';
+ 
+diff --git a/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js b/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js
+index b786ad1..0c5abf5 100644
+--- a/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js
++++ b/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js
+@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
+ import {
+     View,
+     FlatList,
+-    ViewPropTypes,
+     InteractionManager,
+     Dimensions
+ } from 'react-native';
++import { ViewPropTypes } from 'deprecated-react-native-prop-types';
+ import PropTypes from 'prop-types';
+ import Scroller from '../Scroller';
+ import { createResponder } from '../GestureResponder';
