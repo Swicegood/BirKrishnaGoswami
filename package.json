@@ -28,13 +28,16 @@
     "@types/axios": "^0.14.0",
     "axios": "^1.6.7",
     "deprecated-react-native-prop-types": "^5.0.0",
+    "eas-cli": "^9.0.7",
     "expo": "~49.0.15",
     "expo-app-loading": "^2.1.1",
     "expo-av": "^13.4.1",
     "expo-constants": "~14.4.2",
     "expo-dev-client": "~2.4.13",
     "expo-device": "~5.4.0",
+    "expo-file-system": "~15.4.5",
     "expo-font": "~11.4.0",
+    "expo-intent-launcher": "~10.7.0",
     "expo-linking": "~5.0.2",
     "expo-notifications": "~0.20.1",
     "expo-router": "^2.0.0",
@@ -69,9 +72,7 @@
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.2.2",
-    "react-native-youtube-iframe": "^2.3.0",
-    "expo-file-system": "~15.4.5",
-    "expo-intent-launcher": "~10.7.0"
+    "react-native-youtube-iframe": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
