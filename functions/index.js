@@ -134,6 +134,7 @@ exports.getLiveVideo = functions.https.onRequest(async (req, res) => {
       res.send({data: liveVideoId});
     } else {
       console.log("No live streams found.");
+      res.status(404).json({data: 'No live streams found.'});
     }
   } catch (error) {
     console.error("Error fetching data: ", error);
