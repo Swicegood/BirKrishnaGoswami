@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllFiles } from '../app/api/apiWrapper';
 import { Link, useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
 import { getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from './api/firebase';
 import CustomHeaderMain from '../components/CustomHeaderMain';
@@ -20,6 +20,8 @@ interface File {
 const FilesScreen = () => {
   const [files, setFiles] = useState<File[]>([]);
   const { category } = useLocalSearchParams<{ category: string }>();
+  const [isLoading, setIsLoading] = useState(true);
+
   console.log("FileSccreenCat", category);
   useEffect(() => {
     (async () => {
@@ -27,19 +29,19 @@ const FilesScreen = () => {
         const segments = url.split('/');
         const filename = segments[segments.length - 1]; // Get the last segment of the URL
         const title = filename.split('.')[0]; // Remove the file extension
-      
+
         // Get today's date
         const today = new Date();
         const date = today.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
-      
+
         return {
           category: '', // Will be populated later
-          title: title.replaceAll("_"," "),
+          title: title.replaceAll("_", " "),
           url: url,
           date: date, // Add today's date
         };
       });
-  
+
       // Populate file.category with the name of the immediate parent folder derived from each url
       const categorizedFiles = allFiles.map(file => {
         const urlParts = file.url.split('/');
@@ -48,9 +50,9 @@ const FilesScreen = () => {
           return { ...file, category: folder };
         }
         const parentFolder = urlParts[urlParts.length - 3]; // Get the third last element
-        return { ...file, category: folder, parentFolder};
+        return { ...file, category: folder, parentFolder };
       });
-  
+
       // add dates from matched urls from firestore
 
       // Filter files to only include those that belong to the current folder
@@ -60,12 +62,12 @@ const FilesScreen = () => {
           const parts = category.split('_');
           const lastPart = parts[parts.length - 2];
           const firstPart = parts.slice(0, -2).join('_');
-      
+
           // Accept the file if the last part of category before "_" === file.category
           // and the whole first part up until the second to last "_" === file.parentFolder
           return lastPart === file.category && firstPart === file.parentFolder;
         }
-      
+
         // Otherwise, accept the file if file.category === category
         return file.category === category;
       });
@@ -79,44 +81,52 @@ const FilesScreen = () => {
         return { ...file, date: docData?.freindly_date };
       }));
       setFiles(folderFilesWithDate);
-  
+
 
     })();
+    isLoading && setIsLoading(false);
   }, []);
 
   const onPress = (file: File) => {
     // Handle file press
   };
 
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ED4D4E" />
+      </View>
+    );
+  }
   const renderItem = ({ item }: { item: File }) => (
     <View style={styles.container}>
-    <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
-    <TouchableOpacity style={styles.playButton}>
-      {/* Replace with your play icon */}
-      <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
-    </TouchableOpacity>
-    </Link>
-    <View style={styles.textContainer}>
-    <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>
-     {item.title}
-    </Text>
-    <Text>      
-    </Text>
-      <Text style={styles.dateText}>{item.date}</Text>
+      <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
+        <TouchableOpacity style={styles.playButton}>
+          {/* Replace with your play icon */}
+          <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
+        </TouchableOpacity>
+      </Link>
+      <View style={styles.textContainer}>
+        <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>
+          {item.title}
+        </Text>
+        <Text>
+        </Text>
+        <Text style={styles.dateText}>{item.date}</Text>
+      </View>
     </View>
-  </View>
   );
 
   return (
     <>
-    <CustomHeaderMain title={category} />
-    <View>
-      <FlatList
-        data={files}
-        keyExtractor={(item) => item.url}
-        renderItem={renderItem}
-      />
-    </View>
+      <CustomHeaderMain title={category} />
+      <View>
+        <FlatList
+          data={files}
+          keyExtractor={(item) => item.url}
+          renderItem={renderItem}
+        />
+      </View>
     </>
   );
 };

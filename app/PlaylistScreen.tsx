@@ -51,6 +51,7 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
   const [videoWidth, setVideoWidth] = useState<number>(0);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [isLastPage, setIsLastPage] = useState(false);
+  const [pageAlreadyLoaded, setPageAlreadyLoaded] = useState(false);
 
   useEffect(() => {
     const fetchDimensions = async () => {
@@ -104,9 +105,10 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
     // Stop loading if there's no next page
     if (!nextPageToken) {
       setIsLastPage(true);
+      setIsLoading(false);
       return;
     }
-
+    setIsLoading(true);
     const getYouTubePlaylistVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubePlaylistVideos');
 
     // Include the next page token in the request if it exists
@@ -137,6 +139,8 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
       .catch((error: FirebaseFunctionError) => {
         console.error("Error calling the function: ", error.message);
       });
+    setIsLoading(false);
+    setPageAlreadyLoaded(true);
   }
 
   async function getVideoHeight() {
@@ -144,7 +148,7 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
       const orientation = await ScreenOrientation.getOrientationAsync();
       const screenWidth = Dimensions.get('window').width;
       const screenHeight = Dimensions.get('window').height;
-  
+
       if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
         // In portrait mode, set height based on screen width and aspect ratio
         return screenWidth * 9 / 16;
@@ -156,13 +160,13 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
       console.error('Failed to get video height:', error);
     }
   }
-  
+
   async function getVideoWidth() {
     try {
       const orientation = await ScreenOrientation.getOrientationAsync();
       const screenWidth = Dimensions.get('window').width;
       const screenHeight = Dimensions.get('window').height;
-  
+
       if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
         // In portrait mode, set height based on screen width and aspect ratio
         return screenWidth;
@@ -177,8 +181,8 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
 
   const renderItem = ({ item }) => (
 
-    <Link href={{pathname: '/YoutubePlayer', params:{id: item.id}}}> {/* This is the link to the PlaylistScreen */}
-    <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
+    <Link href={{ pathname: '/YoutubePlayer', params: { id: item.id } }}> {/* This is the link to the PlaylistScreen */}
+      <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
     </Link>
   );
 
@@ -196,54 +200,63 @@ const PlaylistScreen = ({ id: propId }: PlaylistScreenProps) => {
     if (isLastPage) {
       return (
         <View>
-          <Text style={{textAlign: 'center', marginTop:10}}>No more videos to load</Text>
+          <Text style={{ textAlign: 'center', marginTop: 10 }}>No more videos to load</Text>
           <View style={{ height: 50, width: videoWidth }}>
-            </View>
+          </View>
         </View>
       );
     }
-    return (
-
-      <View >
-        <TouchableOpacity onPress={loadMoreVideos}>
-          <Text style={styles.text}>SHOW MORE</Text>
-        </TouchableOpacity>
-        <View style={{ height: 50, width: videoWidth }}>
+    if (pageAlreadyLoaded) {
+      return (
+        <View>
+          <Text style={{ textAlign: 'center', marginTop: 10 }}>Loading...</Text>
+          <View style={{ height: 50, width: videoWidth }}>
+          </View>
         </View>
-      </View>
+      );
+    } else {
+      return (
+        <View >
+          <TouchableOpacity onPress={loadMoreVideos}>
+            <Text style={styles.text}>SHOW MORE</Text>
+          </TouchableOpacity>
+          <View style={{ height: 50, width: videoWidth }}>
+          </View>
+        </View>
 
+      );
+    };
+  }
+
+    if (isLoading) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#ED4D4E" />
+        </View>
+      );
+    }
+
+    return (
+      <View>
+        <FlatList
+          data={videos}
+          renderItem={renderItem}
+          ListHeaderComponent={renderHeader}
+          ListFooterComponent={renderFooter}
+        />
+      </View>
     );
   };
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#ED4D4E" />
-      </View>
-    );
-  }
+  const styles = StyleSheet.create({
+    text: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: 'maroon',
+      textAlign: 'center',
+      fontFamily: 'UbuntuRegular',
+      marginTop: 10,
+    },
+  });
 
-  return (
-    <View>
-      <FlatList
-        data={videos}
-        renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  text: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'maroon',
-    textAlign: 'center',
-    fontFamily: 'UbuntuRegular',
-    marginTop: 10,
-  },
-});
-
-export default PlaylistScreen;
+  export default PlaylistScreen;
