@@ -93,7 +93,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   content: {
-    margin: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 5,
     flexDirection: 'row',
     paddingBottom: 15,
     borderBottomWidth: 1,
