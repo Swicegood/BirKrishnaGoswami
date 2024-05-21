@@ -63,7 +63,7 @@ const QuoteScreen = () => {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         // Assuming doc.data() returns an object with text, date, and category
-        setQuote((doc.data().totd).replace(/"/g, '').replace(/“/g, '').replace(/\n/g, ''));
+        setQuote((doc.data().totd).replace(/"/g, '').replace(/\n/g, ' '));
         setDate(doc.data().date);
 
         // Store the current document in the state variable
@@ -126,7 +126,7 @@ const QuoteScreen = () => {
 
         querySnapshot.forEach((doc) => {
           // Assuming doc.data() returns an object with text, date, and category
-          setQuote((doc.data().totd).replace(/"/g, '').replace(/“/g, '').replace(/\n/g, ''));
+          setQuote((doc.data().totd).replace(/"/g, '').replace(/\n/g, ' '));
           setDate(doc.data().date);
 
           console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
