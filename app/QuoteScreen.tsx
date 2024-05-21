@@ -211,7 +211,7 @@ const QuoteScreen = () => {
 
         pQuerySnapshot.forEach((doc) => {
           // Assuming doc.data() returns an object with text, date, and title
-          setQuote((doc.data().totd).replace(/"/g, '').replace(/“/g, '').replace(/\n/g, ''));
+          setQuote((doc.data().totd).replace(/"/g, '').replace(/\n/g, ' '));
           setDate(doc.data().date);
           console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
         });
