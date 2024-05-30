@@ -46,17 +46,18 @@ const fetchPlaylists = async () => {
       // Use the interface for the response
       const response: GetYouTubePlaylistsResponse = result.data;
       const playlists = response.items; // Change this line
+      setPlaylists([]); // Clear the playlists array
+
       playlists.forEach(playlist => {
         const title = playlist.snippet.title;
-        const thumbnailUrl = playlist.snippet.thumbnails.default.url; // or 'medium' or 'high'
+        const thumbnailUrl = playlist.snippet.thumbnails.default?.url; // or 'medium' or 'high'
         const dateModified = playlist.snippet.publishedAt;
         const id = playlist.id;
-        setPlaylists(playlists => {
-          if (playlists.some(playlist => playlist.id === id)) {
-            return playlists;
-          }
-          return [...playlists, { id, title, thumbnailUrl, dateModified }];
-        });
+
+        if (thumbnailUrl && !thumbnailUrl.includes('no_thumbnail')) {
+          setPlaylists(playlists => [...playlists, { id, title, thumbnailUrl, dateModified }]);
+        }
+      
         setIsLoading(false);
       });
     })

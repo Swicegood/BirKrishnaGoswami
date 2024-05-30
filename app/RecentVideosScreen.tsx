@@ -33,6 +33,7 @@ interface FirebaseFunctionError {
 const RecentVideoScreen = () => {
 const [playlists, setPlaylists] = useState([]);
 const [isLoading, setIsLoading] = useState(true);
+console.log("Playlists: ", playlists);
 
 const fetchPlaylists = async () => {
   const getYouTubePlaylists = httpsCallable<GetYouTubePlaylistsRequest, GetYouTubePlaylistsResponse>(functions, 'getYouTubePlaylists');
@@ -62,6 +63,7 @@ useEffect(() => {
   if (playlists.length === 0) {
     fetchPlaylists();
     setIsLoading(false);
+    console.log("Playlists: ", playlists);
   }
 }, []);
 

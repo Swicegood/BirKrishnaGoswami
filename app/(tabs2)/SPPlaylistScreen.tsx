@@ -1,10 +1,24 @@
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries  
+import { useEffect, useState } from "react";
+import { db } from "../api/firebase"
 import PlaylistScreen from "../PlaylistScreen";
+import { collection, query, limit, getDocs } from "firebase/firestore";
 
 const SPPlaylistScreen = () => {
-  return <PlaylistScreen id="PL5EjcFVEeY4hSMum9l9N777F4LiurfPXI" />;
+  const [playlistId, setPlaylistId] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Get playlist id from firebase
+      const q = query(collection(db, 'prabhupada-vyasa-puja-playlist'));
+      // Get the first document
+      const doc = await getDocs(q);
+      // Playlist ID is doc id
+      setPlaylistId(doc.docs[0].id);
+    }
+    fetchData();
+  }, []);
+
+  return playlistId ? <PlaylistScreen id={playlistId} /> : null;
 };
 
 export default SPPlaylistScreen;

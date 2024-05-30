@@ -5,7 +5,7 @@ import CustomHeader from '../../components/CustomHeader';
 import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';
 import React, { useState, useEffect } from 'react';
-import { View, Text, Dimensions, StyleSheet, SafeAreaView, Image, ScrollView } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, SafeAreaView, Image, Platform } from 'react-native';
 import { Link } from 'expo-router';
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -15,12 +15,13 @@ const windowHeight = Dimensions.get('window').height;
 function CustomDrawerContent() {
   const windowDimensions = useWindowDimensions();
   const isLandscape = windowDimensions.width > windowDimensions.height;
+  const isApple = Platform.OS === 'ios';
 
   const [orientation, setOrientation] = useState(isLandscape ? 'LANDSCAPE' : 'PORTRAIT');
 
   useEffect(() => {
     setOrientation(isLandscape ? 'LANDSCAPE' : 'PORTRAIT');
-  }, [isLandscape]); 
+  }, [isLandscape]);
 
 
   return (
@@ -52,11 +53,19 @@ function CustomDrawerContent() {
                 <Ionicons name='newspaper-outline' size={18} color='black' />    News
               </Text>
             </Link>
-            <Link href="./downloads" asChild>
-              <Text style={styles.drawerText}>
-                <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
-              </Text>
-            </Link>
+            {isApple ?
+                  <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
+                    <Text style={styles.drawerText}>
+                      <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
+                    </Text>
+                  </Link>
+                  :
+                  <Link href="https://play.google.com/store/apps/details?id=com.iskcon.bkgaudio" asChild>
+                    <Text style={styles.drawerText}>
+                      <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
+                    </Text>
+                  </Link>
+                }
           </View>
         ) : (
           <View style={styles.content}>
@@ -65,22 +74,31 @@ function CustomDrawerContent() {
               <Link href="./BioScreen" asChild>
                 <Text style={styles.aboutText}>    About        </Text>
               </Link>
-            <Link href="./TravelScreen" asChild>
-              <Text style={styles.aboutText}>
-                <MaterialCommunityIcons name='calendar-clock-outline' size={18} color='black' />    Travel Schedule
-              </Text>
-            </Link>
+              <Link href="./TravelScreen" asChild>
+                <Text style={styles.aboutText}>
+                  <MaterialCommunityIcons name='calendar-clock-outline' size={18} color='black' />    Travel Schedule
+                </Text>
+              </Link>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Link href="./NewsScreen" asChild>
-              <Text style={styles.drawerText}>
-                <Ionicons name='newspaper-outline' size={18} color='black' />    News         </Text>
-            </Link>
-            <Link href="./downloads" asChild>
-              <Text style={styles.drawerText}>
-                <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
-              </Text>
-            </Link>
+              <Link href="./NewsScreen" asChild>
+                <Text style={styles.drawerText}>
+                  <Ionicons name='newspaper-outline' size={18} color='black' />    News
+                </Text>
+              </Link>
+                {isApple ?
+                  <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
+                    <Text style={styles.drawerText}>
+                      <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
+                    </Text>
+                  </Link>
+                  :
+                  <Link href="https://play.google.com/store/apps/details?id=com.iskcon.bkgaudio" asChild>
+                    <Text style={styles.drawerText}>
+                      <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
+                    </Text>
+                  </Link>
+                }
             </View>
           </View>
         )}
