@@ -7,7 +7,9 @@ import {
   ActivityIndicator,
   Dimensions,
   Share,
-  ImageBackground
+  ImageBackground,
+  Alert,
+  Platform
 } from "react-native";
 import { Audio, InterruptionModeIOS } from "expo-av";
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
@@ -19,7 +21,8 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
 import { throttle } from 'lodash';
-
+import * as FileSystem from 'expo-file-system';
+import * as Progress from 'react-native-progress';
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -38,6 +41,8 @@ const AudioScreen = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [isFileDownloaded, setIsFileDownloaded] = useState(false);
 
   const shareAudioLink = async (url) => {
     try {
@@ -62,6 +67,34 @@ const AudioScreen = () => {
       console.error('Error sharing YouTube video:', error);
     }
   };
+
+  const shareAudioFile = async (fileUri) => {
+    try {
+      const shareOptions = {
+        title: 'Share audio file',
+        message: 'Check out this cool audio file!',
+        url: `file://${fileUri}`,
+      };
+
+      const result = await Share.share(shareOptions);
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // Shared with activity type of result.activityType
+          console.log('Shared with', result.activityType);
+        } else {
+          // Shared
+          console.log('Shared successfully!');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // Dismissed
+        console.log('Share dismissed');
+      }
+    } catch (error) {
+      console.error('Error sharing audio file:', error);
+    }
+  };
+
 
   const muteSound = async () => {
     if (!sound) {
@@ -115,7 +148,6 @@ const AudioScreen = () => {
       const songUrl = url;
       const lastPosition = 0;
 
-
       try {
         await Audio.setAudioModeAsync({
           staysActiveInBackground: true,
@@ -144,6 +176,7 @@ const AudioScreen = () => {
 
 
       setIsSoundLoading(false);
+      console.log('Sound loaded', isSoundLoading);
     };
 
     loadSound();
@@ -171,12 +204,12 @@ const AudioScreen = () => {
     setPosition(status.positionMillis);
     // ...
   }, 1000); // Adjust this value as needed
-  
+
   useEffect(() => {
     if (sound) {
       sound.setOnPlaybackStatusUpdate(updateState);
     }
-  
+
     return () => {
       if (sound) {
         sound.setOnPlaybackStatusUpdate(null);
@@ -219,84 +252,115 @@ const AudioScreen = () => {
       style={styles.backgroundImage}
     >
 
-        <View style={styles.musicContainer}>
+      <View style={styles.musicContainer}>
 
-          <View style={styles.overlay}>
-            <View style={styles.header}>
-              {navigation.canGoBack() && (
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
-                  <FontAwesome name="angle-left" size={32} color="white" hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} />
-                </TouchableOpacity>
-              )}
+        <View style={styles.overlay}>
+          <View style={styles.header}>
+            {navigation.canGoBack() && (
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
+                <FontAwesome name="angle-left" size={32} color="white" hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} />
+              </TouchableOpacity>
+            )}
 
-              <View style={styles.rightItem}>
-                <View style={styles.circle}>
-                  <TouchableOpacity onPress={() => shareAudioLink(file.url)}>
-                    <Entypo name="share" size={26} color="orange" fontWeight='bold' />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-            <View style={styles.content}>
-              <View style={{ flex: 1 }} />
-              <Text style={styles.title}>{file.title.toUpperCase().replace('_', ' ')}</Text>
-              <Slider
-                style={styles.slider}
-                thumbTintColor="#FFFFFF" // Color of the knob
-                minimumTrackTintColor="#FFF" // Color of the used track
-                maximumTrackTintColor="#808080" // Color of the unused track
-                value={position}
-                maximumValue={duration}
-                onSlidingComplete={async (value) => {
-                  if (sound) {
-                    await sound.setPositionAsync(value);
-                  }
-                }}
-              />
-              <View style={styles.timeContainer}>
-                <Text style={styles.title}>{formatTime(position)}</Text>
-                <Text style={styles.title}>{formatTime(duration)}</Text>
-              </View>
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={styles.muteButton}
-                  onPress={muteSound}
-                  disabled={!sound}
-                >
-                  <Icon name={isMuted ? "volume-off" : "volume-up"} size={40} color="#FFF" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.seekBackwardButton}
-                  onPress={seekBackward}
-                  disabled={!sound}
-                >
-                  <ReplayIcon />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={togglePlayback}
-                  disabled={!sound}
-                >
-                  <Icon name={isPlaying ? "pause" : "play-arrow"} size={40} color="#FFF" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.seekForwardButton}
-                  onPress={seekForward}
-                  disabled={!sound}
-                >
-                  <ForwardIcon />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.downloadButton}
-                  onPress={() => {}}
-                  disabled={!sound}
-                >
-                  <Icon name="get-app" size={40} color="#FFF" />
+            <View style={styles.rightItem}>
+              <View style={styles.circle}>
+                <TouchableOpacity onPress={() => shareAudioLink(file.url)}>
+                  <Entypo name="share" size={26} color="orange" fontWeight='bold' />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
+          <View style={styles.content}>
+            <View style={{ flex: 1 }} />
+            {downloadProgress > 0 && downloadProgress < 1 && (
+              <Progress.Bar progress={downloadProgress} width={200} />
+            )}
+            <Text style={styles.title}>{file.title.toUpperCase().replace('_', ' ')}</Text>
+            <Slider
+              style={styles.slider}
+              thumbTintColor="#FFFFFF" // Color of the knob
+              minimumTrackTintColor="#FFF" // Color of the used track
+              maximumTrackTintColor="#808080" // Color of the unused track
+              value={position}
+              maximumValue={duration}
+              onSlidingComplete={async (value) => {
+                if (sound) {
+                  await sound.setPositionAsync(value);
+                }
+              }}
+            />
+            <View style={styles.timeContainer}>
+              <Text style={styles.title}>{formatTime(position)}</Text>
+              <Text style={styles.title}>{formatTime(duration)}</Text>
+            </View>
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                style={styles.muteButton}
+                onPress={muteSound}
+                disabled={!sound}
+              >
+                <Icon name={isMuted ? "volume-off" : "volume-up"} size={40} color="#FFF" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.seekBackwardButton}
+                onPress={seekBackward}
+                disabled={!sound}
+              >
+                <ReplayIcon />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={togglePlayback}
+                disabled={!sound}
+              >
+                <Icon name={isPlaying ? "pause" : "play-arrow"} size={40} color="#FFF" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.seekForwardButton}
+                onPress={seekForward}
+                disabled={!sound}
+              >
+                <ForwardIcon />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.downloadButton}
+                onPress={async () => {
+                  if (isFileDownloaded) {
+                    Alert.alert('Downloaded', 'This file is already downloaded');
+                    shareAudioFile(`${FileSystem.cacheDirectory}${file.title}.mp3`);
+                    return;
+                  }
+                  // Check if external storage is available and accessible
+                  const  fileUri = `${FileSystem.cacheDirectory}${file.title}.mp3`;
+
+                  const downloadResumable = FileSystem.createDownloadResumable(
+                    url,
+                    fileUri,
+                    {},
+                    (downloadProgress) => {
+                      const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+                      console.log(`Download progress: ${progress * 100}%`);
+                      setDownloadProgress(progress);
+                    }
+                  );
+
+                  try {
+                    const { uri } = await downloadResumable.downloadAsync();
+                    console.log('Finished downloading to ', uri);
+                    Alert.alert('Download Complete', `Finished downloading to ${uri}`);
+                    setIsFileDownloaded(true);
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }}
+                disabled={!sound}
+              >
+                <Icon name="get-app" size={40} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
+      </View>
     </ImageBackground>
   );
 };
