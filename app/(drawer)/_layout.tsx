@@ -59,12 +59,7 @@ function CustomDrawerContent() {
                       <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
                     </Text>
                   </Link>
-                  :
-                  <Link href="https://play.google.com/store/apps/details?id=com.iskcon.bkgaudio" asChild>
-                    <Text style={styles.drawerText}>
-                      <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
-                    </Text>
-                  </Link>
+                  : null
                 }
           </View>
         ) : (
@@ -92,12 +87,7 @@ function CustomDrawerContent() {
                       <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
                     </Text>
                   </Link>
-                  :
-                  <Link href="https://play.google.com/store/apps/details?id=com.iskcon.bkgaudio" asChild>
-                    <Text style={styles.drawerText}>
-                      <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
-                    </Text>
-                  </Link>
+                  : null
                 }
             </View>
           </View>
