@@ -23,6 +23,9 @@ import { useNavigation } from '@react-navigation/native';
 import { throttle } from 'lodash';
 import * as FileSystem from 'expo-file-system';
 import * as Progress from 'react-native-progress';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { isLoaded } from "expo-font";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -43,6 +46,8 @@ const AudioScreen = () => {
   const [duration, setDuration] = useState(0);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isFileDownloaded, setIsFileDownloaded] = useState(false);
+  // State to hold the list of played songs and their positions
+  const [playedSongs, setPlayedSongs] = useState([]);
 
   const shareAudioLink = async (url) => {
     try {
@@ -128,6 +133,11 @@ const AudioScreen = () => {
     }
   };
 
+  const getStoredPostion = (file) => {
+    const playedSong = playedSongs.find((playedSong) => playedSong.song.title === file.title);
+    return playedSong ? playedSong.position : 0;
+  };
+
 
   useEffect(() => {
     const songUrl = file.url;
@@ -183,22 +193,83 @@ const AudioScreen = () => {
 
   }, [url]);
 
+  const soundRef = useRef(sound);
+  const fileRef = useRef(file);
+  
+  useEffect(() => {
+    soundRef.current = sound;
+    fileRef.current = file;
+  }, [sound, file]);
+  
   useFocusEffect(
     useCallback(() => {
-      // This function runs when the screen comes into focus.
-      // If you need to do something when the screen comes into focus, do it here.
-
       return () => {
-        // This function runs when the screen goes out of focus.
-        // Unload the sound here.
-        if (sound) {
-          sound.unloadAsync();
+        if (soundRef.current) {
+          console.log('Unloading sound', fileRef.current.title);
+          const unloadSound = async () => {
+            try {
+              const status = await soundRef.current.getStatusAsync();
+              console.log('status:', status);
+              const newSong = { song: fileRef.current, position: status.positionMillis };
+          
+              // Retrieve the current playedSongs from AsyncStorage
+              const jsonValue = await AsyncStorage.getItem('@playedSongs');
+              let playedSongs = jsonValue != null ? JSON.parse(jsonValue) : [];
+          
+              // Append the new song
+              playedSongs.push(newSong);
+          
+              // Store the updated playedSongs back to AsyncStorage
+              await AsyncStorage.setItem('@playedSongs', JSON.stringify(playedSongs));
+          
+              console.log('New played songs:', playedSongs);
+            } catch (error) {
+              console.error('Error unloading sound:', error);
+            }
+            await soundRef.current.unloadAsync();
+          };
+          unloadSound();
         }
       };
-    }, [sound]) // Include `sound` in the dependency array if it could change over time.
+    }, []) // Empty dependency array
   );
 
+  useEffect(() => {
+    console.log('Played songs:', playedSongs);
+  }, [playedSongs]);
 
+  useEffect(() => {
+    if (isFirstLoad) {
+      const position = getStoredPostion(file);
+      if (position) {
+        setPosition(position);
+      if (sound) {
+        sound.setPositionAsync(position);
+        setIsFirstLoad(false);
+      }
+    }
+    }
+  }, [file]);
+
+
+  useEffect(() => {
+    const loadPlayedSongs = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@playedSongs');
+        if (jsonValue !== null) {
+          const newPlayedSongs = JSON.parse(jsonValue);
+          if (JSON.stringify(newPlayedSongs) !== JSON.stringify(playedSongs)) {
+            setPlayedSongs(newPlayedSongs);
+          }
+        }
+      } catch (e) {
+        // error reading value
+        console.log(e);
+      }
+    };
+  
+    loadPlayedSongs();
+  }, []);
 
   const updateState = throttle((status) => {
     setPosition(status.positionMillis);
