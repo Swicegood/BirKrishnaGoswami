@@ -90,7 +90,6 @@ exports.getYouTubeChannelVideos = functions.https.onRequest((req, res) => {
 });
 
 
-
 exports.getSearchYouTubeVideos = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
