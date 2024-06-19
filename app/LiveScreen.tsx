@@ -132,7 +132,7 @@ const LiveScreen = () => {
         <View style={{ backgroundColor: 'white', height: Dimensions.get('window').height }}>
           <View style={styles.header}>
             {navigation.canGoBack() && (
-              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
+              <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}} style={styles.leftItem}>
                 <FontAwesome name="angle-left" size={32} color="white" />
               </TouchableOpacity>
             )}
@@ -164,7 +164,7 @@ const LiveScreen = () => {
     <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
         {navigation.canGoBack() && (
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftItem}>
+          <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}} style={styles.leftItem}>
             <FontAwesome name="angle-left" size={32} color="white" />
           </TouchableOpacity>
         )}

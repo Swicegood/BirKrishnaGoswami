@@ -17,7 +17,7 @@ const CustomHeaderMain = ({ title }) => {
             <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
                 <View style={styles.header}>
                     {navigation.canGoBack() && (
-                        <TouchableOpacity style={styles.leftItem} onPress={() => navigation.goBack()}>
+                        <TouchableOpacity style={styles.leftItem} hitSlop={{top: 20, bottom: 20, left: 20, right: 10}} onPress={() => navigation.goBack() }>
                             <FontAwesome name="angle-left" size={32} color="white" />
                         </TouchableOpacity>
                     )}

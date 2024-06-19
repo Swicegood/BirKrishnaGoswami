@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, usePathname } from 'expo-router';
 import { useEffect } from 'react';
-import { StyleSheet, useColorScheme, SafeAreaView } from 'react-native';
+import { StyleSheet } from 'react-native';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 
 

@@ -20,7 +20,7 @@ function CustomBackHeader({title}: {title: string}) {
       <StatusBar style="light" />
     <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
-      <TouchableOpacity  style={styles.leftItem} onPress={() => navigation.navigate('index')}>
+      <TouchableOpacity  style={styles.leftItem} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}} onPress={() => navigation.navigate('index')}>
          <FontAwesome name="angle-left" size={32} color="white" />
       </TouchableOpacity>
         <View style={styles.titleContainer}>

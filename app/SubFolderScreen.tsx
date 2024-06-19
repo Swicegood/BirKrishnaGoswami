@@ -71,6 +71,7 @@ const images = {
   Madhya_Lila: require('../assets/images/Madhya_Lila.jpg'),
   Antya_Lila: require('../assets/images/Antya_Lila.jpg'),
   Nectar_of_Devotion: require('../assets/images/Nectar_of_Devotion.png'),
+  Nectar_of_Instruction: require('../assets/images/Nectar_of_Instruction.png'),
   Gita: require('../assets/images/Bhagavad_Gita.png'),
   Festivals: require('../assets/images/Festivals.png'),
   Lord_Rama_Pastimes: require('../assets/images/Ramayan.jpg'),

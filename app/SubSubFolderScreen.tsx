@@ -43,6 +43,7 @@ const images = {
     "Chapter-15": require('../assets/images/Bhagavad_Gita.png'),
     "Chapter-16": require('../assets/images/Bhagavad_Gita.png'),
     "Chapter-17": require('../assets/images/Bhagavad_Gita.png'),
+    Others : require('../assets/images/Bhagavad_Gita.png'),
     Adi_Lila: require('../assets/images/Adi_Lila.jpg'),
     Madhya_Lila: require('../assets/images/Madhya_Lila.jpg'),
     Antya_Lila: require('../assets/images/Antya_Lila.jpg'),
