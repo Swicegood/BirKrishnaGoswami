@@ -4,8 +4,6 @@ import {
     ActivityIndicator, Dimensions
 } from 'react-native';
 import { Link, useLocalSearchParams, useFocusEffect, router } from 'expo-router';
-import { useNavigationState } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 
 // Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
@@ -55,7 +53,8 @@ const images = {
     "Disciple_Course_01_": require('../assets/images/Disciple_Course.png'),
     "Disciple_Course_02_": require('../assets/images/Disciple_Course.png'),
     "Disciple_Course_03_": require('../assets/images/Disciple_Course.png'),
-
+    "Nectar_of_Instruction_2014_": require('../assets/images/Nectar_of_Instruction.png'),
+    "Nectar_of_Instruction_2022_": require('../assets/images/Nectar_of_Instruction.png'),
 };
 
 function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {

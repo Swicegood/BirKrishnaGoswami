@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getFunctions } from "firebase/functions";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD8JpSB_tK2CBj1tC6f434-vezZ2x0bRbk",
@@ -10,7 +10,8 @@ const firebaseConfig = {
     messagingSenderId: "790459013032",
     appId: "1:790459013032:web:d33b61fc48a0178cf82f9d",
     measurementId: "G-7GVXDMLLSY"
-  };
+};
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
@@ -19,3 +20,8 @@ export const db = getFirestore(app);
 
 // Get a Functions instance
 export const functions = getFunctions(app);
+
+// Connect to local emulator if in development environment
+if (typeof window !== "undefined" && window.location !== undefined && window.location.hostname === "localhost") {
+  connectFunctionsEmulator(functions, "localhost", 5001);
+} 

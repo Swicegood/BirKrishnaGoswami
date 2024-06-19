@@ -24,7 +24,6 @@ interface SubCategory {
 const images = {
     Croatia: require('../assets/images/Health.png'),
     Serbian_Camp: require('../assets/images/Health.png'),
-
 };
 
 function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {

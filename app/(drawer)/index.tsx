@@ -11,6 +11,7 @@ import {
   Linking,
   useWindowDimensions,
   ImageBackground,
+  Platform,
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
@@ -45,7 +46,10 @@ export default function TabOneScireen() {
   const [value, setValue] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0); // Add this state variable
   const [whatsAppUrl, setWhatsAppUrl] = useState('https://chat.whatsapp.com/FaPXfrT3qBLBSxd04TZr9X');
-  const expoPushToken = NotificationHandler();
+  if (Platform.OS !== 'web') {
+    // Initialize and handle push notifications for non-web platforms
+    const expoPushToken = NotificationHandler();
+  }
   const windowDimensions = useWindowDimensions();
 
   const isLandscape = windowDimensions.width > windowDimensions.height;
@@ -87,7 +91,7 @@ export default function TabOneScireen() {
                 loopClonesPerSide={5}
                 onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
               />
-              <View style={{ position: 'absolute', top: sliderHeight- 30, left: windowWidth / 3 , backgroundColor: 'transparent' }}>
+              <View style={{ position: 'absolute', top: sliderHeight - 30, left: windowWidth / 3, backgroundColor: 'transparent' }}>
                 <Pagination // Add this component
                   dotsLength={ENTRIES.length}
                   activeDotIndex={activeSlide}
@@ -238,30 +242,30 @@ export default function TabOneScireen() {
       >
         <View style={styles.footer}>
           <Link href="./ChantingScreen" asChild>
-              <TouchableOpacity style={styles.footerButton}>
-                <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton}/>
-                <Text style={styles.footerText}>CHANTING</Text>
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.footerButton}>
+              <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton} />
+              <Text style={styles.footerText}>CHANTING</Text>
+            </TouchableOpacity>
           </Link>
           <Link href="./(drawer)/BioScreen" asChild>
             <TouchableOpacity style={styles.footerButton}>
-            <Image source={require('../../assets/images/About_Footer.png')} style={styles.footerButton}/>
+              <Image source={require('../../assets/images/About_Footer.png')} style={styles.footerButton} />
               <Text style={styles.footerText}>ABOUT</Text>
             </TouchableOpacity>
           </Link>
           <Link href="./LiveScreen" asChild>
             <TouchableOpacity style={styles.footerButton}>
-            <Image source={require('../../assets/images/Live.png')} style={styles.footerButtonBig}/>
+              <Image source={require('../../assets/images/Live.png')} style={styles.footerButtonBig} />
             </TouchableOpacity>
           </Link>
           <Link href="./DonationScreen" asChild>
             <TouchableOpacity style={styles.footerButton}>
-            <Image source={require('../../assets/images/Donation.png')} style={styles.footerButton}/>
+              <Image source={require('../../assets/images/Donation.png')} style={styles.footerButton} />
               <Text style={styles.footerText}>DONATION</Text>
             </TouchableOpacity>
           </Link>
           <TouchableOpacity style={styles.footerButton} onPress={() => { Linking.openURL(whatsAppUrl) /* Handle button press */ }}>
-          <Image source={require('../../assets/images/WhatsApp.png')} style={styles.footerButton}/>
+            <Image source={require('../../assets/images/WhatsApp.png')} style={styles.footerButton} />
             <Text style={styles.footerText}>WHATSAPP</Text>
           </TouchableOpacity>
         </View>

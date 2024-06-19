@@ -96,6 +96,9 @@ const images = {
   The_Qualities_of_Vaishnavas: require('../assets/images/The_Qualities_of_Vaishnavas.png'),
   Disciple_Course: require('../assets/images/Disciple_Course.png'),
   Raising_Children_or_Brahmacaris: require('../assets/images/Raising_Children_or_Brahmacaris.png'),
+  Jaiva_Dharma: require('../assets/images/Jaiva_Dharma.png'),
+  Ramananda_Samvada: require('../assets/images/Ramananda_Samvada.png'),
+  Camatkara_Candrika: require('../assets/images/Camatkara_Candrika.png'),
 };
 
 function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {

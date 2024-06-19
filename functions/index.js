@@ -13,133 +13,140 @@
 
 const functions = require('firebase-functions');
 const axios = require('axios');
+const cors = require('cors')({origin: true}); // This will allow all domains to access the function
 
-exports.getYouTubePlaylists = functions.https.onRequest(async (req, res) => {
-  const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
-  const channelId = req.body.data.channelId; // Extract channelId from the body of the request
+exports.getYouTubePlaylists = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const API_KEY = functions.config().youtube.api_key;
+    const channelId = req.body.data.channelId;
 
-  try {
-    const response = await axios.get(`https://www.googleapis.com/youtube/v3/playlists`, {
-      params: {
-        part: 'snippet,contentDetails',
-        channelId: channelId,
-        maxResults: 50, // Adjust based on your needs
-        order: 'date', // Order by date
-        key: API_KEY,
-      },
-    });
+    try {
+      const response = await axios.get(`https://www.googleapis.com/youtube/v3/playlists`, {
+        params: {
+          part: 'snippet,contentDetails',
+          channelId: channelId,
+          maxResults: 50, // Adjust based on your needs
+          order: 'date', // Order by date
+          key: API_KEY,
+        },
+      });
 
-    res.send({data: response.data});
-  } catch (error) {
-    console.error("Error fetching data: ", error);
-    res.status(500).send('Failed to fetch data from YouTube');
-  }
-});
-
-
-exports.getYouTubePlaylistVideos = functions.https.onRequest(async (req, res) => {
-  const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
-  const playlistId = req.body.data.playlistId; // Extract channelId from the body of the request
-  const nextPageToken = req.body.data.nextPageToken; // Extract nextPageToken from the body of the request
-
-  try {
-    const response = await axios.get(`https://www.googleapis.com/youtube/v3/playlistItems`, {
-      params: {
-        part: 'snippet,contentDetails',
-        playlistId: playlistId,
-        maxResults: 50, // Adjust based on your needs
-        key: API_KEY,
-        pageToken: nextPageToken, // Add this line
-      },
-    });
-
-    res.send({data: response.data});
-  } catch (error) {
-    console.error("Error fetching data: ", error);
-    res.status(500).send('Failed to fetch data from YouTube');
-  }
-});
-
-exports.getYouTubeChannelVideos = functions.https.onRequest(async (req, res) => {
-  const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
-  const channelId = req.body.data.channelId; // Extract channelId from the body of the request
-
-  try {
-    const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
-      params: {
-        part: 'snippet',
-        channelId: channelId,
-        maxResults: 50, // Maximum allowed by the API
-        order: 'date', // Order by date
-        type: 'video', // Uncommented to only get videos
-        key: API_KEY,
-      },
-    });
-
-    res.send({data: response.data});
-  } catch (error) {
-    console.error("Error fetching data: ", error);
-    res.status(500).send('Failed to fetch data from YouTube');
-  }
-});
-
-
-exports.getSearchYouTubeVideos = functions.https.onRequest(async (req, res) => {
-  const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
-  const channelId = req.body.data.channelId; // Extract channelId from the body of the request
-  const searchTerm = req.body.data.searchTerm; // Extract searchTerm from the body of the request
-
-  try {
-    const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
-      params: {
-        part: 'snippet',
-        q: searchTerm.toLowerCase(),
-        channelId: channelId,
-        maxResults: 50, // Maximum allowed by the API
-        order: 'relevance', // Order by relevance instead of date
-        type: 'video', // Uncommented to only get videos
-        key: API_KEY,
-      },
-    });
-
-    res.send({data: response.data});
-  } catch (error) {
-    console.error("Error fetching data: ", error);
-    res.status(500).send('Failed to fetch data from YouTube');
-  }
-});
-
-
-exports.getLiveVideo = functions.https.onRequest(async (req, res) => {
-  const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
-  const channelId = req.body.data.channelId; // Extract channelId from the body of the request
-
-  try {
-    const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
-      params: {
-        part: 'snippet',
-        channelId: channelId, // Use channelId here
-        eventType: 'live',
-        type: 'video',
-        key: API_KEY,
-      },
-    });
-
-    console.log("Response: ", response.data);
-    const liveVideos = response.data.items;
-    if (liveVideos.length > 0) {
-      const liveVideoId = liveVideos[0].id.videoId;
-      console.log(`Live video ID: ${liveVideoId}`);
-      // Embed this video ID in an iframe
-      res.send({data: liveVideoId});
-    } else {
-      console.log("No live streams found.");
-      res.status(404).json({data: 'No live streams found.'});
+      res.send({data: response.data});
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      res.status(500).send('Failed to fetch data from YouTube');
     }
-  } catch (error) {
-    console.error("Error fetching data: ", error);
-    res.status(500).send('Failed to fetch data from YouTube');
-  }
+  });
+});
+
+exports.getYouTubePlaylistVideos = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const API_KEY = functions.config().youtube.api_key;
+    const playlistId = req.body.data.playlistId;
+    const nextPageToken = req.body.data.nextPageToken;
+
+    try {
+      const response = await axios.get(`https://www.googleapis.com/youtube/v3/playlistItems`, {
+        params: {
+          part: 'snippet,contentDetails',
+          playlistId: playlistId,
+          maxResults: 50,
+          key: API_KEY,
+          pageToken: nextPageToken,
+        },
+      });
+
+      res.send({data: response.data});
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      res.status(500).send('Failed to fetch data from YouTube');
+    }
+  });
+});
+
+exports.getYouTubeChannelVideos = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const API_KEY = functions.config().youtube.api_key;
+    const channelId = req.body.data.channelId;
+
+    try {
+      const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
+        params: {
+          part: 'snippet',
+          channelId: channelId,
+          maxResults: 50, // Maximum allowed by the API
+          order: 'date', // Order by date
+          type: 'video', // Uncommented to only get videos
+          key: API_KEY,
+        },
+      });
+
+      res.send({data: response.data});
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      res.status(500).send('Failed to fetch data from YouTube');
+    }
+  });
+});
+
+
+
+exports.getSearchYouTubeVideos = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const API_KEY = functions.config().youtube.api_key; // Store your API key in Firebase config
+    const channelId = req.body.data.channelId; // Extract channelId from the body of the request
+    const searchTerm = req.body.data.searchTerm; // Extract searchTerm from the body of the request
+
+    try {
+      const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
+        params: {
+          part: 'snippet',
+          q: searchTerm.toLowerCase(),
+          channelId: channelId,
+          maxResults: 50, // Maximum allowed by the API
+          order: 'relevance', // Order by relevance instead of date
+          type: 'video', // Uncommented to only get videos
+          key: API_KEY,
+        },
+      });
+
+      res.send({data: response.data});
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      res.status(500).send('Failed to fetch data from YouTube');
+    }
+  });
+});
+
+
+exports.getLiveVideo = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const API_KEY = functions.config().youtube.api_key;
+    const channelId = req.body.data.channelId;
+
+    try {
+      const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+        params: {
+          part: 'snippet',
+          channelId: channelId,
+          eventType: 'live',
+          type: 'video',
+          key: API_KEY,
+        },
+      });
+
+      const liveVideos = response.data.items;
+      if (liveVideos.length > 0) {
+        const liveVideoId = liveVideos[0].id.videoId;
+        res.send({data: liveVideoId});
+      } else {
+        res.status(404).json({data: 'No live streams found.'});
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      res.status(500).send('Failed to fetch data from YouTube');
+    }
+  });
 });
 
 const admin = require('firebase-admin');
