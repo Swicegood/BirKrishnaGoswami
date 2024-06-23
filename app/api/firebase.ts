@@ -23,5 +23,5 @@ export const functions = getFunctions(app);
 
 // Connect to local emulator if in development environment
 if (typeof window !== "undefined" && window.location !== undefined && window.location.hostname === "localhost") {
-  connectFunctionsEmulator(functions, "localhost", 5001);
+  //connectFunctionsEmulator(functions, "localhost", 5001);
 } 
