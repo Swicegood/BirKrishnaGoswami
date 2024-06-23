@@ -17,7 +17,7 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'expo-router';
-import { collection, query, getDocs } from "firebase/firestore";
+import { collection, query, getDocs, or } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
 import { db } from '../api/firebase';
 import MeasureView from '../api/MeasureView';
@@ -31,8 +31,7 @@ const ENTRIES = [
   // Add more entries here
 ];
 
-const windowWidth = Dimensions.get('window').width;
-const sliderHeight = windowWidth / 3;
+
 
 export default function TabOneScireen() {
   const [value, setValue] = useState(0);
@@ -50,9 +49,7 @@ export default function TabOneScireen() {
     // Initialize and handle push notifications for non-web platforms
     const expoPushToken = NotificationHandler();
   }
-  const windowDimensions = useWindowDimensions();
 
-  const isLandscape = windowDimensions.width > windowDimensions.height;
 
   const onSetWidth = (width) => {
     console.log('Width set to', width);
@@ -74,8 +71,7 @@ export default function TabOneScireen() {
 
   const onSetOrientation = (orientation) => {
     setOrientation(orientation);
-  };[isLandscape];
-
+  };
 
   useEffect(() => {
     const fetchWhatsAppUrl = async () => {
@@ -238,44 +234,12 @@ export default function TabOneScireen() {
 
   return (
     <>
+      {console.log('Rendering: ', orientation)}
       <SafeAreaView style={styles.safeArea}>
         {(Platform.OS === 'ios') ? (
           <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-            {orientation === 'PORTRAIT' ? (
-              <View style={styles.carousel}>
-                <Carousel
-                  data={ENTRIES}
-                  renderItem={renderItem}
-                  sliderWidth={iosWidth}
-                  itemWidth={iosWidth}
-                  autoplay={true}
-                  autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
-                  loop={true}
-                  loopClonesPerSide={5}
-                  onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
-                />
-                <View style={{ position: 'absolute', top: (iosWidth / 3) - 30, left: (iosWidth / 3), backgroundColor: 'transparent' }}>
-                  <Pagination // Add this component
-                    dotsLength={ENTRIES.length}
-                    activeDotIndex={activeSlide}
-                    containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
-                    dotStyle={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 5,
-                      marginHorizontal: 0,
-                      backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
-                    }}
-                    inactiveDotStyle={{
-                      backgroundColor: 'white' // Change this to the color you want for the inactive dots
-                    }}
-                    inactiveDotOpacity={0.4}
-                    inactiveDotScale={0.6}
-                  />
-                </View>
-              </View>
-            ) : (
-              <View style={{ marginBottom: 70}}>
+            {(orientation === 'LANDSCAPE') ? (
+              <View style={{ position: 'absolute', top: 0, left: iosWidth * .1, marginBottom: 0 }}>
                 <Carousel
                   data={ENTRIES}
                   renderItem={renderWideItem}
@@ -307,6 +271,39 @@ export default function TabOneScireen() {
                   />
                 </View>
               </View>
+            ) : (
+              <>
+                <Carousel
+                  data={ENTRIES}
+                  renderItem={renderItem}
+                  sliderWidth={iosWidth}
+                  itemWidth={iosWidth}
+                  autoplay={true}
+                  autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
+                  loop={true}
+                  loopClonesPerSide={5}
+                  onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
+                />
+                <View style={{ position: 'absolute', top: (iosWidth / 3) - 30, left: iosWidth / 3, backgroundColor: 'transparent' }}>
+                  <Pagination // Add this component
+                    dotsLength={ENTRIES.length}
+                    activeDotIndex={activeSlide}
+                    containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
+                    dotStyle={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 5,
+                      marginHorizontal: 0,
+                      backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
+                    }}
+                    inactiveDotStyle={{
+                      backgroundColor: 'white' // Change this to the color you want for the inactive dots
+                    }}
+                    inactiveDotOpacity={0.4}
+                    inactiveDotScale={0.6}
+                  />
+                </View>
+              </>
             )}
           </MeasureView>
         ) : (
@@ -345,7 +342,7 @@ export default function TabOneScireen() {
                 </View>
               </View>
             ) : (
-              <View style={{ flex:1, alignItems:'center', justifyContent: 'center'}}>
+              <View style={styles.carousel}>
                 <Carousel
                   data={ENTRIES}
                   renderItem={renderWideItem}
@@ -380,7 +377,6 @@ export default function TabOneScireen() {
             )}
           </React.Fragment>
         )}
-
         <ScrollView style={styles.container}>
           {/* Header */}
           {orientation === 'PORTRAIT' ? (
@@ -408,7 +404,6 @@ export default function TabOneScireen() {
                 {/* More buttons */}
               </View>
 
-              {/* Additional Button Rows as needed */}
               <View style={styles.buttonRow}>
                 {/* Button components */}
                 <Link href="./GurudevaPicsScreen" asChild>
@@ -646,7 +641,6 @@ export default function TabOneScireen() {
     </>
 
   );
-
 
   // Style definitions
   interface Styles {

@@ -2,12 +2,6 @@ import React, { useCallback, useEffect, useState, ReactNode } from 'react'
 import { LayoutChangeEvent, StyleSheet, View, Dimensions } from 'react-native'
 import { useDebouncedCallback } from '../../hooks'
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-})
-
 let i = 0
 
 interface MeasureViewProps {
@@ -48,7 +42,7 @@ const MeasureView: React.FC<MeasureViewProps> = ({ children, onSetOrientation, o
     )
 
     return (
-        <View style={styles.container} onLayout={handleLayout}>
+        <View onLayout={handleLayout}>
             {children}
         </View>
     )
