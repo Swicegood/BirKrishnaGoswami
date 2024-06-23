@@ -29,7 +29,7 @@
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "versionCode": 24,
+      "versionCode": 25,
       "userInterfaceStyle": "light",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/bkgsquare.png",
@@ -55,7 +55,8 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      "./plugins/withExifInterface"
     ],
     "experiments": {
       "typedRoutes": true

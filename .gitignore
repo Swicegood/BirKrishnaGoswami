@@ -49,3 +49,5 @@ ui-debug.log
 .vscode/settings.json
 .cache_ggshield/
 settings.json
+ios/
+android/
