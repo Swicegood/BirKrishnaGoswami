@@ -35,8 +35,6 @@ const MeasureView: React.FC<MeasureViewProps> = ({ children, onSetOrientation, o
     // Create handlers
     const [setDimensions] = useDebouncedCallback(
         (width: number, height: number) => {
-            alert('setDimensions ' + i + ': width=' + width + ', height=' + height)
-            i++
             setWidth(width)
         },
         500
@@ -44,9 +42,6 @@ const MeasureView: React.FC<MeasureViewProps> = ({ children, onSetOrientation, o
     const handleLayout = useCallback(
         (event: LayoutChangeEvent) => {
             const { width, height } = event.nativeEvent.layout
-
-            alert('handleLayout ' + i + ': width=' + width + ', height=' + height)
-            i++
             setDimensions(width, height)
         },
         [setDimensions]
