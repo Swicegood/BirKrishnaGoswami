@@ -204,7 +204,7 @@ export default function TabOneScireen() {
       fontFamily: 'OblikBold',
     },
     footer: {
-      width: Dimensions.get('window').width,
+      width: '100%',
       height: 80,
       flexDirection: 'row',
       alignItems: 'center',
@@ -610,10 +610,10 @@ export default function TabOneScireen() {
       {/* Footer */}
       <ImageBackground
         source={require('../../assets/images/Footer.png')} // replace with your image path
-        style={styles.footer}
+        style={{...styles.footer, width: Platform.OS === 'ios' ? iosWidth : width}}
         resizeMode="cover" // or "contain" depending on your needs
       >
-        <View style={styles.footer}>
+        <View style={{...styles.footer, width: Platform.OS === 'ios' ? iosWidth : width}}>
           <Link href="./ChantingScreen" asChild>
             <TouchableOpacity style={styles.footerButton}>
               <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton} />

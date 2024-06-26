@@ -393,6 +393,7 @@ const AudioScreen = () => {
               >
                 <ForwardIcon />
               </TouchableOpacity>
+              { Platform.OS !== 'android' && (
               <TouchableOpacity
                 style={styles.downloadButton}
                 onPress={async () => {
@@ -427,7 +428,8 @@ const AudioScreen = () => {
                 disabled={!sound}
               >
                 <Icon name="get-app" size={40} color="#FFF" />
-              </TouchableOpacity>
+              </TouchableOpacity> 
+          )}
             </View>
           </View>
         </View>

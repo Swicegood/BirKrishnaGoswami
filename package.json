@@ -52,6 +52,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.2",
+    "react-native-device-info": "^11.1.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-image-gallery": "^2.1.5",
     "react-native-progress": "^5.0.1",
