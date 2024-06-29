@@ -51,7 +51,7 @@ function CustomDrawerContent() {
             <Link href="./NewsScreen" asChild>
               <Text style={styles.drawerText}>
                 <Ionicons name='newspaper-outline' size={18} color='black' />    News
-              </Text>
+            </Text>
             </Link>
             {isApple ?
                   <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
