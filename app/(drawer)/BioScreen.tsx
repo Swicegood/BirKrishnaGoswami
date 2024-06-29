@@ -47,7 +47,7 @@ const BioScreen = () => {
   In early 1978 Bir Krishna Goswami entered the renounced order of life(sannyasa) in Lima, Peru. In 1982 he came to North Carolina and opened its first permanent Krishna conscious center. In 1995 he began to work on the GBC (Governing Body Commission).`
 
   const scrollViewStyle = Platform.OS === 'web' 
-    ? { ...styles.scrollViewStyle, height: '100vh', overflowY: 'scroll' as 'scroll' }
+    ? { height: '100vh', overflowY: 'scroll' as 'scroll' }
     : styles.scrollViewStyle;
 
   return (
@@ -66,7 +66,7 @@ const BioScreen = () => {
             <View style={styles.header}>
               <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
             </View>
-            <ScrollView style={scrollViewStyle}>
+            <ScrollView style={scrollViewStyle} contentContainerStyle={{ paddingBottom: 450 } }>
               <View style={styles.content}>
                 <Text style={styles.bodyText}>
                   {text}
@@ -76,9 +76,8 @@ const BioScreen = () => {
             </ScrollView>
           </>
         ) : (
-          <ScrollView style={scrollViewStyle}>
-            <>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ScrollView style={scrollViewStyle} contentContainerStyle={styles.scrollViewContent}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <Image
                 source={require('../../assets/images/About_Bio.png')}
                 style={{
@@ -96,7 +95,6 @@ const BioScreen = () => {
               </Text>
               <Text style={styles.category}>Category: Spiritual Leader</Text>
             </View>
-            </>
           </ScrollView>
         )}
       </MeasureView>
@@ -120,12 +118,7 @@ const styles = StyleSheet.create({
   content: {
     marginLeft: 20,
     marginRight: 20,
-  }, 
-  date: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#E53935',
+    paddingBottom: 40, 
   },
   bodyText: {
     fontSize: 20,
@@ -139,6 +132,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   scrollViewStyle: {
+    // Empty as we removed flex: 1
+  },
+  scrollViewContent: {
+    paddingBottom: 40, // Add padding to the bottom of the content
   },
 });
 
