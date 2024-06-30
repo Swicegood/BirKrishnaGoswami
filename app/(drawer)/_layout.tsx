@@ -82,11 +82,11 @@ function CustomDrawerContent() {
                 </Text>
               </Link>
                 {isApple ?
-                  <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
-                    <Text style={styles.drawerText}>
-                      <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
-                    </Text>
-                  </Link>
+                   <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
+                   <Text style={{ ...styles.drawerText, paddingLeft: 40 }}>
+                     <Entypo name="download" size={18} color="#ED4D4E" />    Downloads
+                   </Text>
+               </Link>
                   : null
                 }
             </View>
