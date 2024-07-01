@@ -6,6 +6,14 @@ import { db } from './api/firebase';
 
 const windowHeight = Dimensions.get('window').height;
 
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  const isLandscape = Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+  console.log('isTablet: ', isLandscape);
+  return isLandscape
+};
+
 const chanting: React.FC = () => {
   // Navigation function or hook should be implemented based on your navigation setup
   const [track, setTrack] = useState<string>("https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3");
@@ -83,7 +91,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: '100%',
-    height: 180,
+    height: isTablet() ? 250 : 180,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 8,
     resizeMode: 'contain',
