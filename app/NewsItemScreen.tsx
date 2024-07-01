@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet,
-  ScrollView, Image, Dimensions
+  ScrollView, Image, Dimensions, SafeAreaView, Platform
 } from 'react-native';
-import Swiper from 'react-native-swiper';
 import { useLocalSearchParams, Link } from 'expo-router';
-import YouTubePlayer from './YoutubePlayer'
+import MeasureView from './api/MeasureView';
 
-
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  const isLandscape = Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+  console.log('isTablet: ', isLandscape);
+  return isLandscape
+};
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -29,45 +34,102 @@ const NewsItemScreen = () => {
   const { newsItem } = useLocalSearchParams<{ newsItem: string }>();
   const parsedNewsItem = JSON.parse(newsItem);
 
-  console.log("newsItem", parsedNewsItem);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const [width, setWidth] = useState(Dimensions.get('window').width);
+
+  const onSetWidth = (width: number) => {
+    console.log('NewsItemScreen width: ', width);
+    setWidth(width);
+  };
+
+  const onSetOrientation = (orientation: string) => {
+    if ( ( Platform.OS === 'android' && ! isTablet() ) ||  Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
+    setOrientation(orientation);
+  };
+
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      // Apply styles to force scrollbars on web
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+    }
+  }, []);
+
+  const scrollViewStyle = Platform.OS === 'web' 
+    ? { height: '100vh', overflowY: 'scroll' as 'scroll' }
+    : styles.scrollViewStyle;
 
   return (
-    <Swiper loop={false}>
-      <ScrollView style={styles.container}>
-        <Image source={{ uri: parsedNewsItem.url }} style={{ width: Dimensions.get("screen").width, height: 200, alignSelf: 'center' }} />
-        <Text style={styles.date}>{formatDate(parsedNewsItem.date)}</Text>
-        <Text style={styles.title}>{parsedNewsItem.headline.toUpperCase()}</Text>
-        <Text style={styles.blogEntryText}>{parsedNewsItem.text}</Text>
-        <Link href={{ pathname: './YoutubePlayer', params: { id: parsedNewsItem.youTubeId } }} style={styles.category}>
-          <Text>Category: {parsedNewsItem.category}</Text>
-        </Link>
-      </ScrollView>
-    </Swiper>
+    <SafeAreaView style={styles.safeArea}>
+      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+        {orientation === 'PORTRAIT' ? (
+          <ScrollView style={scrollViewStyle}>
+            <Image 
+              source={{ uri: parsedNewsItem.url }} 
+              style={{ 
+                width: width, 
+                height: width * 0.6, 
+                resizeMode: (Platform.OS === 'web' || isTablet()) ? 'contain' : 'cover'
+              }} 
+            />
+            <View style={styles.content}>
+              <Text style={styles.date}>{formatDate(parsedNewsItem.date)}</Text>
+              <Text style={styles.title}>{parsedNewsItem.headline.toUpperCase()}</Text>
+              <Text style={styles.bodyText}>{parsedNewsItem.text}</Text>
+              <Link href={{ pathname: './YoutubePlayer', params: { id: parsedNewsItem.youTubeId } }} style={styles.category}>
+                <Text>Category: {parsedNewsItem.category}</Text>
+              </Link>
+            </View>
+          </ScrollView>
+        ) : (
+          <ScrollView style={scrollViewStyle} contentContainerStyle={styles.landscapeContainer}>
+            <View style={styles.landscapeImageContainer}>
+              <Image 
+                source={{ uri: parsedNewsItem.url }} 
+                style={{ 
+                  width: width * 0.5, 
+                  height: '60%',
+                  resizeMode: (Platform.OS === 'web' || isTablet()) ? 'contain' : 'cover'
+                }} 
+              />
+            </View>
+            <View style={styles.landscapeContent}>
+              <Text style={styles.date}>{formatDate(parsedNewsItem.date)}</Text>
+              <Text style={styles.title}>{parsedNewsItem.headline.toUpperCase()}</Text>
+              <Text style={styles.bodyText}>{parsedNewsItem.text}</Text>
+              <Link href={{ pathname: './YoutubePlayer', params: { id: parsedNewsItem.youTubeId } }} style={styles.category}>
+                <Text>Category: {parsedNewsItem.category}</Text>
+              </Link>
+            </View>
+          </ScrollView>
+        )}
+      </MeasureView>
+    </SafeAreaView>
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+    backgroundColor: '#fff',
   },
-  header: {
-    backgroundColor: '#E53935',
-    padding: 10,
-  },
-  headerText: {
-    color: 'white',
-    fontSize: 24,
-    textAlign: 'center',
-  },
+  scrollViewStyle: {},
   content: {
-    margin: 20,
+    padding: 16,
   },
   date: {
     fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#E53935',
+    marginTop: 10,
   },
   title: {
     fontSize: 24,
@@ -75,27 +137,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  blogEntryText: {
+  bodyText: {
     fontSize: 20,
-    margin: 10,
+    marginTop: 10,
+    fontFamily: 'OblikBold',
+    color: '#454545'
   },
   category: {
     fontSize: 16,
     color: 'blue',
-    marginLeft: 10,
+    marginTop: 10,
   },
-  nextButton: {
-    backgroundColor: 'transparent',
-    borderColor: '#E53935',
-    borderWidth: 2,
-    borderRadius: 10, // Adjust the border radius value as needed
-    color: '#E53935',
+  landscapeContainer: {
+    flexDirection: 'row',
+    height: '100%',
   },
-  nextButtonText: {
-    color: '#E53935',
-    padding: 10,
+  landscapeImageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-
+  landscapeContent: {
+    flex: 1,
+    padding: 16,
+    justifyContent: 'center',
+  },
 });
 
 export default NewsItemScreen;
