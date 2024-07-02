@@ -54,7 +54,7 @@ const YearScreen = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <ScrollView>
+    <ScrollView style={{ paddingBottom: 200 }}>
       <View>
         {Object.keys(data).sort((a, b) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : Number(a) - Number(b)).map((year) => (
           <TouchableOpacity 
