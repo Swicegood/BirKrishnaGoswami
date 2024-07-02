@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView,
-  Image, Dimensions, ActivityIndicator
+  Image, Dimensions, ActivityIndicator, Platform
 } from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from './api/firebase';
@@ -262,22 +262,28 @@ const QuoteScreen = () => {
       </View>
       <View style={{ justifyContent: 'space-between' }}>
 
-        <View style={{ padding: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
-            {!atFirstDoc && (
-              <TouchableOpacity style={styles.nextButton} onPress={handlePreviousQuote}>
-                <Text style={styles.nextButtonText}>{'<'} NEXT</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <View style={{ flex: !atLastDoc ? 0 : 0 }}>
-            {!atLastDoc && (
-              <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
-                <Text style={styles.nextButtonText}>PREV. {'>'}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+      <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', ...(Platform.OS === 'web' ? { paddingEnd: 100, paddingStart: 100 } : {}) }}>
+        <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+          {!atFirstDoc && (
+            <TouchableOpacity style={styles.nextButton} onPress={handlePreviousQuote}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>{'<'}</Text>
+                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>PREV.</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
+        <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+          {!atLastDoc && (
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>NEXT</Text>
+                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>{'>'}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
       </View>
     </View>
   );
@@ -327,7 +333,8 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: '#E53935',
-    padding: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
 
 });

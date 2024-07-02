@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView,
-  ActivityIndicator, Image, Dimensions
+  ActivityIndicator, Image, Dimensions, Platform
 } from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from '../api/firebase';
@@ -13,7 +13,7 @@ function formatDate(dateString) {
   }
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dateParts = dateString.split('/');
-  const date = new Date(`20${dateParts[0]}`, dateParts[1] -1, dateParts[2]);
+  const date = new Date(`20${dateParts[0]}`, dateParts[1] - 1, dateParts[2]);
 
   const month = months[date.getMonth()];
   const day = String(date.getDate());
@@ -191,25 +191,31 @@ const TravelScreen = () => {
           <Text style={styles.textText}>{text}</Text>
         </View>
       </View>
-        <View style={{ justifyContent: 'space-between' }}></View>
-        <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
-            {!atFirstDoc && (
-              <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-                <Text style={styles.nextButtonText}>{'<'} PREV.</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <View style={{ flex: !atLastDoc ? 0 : 0 }}>
-            {!atLastDoc && (
-              <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-                <Text style={styles.nextButtonText}>NEXT {'>'}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+      <View style={{ justifyContent: 'space-between' }}></View>
+      <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', ...(Platform.OS === 'web' ? { paddingEnd: 100, paddingStart: 100 } : {}) }}>
+        <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+          {!atFirstDoc && (
+            <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>{'<'}</Text>
+                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>PREV.</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
+        <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+          {!atLastDoc && (
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>NEXT</Text>
+                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>{'>'}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
     </View>
-    );
+  );
 };
 
 const styles = StyleSheet.create({
@@ -256,7 +262,8 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: '#E53935',
-    padding: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
 
 });
