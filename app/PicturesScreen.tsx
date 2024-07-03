@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Dimensions, FlatList, Image, TouchableOpacity } from 'react-native';
-import { Link, useLocalSearchParams} from 'expo-router';
+import { Dimensions, FlatList, Image, TouchableOpacity, Platform, ScrollView, View } from 'react-native';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { getAllFiles } from './api/apiWrapper';
-import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-
+import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
+import MeasureView from './api/MeasureView';
 
 // Function to split array into chunks
 const chunkArray = (myArray: string[], chunk_size: number): string[][] => {
@@ -18,15 +18,34 @@ const chunkArray = (myArray: string[], chunk_size: number): string[][] => {
 
   return tempArray;
 }
-  
+
 const screenWidth = Dimensions.get('window').width;
 
-const GalleryComponent = () => {
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+};
+
+const PicturesScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  console.log("id", id);
-  const placeholderImages: string[] = new Array(15).fill(placeholderImage); // Create an array of 15 placeholder images // Create an array of 15 placeholder images
-  const [images, setImages] = useState<string[]>(placeholderImages); // Set the initial state to the placeholder images
+  const placeholderImages: string[] = new Array(15).fill(placeholderImage);
+  const [images, setImages] = useState<string[]>(placeholderImages);
   const [numColumns, setNumColumns] = useState(getOrientation());
+  const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+
+  const onSetWidth = (width: number) => {
+    setWidth(width);
+  };
+
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      setOrientation(orientation === 'LANDSCAPE' ? 'PORTRAIT' : 'LANDSCAPE');
+    } else {
+      setOrientation(orientation);
+    }
+  };
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', onChange);
@@ -36,18 +55,8 @@ const GalleryComponent = () => {
   }, []);
 
   useEffect(() => {
-    let isMounted = true;  // add this line
-  
-    getAllFiles('imageList', 'imageFiles').then((data: string[]) => {
-      if (isMounted) {  // check if component is still mounted
-        setImages(data.length ? data.filter(item => item.includes(id)) : placeholderImages);
-      }
-    });
-  
-    return () => {
-      isMounted = false;  // set to false when component unmounts
-    };
-  }, []);
+    setNumColumns(orientation === 'LANDSCAPE' || Platform.OS === 'web' ? 4 : isTablet() ? 3 : 2);
+  }, [orientation]);
 
   function getOrientation() {
     const { width, height } = Dimensions.get('window');
@@ -58,22 +67,53 @@ const GalleryComponent = () => {
     setNumColumns(getOrientation());
   }
 
-  // Split images into chunks of 15
-  return (
+  useEffect(() => {
+    let isMounted = true;
+
+    getAllFiles('imageList', 'imageFiles').then((data: string[]) => {
+      if (isMounted) {
+        setImages(data.length ? data.filter(item => item.includes(id)) : placeholderImages);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  const renderContent = () => (
     <FlatList
       data={chunkArray(images, 15)}
       numColumns={numColumns}
-      key={numColumns} // Add this line
+      key={numColumns}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
-        <Link href={ {pathname: "./GalleryScreen", params: {imageChunk: item}} }asChild>
-        <TouchableOpacity>
-        <Image defaultSource={placeholderImage} source={{uri: String(item[0])}} style={{ width: screenWidth / 2, height: 200}} />
-        </TouchableOpacity>
+        <Link href={{ pathname: "./GalleryScreen", params: { imageChunk: item } }} asChild>
+          <TouchableOpacity>
+            <Image 
+              defaultSource={placeholderImage}
+              source={{ uri: String(item[0]) }}
+              style={{ width: width / numColumns, height: 200 }}
+            />
+          </TouchableOpacity>
         </Link>
       )}
     />
   );
+
+  return (
+    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      {Platform.OS === 'web' ? (
+        <ScrollView style={{ height: '100vh' }}>
+          <View style={{ minHeight: '100%' }}>
+            {renderContent()}
+          </View>
+        </ScrollView>
+      ) : (
+        renderContent()
+      )}
+    </MeasureView>
+  );
 };
 
-export default GalleryComponent;
+export default PicturesScreen;
