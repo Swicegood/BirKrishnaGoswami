@@ -134,20 +134,26 @@ const BlogScreen = () => {
       {Platform.OS === 'web' ? renderWebVersion() : renderMobileVersion()}
       {Platform.OS !== 'web' && (
         <View style={styles.navigationContainer}>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
-            disabled={currentIndex === 0}
-          >
-            <Text style={styles.navButtonText}>Previous</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentIndex(Math.min(posts.length - 1, currentIndex + 1))}
-            disabled={currentIndex === posts.length - 1}
-          >
-            <Text style={styles.navButtonText}>Next</Text>
-          </TouchableOpacity>
+          <View style={{ flex: 0}}>
+            {currentIndex > 0 && (
+              <TouchableOpacity style={styles.nextButton} onPress={() => setCurrentIndex(currentIndex - 1)}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>{'<'}</Text>
+                  <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>PREV.</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={{ flex: 0 }}>
+            {currentIndex < posts.length - 1 && (
+              <TouchableOpacity style={styles.nextButton} onPress={() => setCurrentIndex(currentIndex + 1)}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>NEXT</Text>
+                  <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>{'>'}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       )}
     </View>
@@ -186,16 +192,21 @@ const styles = StyleSheet.create({
   navigationContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
+    alignItems: 'center',
+    paddingTop: 10,
+    padding: 30,
+    ...(Platform.OS === 'web' ? { paddingEnd: 100, paddingStart: 100 } : {}),
   },
-  navButton: {
-    padding: 10,
-    backgroundColor: '#E53935',
-    borderRadius: 5,
+  nextButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#E53935',
+    borderWidth: 2,
+    borderRadius: 10,
+    color: '#E53935',
   },
-  navButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+  nextButtonText: {
+    color: '#E53935',
+    padding: 10,
   },
 });
 
