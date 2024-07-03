@@ -15,6 +15,7 @@ const isTablet = () => {
 const MemoriesScreen: React.FC = () => {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
 
   const onSetWidth = (width: number) => {
     console.log('MemoriesScreen width: ', width);
@@ -93,7 +94,8 @@ const MemoriesScreen: React.FC = () => {
                   <Image
                     source={require('../assets/images/Prabhupada_Playlist.png')}
                     resizeMode="cover"
-                    style={styles.landscapeCardImage}
+                    style={{...styles.landscapeCardImage, 
+                      height: isTablet() ? height * 0.3 : height * 0.125}}
                   />
                   <Text style={styles.cardText}>PLAYLISTS</Text>
                 </TouchableOpacity>
@@ -103,7 +105,8 @@ const MemoriesScreen: React.FC = () => {
                   <Image
                     source={require('../assets/images/Prabhupada_Offerings.png')}
                     resizeMode="cover"
-                    style={styles.landscapeCardImage}
+                    style={{...styles.landscapeCardImage, 
+                      height: isTablet() ? height * 0.3 : height * 0.125}}
                   />
                   <Text style={styles.cardText}>VYASA PUJA OFFERINGS</Text>
                 </TouchableOpacity>

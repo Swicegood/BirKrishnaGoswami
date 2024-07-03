@@ -15,6 +15,7 @@ const isTablet = () => {
 const AudioStartScreen: React.FC = () => {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
 
   const onSetWidth = (width: number) => {
     console.log('AudioStartScreen width: ', width);
@@ -101,7 +102,8 @@ const AudioStartScreen: React.FC = () => {
                   <Image
                     source={require('../assets/images/By-Year.png')}
                     resizeMode="cover"
-                    style={styles.landscapeCardImage}
+                    style={{...styles.landscapeCardImage, 
+                      height: isTablet() ? height * 0.3 : height * 0.125}}
                   />
                   <Text style={styles.cardText}>BY-YEAR</Text>
                 </TouchableOpacity>
@@ -111,7 +113,8 @@ const AudioStartScreen: React.FC = () => {
                   <Image
                     source={require('../assets/images/By-Book.png')}
                     resizeMode="cover"
-                    style={styles.landscapeCardImage}
+                    style={{...styles.landscapeCardImage, 
+                      height: isTablet() ? height * 0.3 : height * 0.125}}
                   />
                   <Text style={styles.cardText}>BY-BOOK</Text>
                 </TouchableOpacity>
@@ -187,10 +190,9 @@ const styles = StyleSheet.create({
   },
   landscapeCardImage: {
     width: '100%',
-    height: 250,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
-});
+}); 
 
 export default AudioStartScreen;
