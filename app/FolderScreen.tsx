@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
-import { FlatList, Dimensions, ActivityIndicator, Image } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, FlatList, Dimensions, ActivityIndicator, Image, Platform } from 'react-native';
 import { Link } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
+import MeasureView from './api/MeasureView';
 
-// Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
 export const HierarchyContext = React.createContext<Record<string, any> | null>(null);
-
-// Calculate the width of the screen
-const { width } = Dimensions.get('window');
-const itemWidth = width / 2; // Assuming we want 16px padding on both sides
-const itemHeight = Dimensions.get('window').height / 3;
 
 interface File {
   category: string;
@@ -41,19 +35,11 @@ const images = {
 };
 
 function extractHierarchyFromUrl(url: string) {
-  // Split the URL by slashes and filter out empty strings
   const parts = url.split('/').filter(part => part);
-
-  // Assume the domain and protocol are not part of the hierarchy
-  // Skip 'http:', '', 'audio.iskcondesiretree.com', and the first two sections
-  // Also ignore the last part as it is the actual file
-  const hierarchicalParts = parts.slice(5, -1);  // from the third to the last
-
-  // Build a nested dictionary from the hierarchical parts
+  const hierarchicalParts = parts.slice(5, -1);
   const hierarchy: Record<string, any> = {};
   let currentLevel = hierarchy;
 
-  // For each part, if it's not already a key in the current level of the hierarchy, add it
   for (const part of hierarchicalParts) {
     if (!(part in currentLevel)) {
       currentLevel[part] = {};
@@ -64,7 +50,6 @@ function extractHierarchyFromUrl(url: string) {
   return hierarchy;
 }
 
-// Function to recursively build a list of categories from the nested dictionary
 function buildCategoryList(hierarchy: Record<string, any>, level: number): string[] {
   const categories: string[] = [];
 
@@ -98,39 +83,36 @@ function buildListFromParent (hierarchy: Record<string, any>, parent: string): s
   return categories;
 }
 
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  return Math.min(width, height) >= 600 && (aspectRatio > 1.6 || aspectRatio < 0.64);
+};
 
 const FolderScreen = () => {
   const [folders, setFolders] = useState<string[]>([]);
-  const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);// Correct the spelling here
+  const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);
   const [deserializedHierarchy, setDeserializedHierarchy] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const [width, setWidth] = useState(Dimensions.get('window').width);
 
-
-  const data = new Array(folders.length).fill(null).map((_, index) => ({
-    key: String(index),
-    category: folders[index] || 'Loading...', // Replace with folders[index]
-    image: placeholderImage,
-  }));
-
-  const disambiguate = (hierarchy: Record<string, any>, parentName = '') => {
-    return Object.entries(hierarchy).reduce((acc, [key, value]) => {
-      // Check if the key is a simple number
-      const isNumber = !isNaN(Number(key));
-  
-      // Generate a unique name for the child node if its name is a simple number
-      const uniqueName = isNumber ? `${parentName}_${key}_` : key;
-  
-      // If the child node is an object, recursively disambiguate its child nodes
-      if (typeof value === 'object' && value !== null) {
-        acc[uniqueName] = disambiguate(value, uniqueName);
-      } else {
-        acc[uniqueName] = value;
-      }
-  
-      return acc;
-    }, {} as Record<string, any>);
+  const onSetWidth = (width: number) => {
+    console.log('FolderScreen width: ', width);
+    setWidth(width);
   };
 
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
+    setOrientation(orientation);
+  };
 
   useEffect(() => {
     (async () => {
@@ -149,58 +131,97 @@ const FolderScreen = () => {
     })();
   }, []);
 
-  const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => (
-    <View style={styles.itemContainer}>
-      <Link href={{
-        pathname: buildListFromParent(deserializedHierarchy, item.category).length === 0 ? "FilesScreen" : "SubFolderScreen",
-        params: { category: item.category, hierarchy: JSON.stringify(hierarchy) }
-      }} asChild>
-        <TouchableOpacity>
-          <View style={styles.imageView}>
-            <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
-          </View>
-        </TouchableOpacity>
-      </Link>
-      <Text style={styles.itemText}>{item.category.replaceAll('_', ' ')}</Text>
-    </View>
-  );
+  const disambiguate = (hierarchy: Record<string, any>, parentName = '') => {
+    return Object.entries(hierarchy).reduce((acc, [key, value]) => {
+      const isNumber = !isNaN(Number(key));
+      const uniqueName = isNumber ? `${parentName}_${key}_` : key;
+      if (typeof value === 'object' && value !== null) {
+        acc[uniqueName] = disambiguate(value, uniqueName);
+      } else {
+        acc[uniqueName] = value;
+      }
+      return acc;
+    }, {} as Record<string, any>);
+  };
+
+  const getItemDimensions = () => {
+    let itemWidth, itemHeight;
+    if (Platform.OS === 'web') {
+      itemWidth = width / 4;
+      itemHeight = width / 2;
+    } else if (isTablet()) {
+      itemWidth = width / 4;
+      itemHeight = width / 3;
+    } else {
+      itemWidth = orientation === 'LANDSCAPE' ? width / 4 : width / 2;
+      itemHeight = orientation === 'LANDSCAPE' ?  width / 3 : width * .75 ;
+    }
+    return { itemWidth, itemHeight };
+  };
+
+  const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => {
+    const { itemWidth, itemHeight } = getItemDimensions();
+    return (
+      <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }]}>
+        <Link
+          href={{
+            pathname: buildListFromParent(deserializedHierarchy, item.category).length === 0 ? "FilesScreen" : "SubFolderScreen",
+            params: { category: item.category, hierarchy: JSON.stringify(hierarchy) }
+          }}
+          asChild
+        >
+          <TouchableOpacity>
+          <View style={(Platform.OS === 'web') ? {} : styles.imageView}>
+              {(Platform.OS === 'web' ? (
+                <Image source={images[item.category] || item.image} style={{...styles.image, width: width /5}} resizeMode="contain" />
+              ) : (
+                <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
+              ))}
+            </View>
+          </TouchableOpacity>
+        </Link>
+        <Text style={styles.itemText}>{item.category.replaceAll('_', ' ')}</Text>
+      </View>
+    );
+  };
 
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#ED4D4E" />
-      </View>)
+      </View>
+    );
   }
+
+  const data = folders.map((folder, index) => ({
+    key: String(index),
+    category: folder || 'Loading...',
+    image: placeholderImage,
+  }));
 
   return (
     <HierarchyContext.Provider value={deserializedHierarchy}>
-      <View>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.key}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.contentContainer}
-          ListFooterComponent={<View style={{ height: 20 }} />} // Add this line
-        />
-      </View>
+      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+        <View style={styles.container}>
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.key}
+            numColumns={Platform.OS === 'web' ? 4 : (isTablet() || orientation === 'LANDSCAPE' ? 4 : 2)}
+            key={Platform.OS === 'web' ? 4 : (isTablet() || orientation === 'LANDSCAPE' ? 4 : 2)}
+            columnWrapperStyle={styles.columnWrapper}
+            contentContainerStyle={styles.contentContainer}
+            ListFooterComponent={<View style={{ height: 20 }} />}
+          />
+        </View>
+      </MeasureView>
     </HierarchyContext.Provider>
   );
 };
 
-
-
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
+    backgroundColor: '#fff',
   },
   columnWrapper: {
     justifyContent: 'space-between',
@@ -209,18 +230,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemContainer: {
-    width: itemWidth,
-    height: itemHeight,
-    borderWidth: .25, // This sets the width of the border
-    borderColor: 'lightgray', // This sets the color of the border
+    borderWidth: 0.25,
+    borderColor: 'lightgray',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    paddingTop: 120,
+    paddingBottom: 120,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
   image: {
     width: '50%',
     height: undefined,
-    aspectRatio: .673, // Your images are square
+    aspectRatio: 0.673,
   },
   imageView: {
     width: '100%',
@@ -239,6 +262,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     fontFamily: 'OblikBold',
     color: 'maroon',
+    textAlign: 'center',
   },
 });
 
