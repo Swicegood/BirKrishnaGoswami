@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView,
-  ActivityIndicator, Image, Dimensions, Platform
+  View, Text, TouchableOpacity, StyleSheet,
+  ScrollView, Image, Dimensions, ActivityIndicator, Platform
 } from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from '../api/firebase';
-
+import MeasureView from '../api/MeasureView';
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -16,9 +16,17 @@ function formatDate(dateString) {
   const date = new Date(`20${dateParts[0]}`, dateParts[1] - 1, dateParts[2]);
 
   const month = months[date.getMonth()];
-  const day = String(date.getDate());
+  const day = String(date.getDate()).padStart(2, '0');
 
   return `${month} ${day}`;
+}
+
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  const isLandscape = Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+  console.log('isTablet: ', isLandscape);
+  return isLandscape
 }
 
 const TravelScreen = () => {
@@ -28,19 +36,33 @@ const TravelScreen = () => {
   const [atFirstDoc, setAtFirstDoc] = useState(true);
   const [atLastDoc, setAtLastDoc] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const [width, setWidth] = useState(Dimensions.get('window').width);
 
+  const onSetWidth = (width: number) => {
+    console.log('TravelScreen width: ', width);
+    setWidth(width);
+  };
 
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
+    setOrientation(orientation);
+  };
 
   useEffect(() => {
     const fetchText = async () => {
       const q = query(collection(db, 'travel-schedule'), orderBy('date', 'desc'), limit(1));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
-        // Assuming doc.data() returns an object with text, date, and category
         setText(doc.data().text);
         setDate(doc.data().date);
-
-        // Store the current document in the state variable
         setCurrentDoc(doc);
       });
       setIsLoading(false);
@@ -66,8 +88,6 @@ const TravelScreen = () => {
 
       try {
         const nextQuerySnapshot = await getDocs(nextQuery);
-        // rest of your code
-
         nextQuerySnapshot.forEach((doc) => {
           newText = doc.data().text;
           newDate = doc.data().date;
@@ -88,9 +108,8 @@ const TravelScreen = () => {
         }
       } catch (error) {
         console.error("Failed to get documents:", error);
-        // handle the error as needed
       }
-      // Check if the current document is the last one
+      
       try {
         if (nextdoc) {
           console.log("currentDocNextQuery", nextdoc.date);
@@ -112,7 +131,6 @@ const TravelScreen = () => {
         }
       } catch (error) {
         console.error("Failed to get documents:", error);
-        // handle the error as needed
       }
     }
   };
@@ -172,46 +190,66 @@ const TravelScreen = () => {
         }
       } else {
         setAtFirstDoc(true);
-
       }
     };
-
   };
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#ED4D4E" />;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ED4D4E" />
+      </View>
+    );
   }
 
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Image source={require('../../assets/images/Trave_Plane.png')} style={{ width: Dimensions.get("screen").width, height: 250, resizeMode: 'cover' }} />
+        <MeasureView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
+          <Image
+            source={require('../../assets/images/Trave_Plane.png')}
+            style={{
+              width: width,
+              height: (isTablet() || Platform.OS === 'web') ? 300 : orientation === 'LANDSCAPE' ? 160 : 250,
+              resizeMode: (isTablet() || Platform.OS === 'web' || orientation === 'LANDSCAPE') ? 'contain' : 'cover'
+            }}
+          />
+        </MeasureView>
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
-          <Text style={styles.textText}>{text}</Text>
+          {(Platform.OS === 'web' || isTablet()) ? (
+            <Text style={styles.textText}>{text}</Text>
+          ) : (
+            orientation === 'LANDSCAPE' ? (
+              <Text style={{...styles.textText, paddingLeft: 100, paddingRight: 100}}>{text}</Text>
+            ) : (
+              <Text style={styles.textText}>{text}</Text>
+            )
+          )}
         </View>
       </View>
-      <View style={{ justifyContent: 'space-between' }}></View>
-      <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', ...(Platform.OS === 'web' ? { paddingEnd: 100, paddingStart: 100 } : {}) }}>
-        <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
-          {!atFirstDoc && (
-            <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>{'<'}</Text>
-                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>PREV.</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
-        <View style={{ flex: !atLastDoc ? 0 : 0 }}>
-          {!atLastDoc && (
-            <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>NEXT</Text>
-                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>{'>'}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
+      <View style={{ justifyContent: 'space-between' }}>
+        <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', ...(Platform.OS === 'web' ? { paddingEnd: 100, paddingStart: 100 } : {}) }}>
+          <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+            {!atFirstDoc && (
+              <TouchableOpacity style={styles.nextButton} onPress={handlePreviousText}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>{'<'}</Text>
+                  <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>PREV.</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+            {!atLastDoc && (
+              <TouchableOpacity style={styles.nextButton} onPress={handleNextText}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>NEXT</Text>
+                  <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>{'>'}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
     </View>
@@ -257,15 +295,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: '#E53935',
     borderWidth: 2,
-    borderRadius: 10, // Adjust the border radius value as needed
+    borderRadius: 10,
     color: '#E53935',
   },
   nextButtonText: {
     color: '#E53935',
-    paddingTop: 10,
-    paddingBottom: 10,
+    padding: 10,
   },
-
 });
 
 export default TravelScreen;

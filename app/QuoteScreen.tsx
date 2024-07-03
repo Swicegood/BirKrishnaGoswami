@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+  View, Text, TouchableOpacity, StyleSheet,
   Image, Dimensions, ActivityIndicator, Platform
 } from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from './api/firebase';
+import MeasureView from './api/MeasureView';
 const defaultImage = require('../assets/images/Quote.png');
+
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -36,6 +38,13 @@ function dateToDayNumber(dateString) {
   return day;
 }
 
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  const isLandscape = Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+  console.log('isTablet: ', isLandscape);
+  return isLandscape
+}
 
 const QuoteScreen = () => {
   const [quote, setQuote] = useState('');
@@ -45,6 +54,25 @@ const QuoteScreen = () => {
   const [atFirstDoc, setAtFirstDoc] = useState(true);
   const [atLastDoc, setAtLastDoc] = useState(false);
   const [image, setImage] = useState(`https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/quotes/${dateToDayNumber(date)}.png`);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const [width, setWidth] = useState(Dimensions.get('window').width);
+
+  const onSetWidth = (width: number) => {
+    console.log('QuoteScreen width: ', width);
+    setWidth(width);
+  };
+
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
+    setOrientation(orientation);
+  };
 
   const getImageSource = (image) => {
     if (typeof image === 'string' && image.startsWith('http')) {
@@ -247,43 +275,48 @@ const QuoteScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.quoteContainer}>
-        <Image
-          source={getImageSource(image)}
-          onError={(error) => {
-            console.log('Failed to load image', error);
-            setImage(defaultImage);
-          }}
-          style={{ width: Dimensions.get("screen").width, height: 260, resizeMode: 'cover' }}
-        />
+        <MeasureView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
+          <Image
+            source={getImageSource(image)}
+            onError={(error) => {
+              console.log('Failed to load image', error);
+              setImage(defaultImage);
+            }}
+            style={{ width:  width, height: (isTablet() || Platform.OS === 'web') ? 300 : orientation === 'LANDSCAPE' ? 160 : 260, resizeMode: (isTablet() || Platform.OS === 'web' || orientation == 'LANDSCAPE') ? 'contain' : 'cover' }}
+          />
+
+        </MeasureView>
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
-          <Text style={styles.quoteText}>{quote}</Text>
+          {(Platform.OS === 'web' || isTablet()) ? <Text style={styles.quoteText}>{quote}</Text> :
+          ( orientation == 'LANDSCAPE' ? <Text style={{...styles.quoteText, paddingLeft: 100, paddingRight: 100}}>{quote}</Text> :
+          <Text style={styles.quoteText}>{quote}</Text>)}
         </View>
       </View>
       <View style={{ justifyContent: 'space-between' }}>
 
-      <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', ...(Platform.OS === 'web' ? { paddingEnd: 100, paddingStart: 100 } : {}) }}>
-        <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
-          {!atFirstDoc && (
-            <TouchableOpacity style={styles.nextButton} onPress={handlePreviousQuote}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>{'<'}</Text>
-                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>PREV.</Text>
-              </View>
-            </TouchableOpacity>
-          )}
+        <View style={{ paddingTop: 10, padding: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', ...(Platform.OS === 'web' ? { paddingEnd: 100, paddingStart: 100 } : {}) }}>
+          <View style={{ flex: !atFirstDoc ? 0 : 0 }}>
+            {!atFirstDoc && (
+              <TouchableOpacity style={styles.nextButton} onPress={handlePreviousQuote}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>{'<'}</Text>
+                  <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>PREV.</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={{ flex: !atLastDoc ? 0 : 0 }}>
+            {!atLastDoc && (
+              <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>NEXT</Text>
+                  <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>{'>'}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-        <View style={{ flex: !atLastDoc ? 0 : 0 }}>
-          {!atLastDoc && (
-            <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ ...styles.nextButtonText, paddingStart: 10 }}>NEXT</Text>
-                <Text style={{ ...styles.nextButtonText, paddingEnd: 10 }}>{'>'}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
       </View>
     </View>
   );
