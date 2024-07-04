@@ -1,137 +1,185 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, 
-  ActivityIndicator, FlatList, SafeAreaView, Dimensions } from 'react-native';
+import {
+  View, Text, StyleSheet, Image, TouchableOpacity,
+  ActivityIndicator, FlatList, SafeAreaView, Dimensions, Platform, ScrollView
+} from 'react-native';
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from './api/firebase';
-// Assuming you have a placeholder image, replace 'placeholder.jpg' with your image path
-import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
+import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
 import { Link } from 'expo-router';
+import MeasureView from './api/MeasureView';
 
+interface Book {
+  key: string;
+  title: string;
+  imgurl: string;
+  buyurl: string;
+}
 
-const itemWidth = Dimensions.get('screen').width / 2 - 20; // Width of the item 
-const itemHeight = itemWidth * 1.5; // Height of the item
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+};
 
 const PurchaseScreen = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const [width, setWidth] = useState(Dimensions.get('window').width);
 
+  const onSetWidth = (width: number) => {
+    console.log('PurchaseScreen width: ', width);
+    setWidth(width);
+  };
+
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
+    setOrientation(orientation);
+  };
 
   useEffect(() => {
     const fetchBooks = async () => {
       const q = query(collection(db, 'books'));
       const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        // doc.data() returns an object with title, blurb, imageurl, and purchaseurl
-
-      });
-      setData(querySnapshot.docs.map((doc) => {
-        return { ...doc.data(), key: doc.id };  // Add the key property to the object
-      }));
+      const books = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        key: doc.id
+      })) as Book[];
+      setData(books);
       setIsLoading(false);
     }
-  
+
     fetchBooks();
   }, []);
 
-const renderItem = ({ item }) => {
+  const getItemDimensions = () => {
+    let itemWidth, itemHeight;
+    if (Platform.OS === 'web') {
+      itemWidth = width / 4;
+      //itemHeight = width / 3;
+    } else if (isTablet()) {
+      itemWidth = orientation === 'LANDSCAPE' ? width / 4 : width / 3;
+      itemHeight = orientation === 'LANDSCAPE' ? width / 2 : width / 2;
+    } else {
+      itemWidth = orientation === 'LANDSCAPE' ? width / 4 : width / 2 - 20;
+      itemHeight = orientation === 'LANDSCAPE' ? width / 3 : width * 0.75;
+    }
+    return { itemWidth, itemHeight };
+  };
+
+  const renderItem = ({ item }: { item: Book }) => {
+    const { itemWidth, itemHeight } = getItemDimensions();
     return (
-      <View style={styles.itemContainer}>
-        <Link href={ {pathname: item.buyurl }}asChild>
-        <TouchableOpacity>
-        <Image
-          source={{ uri: item.imgurl || placeholderImage }}
-          style={styles.image}
-        />
-        </TouchableOpacity>
+      <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }]}>
+        { (Platform.OS === 'web') ? (
+          <Link href={{ pathname: item.buyurl }} asChild>
+            <Image
+              source={{ uri: item.imgurl || placeholderImage }}
+              style={styles.image}
+            />
+          </Link>
+        ) : (
+        <Link href={{ pathname: item.buyurl }} asChild>
+          <TouchableOpacity>
+            <Image
+              source={{ uri: item.imgurl || placeholderImage }}
+              style={styles.image}
+            />
+          </TouchableOpacity>
         </Link>
+        )}
         <Text style={styles.itemText}>{item.title}</Text>
-        <Link href={ {pathname: item.buyurl }}asChild>
-        <TouchableOpacity
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>PURCHASE BOOK</Text>
-        </TouchableOpacity>
+        <Link href={{ pathname: item.buyurl }} asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>PURCHASE BOOK</Text>
+          </TouchableOpacity>
         </Link>
+      </View>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ED4D4E" />
       </View>
     );
   }
 
- if (isLoading) {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color="#ED4D4E" />
-    </View>
-  )
-  }
+  const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-        <View>
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.key}
-            numColumns={2}
-            columnWrapperStyle={styles.columnWrapper}
-            contentContainerStyle={styles.contentContainer}
-          />
-        </View>
+    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <ListComponent style={[styles.container, (Platform.OS === 'web' || isTablet()) && styles.webContainer]}>
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.key}
+          numColumns={Platform.OS === 'web' ? 3 : (orientation === 'LANDSCAPE' ? 3 : 2)}
+          key={Platform.OS === 'web' ? 3 : (orientation === 'LANDSCAPE' ? 3 : 2)}
+          columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={styles.contentContainer}
+          ListFooterComponent={<View style={{ height: 120 }} />}
+          scrollEnabled={Platform.OS !== 'web'}
+        />
+      </ListComponent>
+    </MeasureView>
   );
 };
 
-
-
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   container: {
-    flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  item: {
-    width: itemWidth,
-    marginBottom: 20,
-    alignItems: 'center', // Center children horizontally
-    justifyContent: 'center', // Center children vertically
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  button: {
-    backgroundColor: '#ED4D4E',
-    color: '#fff',
-    borderRadius: 8,
-    textAlign: 'center',
-    paddingVertical: 20,
-    marginTop: 10,
-    width: itemWidth-16,
-    alignItems: 'center',
+  webContainer: {
+    height: 'calc(100vh - 70px)',
+    overflowY: 'auto' as 'auto',
+    paddingTop: 20,
   },
   columnWrapper: {
     justifyContent: 'space-between',
   },
   contentContainer: {
+    height: '100%',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   itemContainer: {
-    width: itemWidth,
-    marginBottom: 16, // Space between rows
-    padding: 8,
+    marginBottom: 40,
+    alignItems: 'center',
+    paddingRight: 10,
   },
   image: {
     width: '100%',
     height: undefined,
-    aspectRatio: 1/1.5, // Your images are square
-    borderRadius: 10, // Optional: if you want rounded corners
+    aspectRatio: 1 / 1.5,
+    borderRadius: 10,
   },
   itemText: {
     marginTop: 8,
     textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#ED4D4E',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 

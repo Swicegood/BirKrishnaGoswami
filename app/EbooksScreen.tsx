@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, Image, TouchableOpacity,
-  ActivityIndicator, FlatList, SafeAreaView, Dimensions
+  ActivityIndicator, FlatList, Dimensions, Platform, ScrollView
 } from 'react-native';
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
-import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
+import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
 import { Link } from 'expo-router';
 import { db } from './api/firebase';
-
-const itemWidth = Dimensions.get('screen').width / 2 - 20; // Width of the item 
-const itemHeight = itemWidth * 1.5; // Height of the item
+import MeasureView from './api/MeasureView';
 
 interface EBooksScreenProps {
   vponly?: boolean;
@@ -23,10 +21,35 @@ interface EBook {
   key: string;
 }
 
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+};
+
 const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
   const [data, setData] = useState<EBook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
 
+  const onSetWidth = (width: number) => {
+    console.log('EBooksScreen width: ', width);
+    setWidth(width);
+  };
+
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
+    setOrientation(orientation);
+  };
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -39,42 +62,58 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
             let modifiedUrl = data.imgurl.replace('.png', '.jpg');
             return { ...data, imgurl: modifiedUrl, key: doc.id };
           }
-          return null;  // Return null when the condition is not met
+          return null;
         })
-        .filter(item => item !== null);  // Filter out null values
+        .filter(item => item !== null);
       setData(result as EBook[]);
       setIsLoading(false);
     }
 
     fetchBooks();
-  }, []);
+  }, [vponly]);
 
-  if (isLoading) {
+  const getItemDimensions = () => {
+    let itemWidth, itemHeight;
+    if (Platform.OS === 'web') {
+      itemWidth = width / 4;
+      itemHeight = width / 3;
+    } else if (isTablet()) {
+      itemWidth = orientation === 'LANDSCAPE' ? width / 4 : width / 3;
+      itemHeight = orientation === 'LANDSCAPE' ? width / 2 : width / 2;
+    } else {
+      itemWidth = orientation === 'LANDSCAPE' ? width / 4 : width / 2 - 20;
+      itemHeight = orientation === 'LANDSCAPE' ? width / 3 : width * 0.75;
+    }
+    return { itemWidth, itemHeight };
+  };
+
+  const handleImageLoad = (key: string) => {
+    setLoadedImages(prev => ({ ...prev, [key]: true }));
+  };
+
+  const renderItem = ({ item }: { item: EBook }) => {
+    const { itemWidth, itemHeight } = getItemDimensions();
+    const isImageLoaded = loadedImages[item.key];
+
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#ED4D4E" />
-      </View>)
-  }
-
-  interface BookItemProps {
-    item: EBook;
-  }
-
-  const BookItem: React.FC<BookItemProps> = ({ item }) => {
-
-    const [isImageLoaded, setIsImageLoaded] = useState(false);
-
-    return (
-      <View style={styles.itemContainer}>
-        <Link href={{ pathname: "./PdfViewScreen", params: { url: item.contenturl } }} asChild>
+      <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }, Platform.OS === 'web' && { marginBottom: 150}]}>
+        {(Platform.OS === 'web') ? (
+          <Link href={{ pathname: "./PdfViewScreen", params: { url: item.contenturl } }} asChild>
+            <Image
+              source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
+              style={styles.image}
+              onLoad={() => handleImageLoad(item.key)}
+            />
+          </Link>
+        ) : (
           <TouchableOpacity>
             <Image
               source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
               style={styles.image}
-              onLoad={() => setIsImageLoaded(true)}
+              onLoad={() => handleImageLoad(item.key)}
             />
           </TouchableOpacity>
-        </Link>
+        )}
         <Text style={styles.itemText}>{item.title}</Text>
         <Link
           href={{
@@ -91,77 +130,80 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
     );
   };
 
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ED4D4E" />
+      </View>
+    );
+  }
+
+  const numColumns = Platform.OS === 'web' ? 4 : (isTablet() || orientation === 'LANDSCAPE' ? 3 : 2);
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View>
+    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <View style={styles.container}>
         <FlatList
           data={data}
-          renderItem={({ item }) => <BookItem item={item} />}
+          renderItem={renderItem}
           keyExtractor={(item) => item.key}
-          numColumns={2}
+          numColumns={numColumns}
+          key={numColumns}
           columnWrapperStyle={styles.columnWrapper}
           contentContainerStyle={styles.contentContainer}
+          scrollEnabled={true}
+          removeClippedSubviews={true}
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          windowSize={5}
         />
       </View>
-    </SafeAreaView>
+    </MeasureView>
   );
 };
 
-
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   container: {
-    flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  item: {
-    width: itemWidth,
-    alignItems: 'center', // Center children horizontally
-    justifyContent: 'center', // Center children vertically
+  webContainer: {
+    height: 'calc(100vh - 70px)',
+    overflowY: 'auto' as 'auto',
   },
-
   columnWrapper: {
     justifyContent: 'space-between',
   },
   contentContainer: {
-    marginTop: 10,
     alignItems: 'center',
   },
   itemContainer: {
-    width: itemWidth,
-    marginBottom: 16, // Space between rows
+    marginBottom: 80,
+    alignItems: 'center',
+    paddingHorizontal: 10,
   },
   image: {
     width: '100%',
     height: undefined,
-    aspectRatio: 1 / 1.5, // Your images are square
-    borderRadius: 10, // Optional: if you want rounded corners
+    aspectRatio: 1 / 1.5,
+    borderRadius: 10,
   },
   itemText: {
     marginTop: 8,
-    marginRight: 8,
     textAlign: 'center',
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
   },
   button: {
     backgroundColor: '#ED4D4E',
-    color: '#fff',
     borderRadius: 8,
-    textAlign: 'center',
-    paddingVertical: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     marginTop: 10,
-    width: itemWidth - 16,
+    width: '100%',
     alignItems: 'center',
-    marginLeft: 8,
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 
