@@ -1,138 +1,170 @@
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries  
-import { httpsCallable } from 'firebase/functions';
-import VideoItem from '../../components/VideoItem'; // Import the PlaylistItem component
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { functions } from '../api/firebase';
+import { View, FlatList, StyleSheet, ActivityIndicator, Dimensions, Platform, ScrollView, TouchableOpacity, Text } from 'react-native';
+import VideoItem from '../../components/VideoItem';
 import { Link } from 'expo-router';
-
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../api/firebase';
+import MeasureView from '../api/MeasureView';
+import mockYoutubeData from '../../components/mockYoutubeData';
 
 interface GetYouTubeVideosRequest {
   channelId: string;
 }
 
-interface Videolist {
+interface Video {
   id: string;
   title: string;
-  // Add other playlist properties as needed
+  thumbnailUrl: string;
+  dateModified: string;
 }
 
 interface GetYouTubeVideosResponse {
-  videos: Videolist[];
+  videos: Video[];
 }
-
 
 interface FirebaseFunctionError {
   code: string;
   message: string;
-  details?: any; // The details can vary depending on the error
+  details?: any;
 }
 
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+};
 
-const YoutubeChannelVideosScreen = () => {
-  const [videos, setVideos] = useState([]);
+const RecentUploadsScreen = () => {
+  const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const [width, setWidth] = useState(Dimensions.get('window').width);
 
-  // Function to fetch videos based on search term
+  const USE_MOCK_DATA = true; // Set this to false when you want to use real API calls
+
+  const onSetWidth = (width: number) => {
+    console.log('RecentUploadsScreen width: ', width);
+    setWidth(width);
+  };
+
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
+    setOrientation(orientation);
+  };
+
   const fetchVideos = async () => {
     setIsLoading(true);
-    setVideos([]); // Clear the videos state
-    const getYouTubeChannelVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubeChannelVideos');
-    const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' }; // Use state for searchTerm
+    setVideos([]);
 
-    getYouTubeChannelVideos(request)
-      .then((result: { data: GetYouTubeVideosResponse }) => {
-        // Use the interface for the response
+    if (USE_MOCK_DATA) {
+      // Use mock data
+      const mockVideos = mockYoutubeData.items.map(item => ({
+        id: item.id.videoId,
+        title: item.snippet.title,
+        thumbnailUrl: item.snippet.thumbnails.medium.url,
+        dateModified: item.snippet.publishTime
+      }));
+      setVideos(mockVideos);
+      setIsLoading(false);
+    } else {
+      // Use real API call
+      const getYouTubeChannelVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubeChannelVideos');
+      const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
+
+      try {
+        const result = await getYouTubeChannelVideos(request);
         const response: GetYouTubeVideosResponse = result.data;
-        const videos = response.items; // Change this line
-        console.log("videos", videos[4]);
-        videos.forEach(video => {
-          const title = video.snippet.title;
-          const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'
-          const dateModified = video.snippet.publishTime;
-          const id = video.id.videoId;
-          setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
-          setIsLoading(false);
-        });
-      })
-      .catch((error: FirebaseFunctionError) => {
+        const videos = response.items;
+        const formattedVideos = videos.map(video => ({
+          id: video.id.videoId,
+          title: video.snippet.title,
+          thumbnailUrl: video.snippet.thumbnails.default.url,
+          dateModified: video.snippet.publishTime
+        }));
+        setVideos(formattedVideos);
+        setIsLoading(false);
+      } catch (error: any) {
         console.error("Error calling the function: ", error.message);
-      });
+        setIsLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
-    setVideos([]); // Clear the videos state
-    const fetchVideos = async () => {
-      const getYouTubeChannelVideos = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getYouTubeChannelVideos');
-
-      // Use the interface for the request
-      const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
-
-      getYouTubeChannelVideos(request)
-        .then((result: { data: GetYouTubeVideosResponse }) => {
-          // Use the interface for the response
-          const response: GetYouTubeVideosResponse = result.data;
-          const videos = response.items; // Change this line
-          videos.forEach(video => {
-            const title = video.snippet.title;
-            const thumbnailUrl = video.snippet.thumbnails.default.url; // or 'medium' or 'high'
-            const dateModified = video.snippet.publishTime;
-            const id = video.id.videoId;
-            setVideos(videos => [...videos, { id, title, thumbnailUrl, dateModified }]);
-            setIsLoading(false);
-          });
-        })
-        .catch((error: FirebaseFunctionError) => {
-          console.error("Error calling the function: ", error.message);
-        });
-    };
-
     fetchVideos();
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
+
+  const renderItem = ({ item }: { item: Video }) => (
+    <Link href={{ pathname: '/YoutubePlayer', params: { id: item.id } }} asChild>
+      <TouchableOpacity style={{ paddingTop: 10 }}>
+        <VideoItem
+          title={item.title}
+          lastModified={item.dateModified}
+          thumbnail={item.thumbnailUrl}
+          id={item.id}
+          imageStyle={(isTablet() || Platform.OS === 'web')
+            ? { width: width / 4, height: width * 1.5 / 10 }
+            : (orientation === 'LANDSCAPE')
+              ? { width: width / 5 }
+              : { width: width / 2.2 }}
+        />
+      </TouchableOpacity>
+    </Link>
+  );
 
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#ED4D4E" />
-      </View>)
+      </View>
+    );
   }
 
-  const renderItem = ({ item }) => (
-    <Link href={{ pathname: '/YoutubePlayer', params: { id: item.id } }}> {/* This is the link to the PlaylistScreen */}
-      <VideoItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} />
-    </Link>
-  );
+  const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <View style={styles.container}>
-
-      <FlatList
-        data={videos}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        ListFooterComponent={<View style={{ height: 20 }} />} // Add this line
-      />
-    </View>
+    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+        <FlatList
+          data={videos}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          numColumns={1}
+          contentContainerStyle={styles.flatListContent}
+          ListEmptyComponent={<Text style={styles.noResultsText}>No videos found</Text>}
+          ListFooterComponent={<View style={{ height: 20 }} />}
+          scrollEnabled={Platform.OS !== 'web'}
+        />
+      </ListComponent>
+    </MeasureView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff',
-    padding: -10,
   },
-  searchInput: {
-    borderColor: 'gray',
-    borderWidth: 1,
+  webContainer: {
+    height: 'calc(100vh - 70px)',
+    overflowY: 'auto' as 'auto',
+    paddingBottom: 120,
   },
-  text: {
-    fontSize: 20,
+  flatListContent: {
+    paddingHorizontal: 10,
+  },
+  noResultsText: {
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+    marginTop: 20,
   },
 });
 
-export default YoutubeChannelVideosScreen;
+export default RecentUploadsScreen;

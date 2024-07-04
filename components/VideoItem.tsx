@@ -1,22 +1,36 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
-import { Link } from 'expo-router'
+import { View, Text, StyleSheet, Image, Dimensions, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 
 interface VideoItemProps {
   title: string;
   lastModified: string;
   thumbnail: string;
   id: string;
+  containerStyle?: ViewStyle;
+  imageStyle?: ImageStyle;
+  textContainerStyle?: ViewStyle;
+  titleStyle?: TextStyle;
+  lastModifiedStyle?: TextStyle;
 }
 
-const VideoItem: React.FC<VideoItemProps> = ({ title, lastModified, thumbnail, id }) => {
+const VideoItem: React.FC<VideoItemProps> = ({
+  title,
+  lastModified,
+  thumbnail,
+  id,
+  containerStyle,
+  imageStyle,
+  textContainerStyle,
+  titleStyle,
+  lastModifiedStyle
+}) => {
   return (
-    <View style={styles.item}>
-      <Image style={styles.image} source={{ uri: thumbnail }} />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.lastModified}>Last Modified: {lastModified.split("T")[0]}</Text>
-        <Text style={styles.lastModified}>{lastModified.split("T")[1].split(":").slice(0, -1).join(":")}</Text>
+    <View style={[styles.item, containerStyle]}>
+      <Image style={[styles.image, imageStyle]} source={{ uri: thumbnail }} />
+      <View style={[styles.textContainer, textContainerStyle]}>
+        <Text style={[styles.title, titleStyle]}>{title}</Text>
+        <Text style={[styles.lastModified, lastModifiedStyle]}>Last Modified: {lastModified.split("T")[0]}</Text>
+        <Text style={[styles.lastModified, lastModifiedStyle]}>{lastModified.split("T")[1].split(":").slice(0, -1).join(":")}</Text>
       </View>
     </View>
   );
