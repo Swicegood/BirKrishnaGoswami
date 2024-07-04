@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, FlatList, Dimensions, ActivityIndicator, Image, Platform } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, FlatList, Dimensions, ActivityIndicator, Image, Platform, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
 import MeasureView from './api/MeasureView';
@@ -67,7 +67,7 @@ function buildCategoryList(hierarchy: Record<string, any>, level: number): strin
   return categories;
 }
 
-function buildListFromParent (hierarchy: Record<string, any>, parent: string): string[] {
+function buildListFromParent(hierarchy: Record<string, any>, parent: string): string[] {
   const categories: string[] = [];
   const traverse = (node: Record<string, any> | null, currentParent: string) => {
     if (currentParent === parent) {
@@ -154,7 +154,7 @@ const FolderScreen = () => {
       itemHeight = width / 3;
     } else {
       itemWidth = orientation === 'LANDSCAPE' ? width / 4 : width / 2;
-      itemHeight = orientation === 'LANDSCAPE' ?  width / 3 : width * .75 ;
+      itemHeight = orientation === 'LANDSCAPE' ? width / 3 : width * .75;
     }
     return { itemWidth, itemHeight };
   };
@@ -171,9 +171,9 @@ const FolderScreen = () => {
           asChild
         >
           <TouchableOpacity>
-          <View style={(Platform.OS === 'web') ? {} : styles.imageView}>
+            <View style={(Platform.OS === 'web') ? {} : styles.imageView}>
               {(Platform.OS === 'web' ? (
-                <Image source={images[item.category] || item.image} style={{...styles.image, width: width /5}} resizeMode="contain" />
+                <Image source={images[item.category] || item.image} style={{...styles.image, width: width / 5}} resizeMode="contain" />
               ) : (
                 <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
               ))}
@@ -199,10 +199,12 @@ const FolderScreen = () => {
     image: placeholderImage,
   }));
 
+  const ListComponent = Platform.OS === 'web' ? ScrollView : View;
+
   return (
     <HierarchyContext.Provider value={deserializedHierarchy}>
       <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-        <View style={styles.container}>
+        <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
           <FlatList
             data={data}
             renderItem={renderItem}
@@ -212,8 +214,9 @@ const FolderScreen = () => {
             columnWrapperStyle={styles.columnWrapper}
             contentContainerStyle={styles.contentContainer}
             ListFooterComponent={<View style={{ height: 20 }} />}
+            scrollEnabled={Platform.OS !== 'web'}
           />
-        </View>
+        </ListComponent>
       </MeasureView>
     </HierarchyContext.Provider>
   );
@@ -222,6 +225,11 @@ const FolderScreen = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
+  },
+  webContainer: {
+    height: '100vh',
+    overflowY: 'auto' as 'auto',
+    paddingBottom: 100,
   },
   columnWrapper: {
     justifyContent: 'space-between',

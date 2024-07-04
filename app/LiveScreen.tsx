@@ -138,7 +138,7 @@ const LiveScreen = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       const getLiveVideo = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getLiveVideo');
-      const request: GetYouTubeVideosRequest = { channelId: 'UCioh9Wq_z825232pIKsGZyA' };
+      const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
       try {
         const result = await getLiveVideo(request);
         const response: GetYouTubeVideosResponse = result.data;
