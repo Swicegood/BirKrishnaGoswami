@@ -53,7 +53,7 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
 
-  const USE_MOCK_DATA = true;
+  const USE_MOCK_DATA = false;
 
   const onSetWidth = (width: number) => {
     console.log('PlaylistScreen width: ', width);

@@ -264,6 +264,22 @@ const QuoteScreen = () => {
     }
   };
 
+  const getImageHeight = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        return width * 0.3;
+      }
+      return width * 0.4;
+    }
+    return orientation === 'LANDSCAPE' ? 160 : 260;
+  }
+
+  const getImageWidth = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      return getImageHeight() * 1.44;
+    }
+    return width;
+  }
 
   if (isLoading) {
     return (
@@ -276,21 +292,35 @@ const QuoteScreen = () => {
     <View style={{ flex: 1 }}>
       <View style={styles.quoteContainer}>
         <MeasureView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
-          <Image
-            source={getImageSource(image)}
-            onError={(error) => {
-              console.log('Failed to load image', error);
-              setImage(defaultImage);
-            }}
-            style={{ width:  width, height: (isTablet() || Platform.OS === 'web') ? 300 : orientation === 'LANDSCAPE' ? 160 : 260, resizeMode: (isTablet() || Platform.OS === 'web' || orientation == 'LANDSCAPE') ? 'contain' : 'cover' }}
-          />
-
+          {(Platform.OS === 'web' || isTablet() || orientation === 'LANDSCAPE') ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+              <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+              <Image
+                source={getImageSource(image)}
+                onError={(error) => {
+                  console.log('Failed to load image', error);
+                  setImage(defaultImage);
+                }}
+                style={{ width: getImageWidth(), height: getImageHeight(), resizeMode: (orientation == 'LANDSCAPE') ? 'contain' : 'cover' }}
+              />
+              <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+            </View>
+          ) : (
+            <Image
+              source={getImageSource(image)}
+              onError={(error) => {
+                console.log('Failed to load image', error);
+                setImage(defaultImage);
+              }}
+              style={{ width: width, height: orientation === 'LANDSCAPE' ? 160 : 260, resizeMode: (orientation == 'LANDSCAPE') ? 'contain' : 'cover' }}
+            />
+          )}
         </MeasureView>
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
           {(Platform.OS === 'web' || isTablet()) ? <Text style={styles.quoteText}>{quote}</Text> :
-          ( orientation == 'LANDSCAPE' ? <Text style={{...styles.quoteText, paddingLeft: 100, paddingRight: 100}}>{quote}</Text> :
-          <Text style={styles.quoteText}>{quote}</Text>)}
+            (orientation == 'LANDSCAPE' ? <Text style={{ ...styles.quoteText, paddingLeft: 100, paddingRight: 100 }}>{quote}</Text> :
+              <Text style={styles.quoteText}>{quote}</Text>)}
         </View>
       </View>
       <View style={{ justifyContent: 'space-between' }}>
@@ -344,6 +374,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#E53935',
     padding: 10,
+  },
+  fill: {
+    backgroundColor: '#E53935',
   },
   quoteText: {
     fontSize: 18,

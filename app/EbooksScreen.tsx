@@ -96,36 +96,46 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
     const isImageLoaded = loadedImages[item.key];
 
     return (
-      <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }, Platform.OS === 'web' && { marginBottom: 150}]}>
-        {(Platform.OS === 'web') ? (
-          <Link href={{ pathname: "./PdfViewScreen", params: { url: item.contenturl } }} asChild>
-            <Image
-              source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
-              style={styles.image}
-              onLoad={() => handleImageLoad(item.key)}
-            />
-          </Link>
+      <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }, Platform.OS === 'web' && { marginBottom: 150 }]}>
+        {Platform.OS === 'web' ? (
+          <React.Fragment>
+            <Link href={{ pathname: item.contenturl }} asChild>
+              <Image
+                source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
+                style={styles.image}
+                onLoad={() => handleImageLoad(item.key)}
+              />
+            </Link>
+            <Text style={styles.itemText}>{item.title}</Text>
+            <Link href={{ pathname: item.contenturl }} asChild>
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>READ NOW</Text>
+              </TouchableOpacity>
+            </Link>
+          </React.Fragment>
         ) : (
-          <TouchableOpacity>
-            <Image
-              source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
-              style={styles.image}
-              onLoad={() => handleImageLoad(item.key)}
-            />
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity>
+              <Image
+                source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
+                style={styles.image}
+                onLoad={() => handleImageLoad(item.key)}
+              />
+            </TouchableOpacity>
+            <Text style={styles.itemText}>{item.title}</Text>
+            <Link
+              href={{
+                pathname: "/PdfViewScreen",
+                params: { url: item.contenturl, key: Date.now() }
+              }}
+              asChild
+            >
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>READ NOW</Text>
+              </TouchableOpacity>
+            </Link>
+          </>
         )}
-        <Text style={styles.itemText}>{item.title}</Text>
-        <Link
-          href={{
-            pathname: "/PdfViewScreen",
-            params: { url: item.contenturl, key: Date.now() }
-          }}
-          asChild
-        >
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>READ NOW</Text>
-          </TouchableOpacity>
-        </Link>
       </View>
     );
   };
@@ -142,7 +152,7 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
 
   return (
     <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-      <View style={styles.container}>
+      <View style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
         <FlatList
           data={data}
           renderItem={renderItem}
@@ -151,7 +161,6 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
           key={numColumns}
           columnWrapperStyle={styles.columnWrapper}
           contentContainerStyle={styles.contentContainer}
-          scrollEnabled={true}
           removeClippedSubviews={true}
           initialNumToRender={8}
           maxToRenderPerBatch={8}
@@ -168,13 +177,14 @@ const styles = StyleSheet.create({
   },
   webContainer: {
     height: 'calc(100vh - 70px)',
-    overflowY: 'auto' as 'auto',
+    overflow: 'auto',
   },
   columnWrapper: {
     justifyContent: 'space-between',
   },
   contentContainer: {
     alignItems: 'center',
+    paddingBottom: 20,
   },
   itemContainer: {
     marginBottom: 80,

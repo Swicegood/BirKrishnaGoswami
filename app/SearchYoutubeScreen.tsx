@@ -43,7 +43,7 @@ const SearchYoutubeVideosScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
-  const USE_MOCK_DATA = true; // Set this to false when you want to use real API calls
+  const USE_MOCK_DATA = false; // Set this to false when you want to use real API calls
 
 
   const onSetWidth = (width: number) => {
