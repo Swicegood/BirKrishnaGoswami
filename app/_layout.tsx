@@ -66,6 +66,7 @@ function RootLayoutNav() {
         <Stack.Screen name="YoutubePlayer" options={{ animation: 'none', header: () => <CustomHeaderMain title='VIDEOS' /> }} />
         <Stack.Screen name="AudioStartScreen" options={{ header: () => <CustomHeaderMain title='AUDIO' /> }} />
         <Stack.Screen name="ChantingScreen" options={{ header: () => <CustomHeaderMain title='CHANTING' /> }} />
+        <Stack.Screen name="CustomImageGalleryScreen" options={{ header: () => <CustomHeaderMain title='PHOTOS' /> }} />
         <Stack.Screen name="DayScreen" options={{ header: () => <CustomHeaderMain title='AUDIO' /> }} />
         <Stack.Screen name="DeitiesScreen" options={{ header: () => <CustomHeaderMain title='DEITIES' /> }} />
         <Stack.Screen name="DeityGallery" options={{ header: () => <CustomHeaderMain title='DEITIES' /> }} />

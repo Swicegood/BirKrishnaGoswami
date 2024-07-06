@@ -61,21 +61,21 @@ export default function TabOneScireen() {
   }
 
   const handleOrientationChange = () => {
-      const newWidth = Dimensions.get('window').width;
-      const newHeight = Dimensions.get('window').height;
-      const aspectRatio = newWidth / newHeight;
-      const previousAspectRatio = width / height;
-  
-      // Only change orientation if the aspect ratio change is significant
-      if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
-        const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
-        setOrientation(newOrientation);
-      }
-  
-      setWidth(newWidth);
-      setHeight(newHeight);
+    const newWidth = Dimensions.get('window').width;
+    const newHeight = Dimensions.get('window').height;
+    const aspectRatio = newWidth / newHeight;
+    const previousAspectRatio = width / height;
+
+    // Only change orientation if the aspect ratio change is significant
+    if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
+      const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+      setOrientation(newOrientation);
     }
-  
+
+    setWidth(newWidth);
+    setHeight(newHeight);
+  }
+
 
   const onSetWidth = (width) => {
     setWidth(width);
@@ -91,7 +91,7 @@ export default function TabOneScireen() {
       }
       return;
     }
-    if (Platform.OS === 'web'){
+    if (Platform.OS === 'web') {
       handleOrientationChange()
       return;
     }
@@ -123,7 +123,7 @@ export default function TabOneScireen() {
   }
 
   const getImageWidth = () => {
-    if (isTablet() || Platform.OS === 'web'){
+    if (isTablet() || Platform.OS === 'web') {
       if (orientation === 'LANDSCAPE') {
         return width * 0.8;
       }
@@ -150,500 +150,470 @@ export default function TabOneScireen() {
       if (orientation === 'LANDSCAPE') {
         return width * .8 / 3 - 30;
       }
-      return width / 2.5;
+      return width / 3 - 30;
     }
     if (orientation === 'LANDSCAPE') {
       return width * .8 / 3 - 30;
     }
+    return width / 2.5 - 30;
   }
 
-  const getLeftPosition = () => {
-    if (isTablet() || Platform.OS === 'web') {
-      if (orientation === 'LANDSCAPE') {
-        return width / 3;
-      }
-    }
-    if (orientation === 'LANDSCAPE') {
-      return width / 2.5;
-    }
-    return width / 3;
-  }
 
   const renderCarousel = () => {
     const sliderWidth = getImageWidth();
     const itemWidth = getImageWidth();
     if (sliderWidth > 0 && itemWidth > 0) {
-    return (
-      <Carousel
-        data={ENTRIES}
-        renderItem={renderItem}
-        sliderWidth={sliderWidth}
-        itemWidth={itemWidth}
-        autoplay={true}
-        autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
-        loop={true}
-        loopClonesPerSide={5}
-        onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
-      />
-    );
-  }
+      return (
+        <Carousel
+          data={ENTRIES}
+          renderItem={renderItem}
+          sliderWidth={sliderWidth}
+          itemWidth={itemWidth}
+          autoplay={true}
+          autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
+          loop={true}
+          loopClonesPerSide={5}
+          onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
+        />
+      );
+    }
     return null;
   }
 
-  return (
-    <>
-      <SafeAreaView style={styles.safeArea}>
-        <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-          {(orientation === 'PORTRAIT') ? (
-            <View style={styles.carousel}>
-              {renderCarousel()}
-              <View style={{ position: 'absolute', top: getTopPosition(), left: getLeftPosition(), backgroundColor: 'transparent' }}>
-                <Pagination // Add this component
-                  dotsLength={ENTRIES.length}
-                  activeDotIndex={activeSlide}
-                  containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
-                  dotStyle={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 5,
-                    marginHorizontal: 0,
-                    backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
-                  }}
-                  inactiveDotStyle={{
-                    backgroundColor: 'white' // Change this to the color you want for the inactive dots
-                  }}
-                  inactiveDotOpacity={0.4}
-                  inactiveDotScale={0.6}
-                />
-              </View>
-            </View>
-          ) : (
-            <View style={{ ...styles.carousel, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
-              <Carousel
-                data={ENTRIES}
-                renderItem={renderItem}
-                sliderWidth={getImageWidth()}
-                itemWidth={getImageWidth()}
-                autoplay={true}
-                autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
-                loop={true}
-                loopClonesPerSide={5}
-                onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
-              />
-              <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
-              <View style={{ position: 'absolute', top: getTopPosition(), left: getLeftPosition(), backgroundColor: 'transparent' }}>
-                <Pagination // Add this component
-                  dotsLength={ENTRIES.length}
-                  activeDotIndex={activeSlide}
-                  containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
-                  dotStyle={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 5,
-                    marginHorizontal: 0,
-                    backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
-                  }}
-                  inactiveDotStyle={{
-                    backgroundColor: 'white' // Change this to the color you want for the inactive dots
-                  }}
-                  inactiveDotOpacity={0.4}
-                  inactiveDotScale={0.6}
-                />
-              </View>
-            </View>
-          )}
-        </MeasureView>
-        <ScrollView style={styles.container}>
-          {/* Header */}
-          {orientation === 'PORTRAIT' ? (
-            <React.Fragment>
-              <View style={styles.buttonRow}>
-                {/* Button components */}
-                <Link href="./LiveScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Live_Streaming.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>LIVE</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./AudioStartScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Audio.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>AUDIO</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
-              </View>
+  const renderPagination = () => {
+    return (
+      <Pagination // Add this component
+        dotsLength={ENTRIES.length}
+        activeDotIndex={activeSlide}
+        containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
+        dotStyle={{
+          width: 8,
+          height: 8,
+          borderRadius: 5,
+          marginHorizontal: 0,
+          backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
+        }}
+        inactiveDotStyle={{
+          backgroundColor: 'white' // Change this to the color you want for the inactive dots
+        }}
+        inactiveDotOpacity={0.4}
+        inactiveDotScale={0.6}
+      />
+    );
+  }
 
-              {/* Additional Button Rows as needed */}
-              <View style={styles.buttonRow}>
-                {/* Button components */}
-                <Link href="./GurudevaPicsScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Pictures.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>PICTURES</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./DeityGallery" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Deities.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>DEITIES</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
+    return (
+      <>
+        <SafeAreaView style={styles.safeArea}>
+          <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+            {(orientation === 'PORTRAIT') ? (
+              <View style={styles.carousel}>
+                {renderCarousel()}
+                <View style={{ position: 'absolute', top: getTopPosition(), left: width / 2 - 80, backgroundColor: 'transparent' }}>
+                {renderPagination()}
+                </View>
               </View>
+            ) : (
+              <View style={{ ...styles.carousel, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+                {renderCarousel()}
+                <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+                <View style={{ position: 'absolute', top: getTopPosition(), left: width / 2 - 80, backgroundColor: 'transparent' }}>
+                  {renderPagination()}
+                </View>
+              </View>
+            )}
+          </MeasureView>
+          <ScrollView style={styles.container}>
+            {/* Header */}
+            {orientation === 'PORTRAIT' ? (
+              <React.Fragment>
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="./LiveScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Live_Streaming.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>LIVE</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./AudioStartScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Audio.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>AUDIO</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                </View>
 
-              <View style={styles.buttonRow}>
-                {/* Button components */}
-                <Link href="./TemplesScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Temples.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>TEMPLES</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./BlogScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Blog.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>BLOG</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
-              </View>
+                {/* Additional Button Rows as needed */}
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="./GurudevaPicsScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Pictures.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>PICTURES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./DeityGallery" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Deities.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>DEITIES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                </View>
 
-              <View style={styles.buttonRow}>
-                {/* Button components */}
-                <Link href="./SearchYouTubeScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Search_Videos.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./(tabs)/RecentUploads" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Recent_Uploads.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>RECENT UPLOADS</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
-              </View>
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="./TemplesScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Temples.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>TEMPLES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./BlogScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Blog.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>BLOG</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                </View>
 
-              <View style={styles.buttonRow}>
-                {/* Button components */}
-                <Link href="./QuoteScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/quotes.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>QUOTES</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./BooksScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Books.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>BOOKS</Text>
-                  </TouchableOpacity>
-                </Link>
-              </View>
-            </React.Fragment>
-          ) : (
-            <>
-              <View style={styles.buttonRow}>
-                {/* Button components */}
-                <Link href="./LiveScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Live_Streaming.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>LIVE</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./AudioStartScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Audio.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>AUDIO</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
-                <Link href="./GurudevaPicsScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Pictures.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>PICTURES</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./DeityGallery" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Deities.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>DEITIES</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
-                <Link href="./TemplesScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Temples.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>TEMPLES</Text>
-                  </TouchableOpacity>
-                </Link>
-              </View>
-              <View style={styles.buttonRow}>
-                <Link href="./BlogScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Blog.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>BLOG</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
-                <Link href="./SearchYouTubeScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Search_Videos.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./(tabs)/RecentUploads" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Recent_Uploads.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>RECENT UPLOADS</Text>
-                  </TouchableOpacity>
-                </Link>
-                {/* More buttons */}
-                <Link href="./QuoteScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/quotes.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>QUOTES</Text>
-                  </TouchableOpacity>
-                </Link>
-                <Link href="./BooksScreen" asChild>
-                  <TouchableOpacity style={styles.buttonContainer}>
-                    <Image
-                      source={require('../../assets/images/Books.png')} // Replace with your local or network image
-                      style={styles.buttonImage}
-                    />
-                    <Text style={styles.buttonText}>BOOKS</Text>
-                  </TouchableOpacity>
-                </Link>
-              </View>
-            </>
-          )
-          }
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="./SearchYouTubeScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Search_Videos.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./(tabs)/RecentUploads" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Recent_Uploads.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>RECENT UPLOADS</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                </View>
 
-        </ScrollView>
-      </SafeAreaView>
-      {/* Footer */}
-      <ImageBackground
-        source={require('../../assets/images/Footer.png')} // replace with your image path
-        style={{ ...styles.footer, width: width }}
-        resizeMode="cover" // or "contain" depending on your needs
-      >
-        <View style={{ ...styles.footer, width: width }}>
-          <Link href="./ChantingScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton} />
-              <Text style={styles.footerText}>CHANTING</Text>
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="./QuoteScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/quotes.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>QUOTES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./BooksScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Books.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>BOOKS</Text>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
+              </React.Fragment>
+            ) : (
+              <>
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="./LiveScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Live_Streaming.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>LIVE</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./AudioStartScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Audio.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>AUDIO</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                  <Link href="./GurudevaPicsScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Pictures.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>PICTURES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./DeityGallery" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Deities.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>DEITIES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                  <Link href="./TemplesScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Temples.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>TEMPLES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
+                <View style={styles.buttonRow}>
+                  <Link href="./BlogScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Blog.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>BLOG</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                  <Link href="./SearchYouTubeScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Search_Videos.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./(tabs)/RecentUploads" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Recent_Uploads.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>RECENT UPLOADS</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  {/* More buttons */}
+                  <Link href="./QuoteScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/quotes.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>QUOTES</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="./BooksScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Books.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>BOOKS</Text>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
+              </>
+            )
+            }
+
+          </ScrollView>
+        </SafeAreaView>
+        {/* Footer */}
+        <ImageBackground
+          source={require('../../assets/images/Footer.png')} // replace with your image path
+          style={{ ...styles.footer, width: width }}
+          resizeMode="cover" // or "contain" depending on your needs
+        >
+          <View style={{ ...styles.footer, width: width }}>
+            <Link href="./ChantingScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton} />
+                <Text style={styles.footerText}>CHANTING</Text>
+              </TouchableOpacity>
+            </Link>
+            <Link href="./(drawer)/BioScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/About_Footer.png')} style={styles.footerButton} />
+                <Text style={styles.footerText}>ABOUT</Text>
+              </TouchableOpacity>
+            </Link>
+            <Link href="./LiveScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/Live.png')} style={styles.footerButtonBig} />
+              </TouchableOpacity>
+            </Link>
+            <Link href="./DonationScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/Donation.png')} style={styles.footerButton} />
+                <Text style={styles.footerText}>DONATION</Text>
+              </TouchableOpacity>
+            </Link>
+            <TouchableOpacity style={styles.footerButton} onPress={() => { Linking.openURL(whatsAppUrl) /* Handle button press */ }}>
+              <Image source={require('../../assets/images/WhatsApp.png')} style={styles.footerButton} />
+              <Text style={styles.footerText}>WHATSAPP</Text>
             </TouchableOpacity>
-          </Link>
-          <Link href="./(drawer)/BioScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/About_Footer.png')} style={styles.footerButton} />
-              <Text style={styles.footerText}>ABOUT</Text>
-            </TouchableOpacity>
-          </Link>
-          <Link href="./LiveScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/Live.png')} style={styles.footerButtonBig} />
-            </TouchableOpacity>
-          </Link>
-          <Link href="./DonationScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/Donation.png')} style={styles.footerButton} />
-              <Text style={styles.footerText}>DONATION</Text>
-            </TouchableOpacity>
-          </Link>
-          <TouchableOpacity style={styles.footerButton} onPress={() => { Linking.openURL(whatsAppUrl) /* Handle button press */ }}>
-            <Image source={require('../../assets/images/WhatsApp.png')} style={styles.footerButton} />
-            <Text style={styles.footerText}>WHATSAPP</Text>
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
-    </>
+          </View>
+        </ImageBackground>
+      </>
 
-  );
+    );
 
-}
+  }
 
-// Style definitions
-interface Styles {
-  slide: ViewStyle;
-  carousel: ViewStyle;
-  title: TextStyle;
-  image: ImageStyle;
-  safeArea: ViewStyle;
-  container: ViewStyle;
-  header: ViewStyle;
-  menuButton: ViewStyle;
-  menuText: TextStyle;
-  headerText: TextStyle;
-  buttonRow: ViewStyle;
-  buttonContainer: ViewStyle;
-  buttonImage: ImageStyle;
-  buttonText: TextStyle;
-  footer: ViewStyle;
-  footerButton: ViewStyle;
-  footerButtonBig: ViewStyle;
-  footerText: TextStyle;
-  imageWide: ImageStyle;
-}
+  // Style definitions
+  interface Styles {
+    slide: ViewStyle;
+    carousel: ViewStyle;
+    title: TextStyle;
+    image: ImageStyle;
+    safeArea: ViewStyle;
+    container: ViewStyle;
+    header: ViewStyle;
+    menuButton: ViewStyle;
+    menuText: TextStyle;
+    headerText: TextStyle;
+    buttonRow: ViewStyle;
+    buttonContainer: ViewStyle;
+    buttonImage: ImageStyle;
+    buttonText: TextStyle;
+    footer: ViewStyle;
+    footerButton: ViewStyle;
+    footerButtonBig: ViewStyle;
+    footerText: TextStyle;
+    imageWide: ImageStyle;
+  }
 
-const styles = StyleSheet.create<Styles>({
-  carousel: {
-    marginBottom: 20,
-  },
-  slide: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#9DD6EB',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  image: {
-    resizeMode: 'cover',
-  },
-  imageWide: {
-    resizeMode: 'cover',
-  },
+  const styles = StyleSheet.create<Styles>({
+    carousel: {
+      marginBottom: 20,
+    },
+    slide: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#9DD6EB',
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+    },
+    image: {
+      resizeMode: 'cover',
+    },
+    imageWide: {
+      resizeMode: 'cover',
+    },
 
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFDF8',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFDF8',
-  },
-  header: {
-    height: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'coral',
+    safeArea: {
+      flex: 1,
+      backgroundColor: '#FFFDF8',
+    },
+    container: {
+      flex: 1,
+      backgroundColor: '#FFFDF8',
+    },
+    header: {
+      height: 60,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'coral',
 
-  },
-  menuButton: {
-    position: 'absolute',
-    left: 10,
-    top: 15,
-  },
-  menuText: {
-    fontSize: 28,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
-  },
-  buttonContainer: {
-    alignItems: 'center',
-    width: 100, // Set a fixed width
-  },
-  buttonImage: {
-    width: 178, // Set your desired image width
-    height: 100, // Set your desired image height
-    marginBottom: 8, // Space between image and text
-    borderRadius: 5, // Adjust this value as needed
-  },
-  buttonText: {
-    color: '#7e2b18',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginLeft: -20,
-    marginRight: -20,
-    fontFamily: 'OblikBold',
-  },
-  footer: {
-    width: '100%',
-    height: 80,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'transparent',
-    paddingLeft: 20, // Add this
-    paddingRight: 60, // Add this
-    paddingBottom: 10, // Add this
-  },
-  footerButton: {
-    width: 36, // Adjust this value as needed
-    height: 36, // This is 50% of the footer height
-    borderRadius: 18, // This should be half of the button width/height
-  },
-  footerButtonBig: {
-    width: 44, // Adjust this value as needed
-    height: 44, // This is 50% of the footer height
-    borderRadius: 22, // This should be half of the button width/height
-    marginLeft: -5,
-  },
-  footerText: {
-    color: 'maroon',
-    fontWeight: 'bold',
-    fontSize: 10,
-    fontFamily: 'OblikBold',
-    marginLeft: -10,
-    marginRight: -10,
-    textAlign: 'center',
-  },
-});
+    },
+    menuButton: {
+      position: 'absolute',
+      left: 10,
+      top: 15,
+    },
+    menuText: {
+      fontSize: 28,
+    },
+    headerText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      marginVertical: 5,
+    },
+    buttonContainer: {
+      alignItems: 'center',
+      width: 100, // Set a fixed width
+    },
+    buttonImage: {
+      width: 178, // Set your desired image width
+      height: 100, // Set your desired image height
+      marginBottom: 8, // Space between image and text
+      borderRadius: 5, // Adjust this value as needed
+    },
+    buttonText: {
+      color: '#7e2b18',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginLeft: -20,
+      marginRight: -20,
+      fontFamily: 'OblikBold',
+    },
+    footer: {
+      width: '100%',
+      height: 80,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: 'transparent',
+      paddingLeft: 20, // Add this
+      paddingRight: 60, // Add this
+      paddingBottom: 10, // Add this
+    },
+    footerButton: {
+      width: 36, // Adjust this value as needed
+      height: 36, // This is 50% of the footer height
+      borderRadius: 18, // This should be half of the button width/height
+    },
+    footerButtonBig: {
+      width: 44, // Adjust this value as needed
+      height: 44, // This is 50% of the footer height
+      borderRadius: 22, // This should be half of the button width/height
+      marginLeft: -5,
+    },
+    footerText: {
+      color: 'maroon',
+      fontWeight: 'bold',
+      fontSize: 10,
+      fontFamily: 'OblikBold',
+      marginLeft: -10,
+      marginRight: -10,
+      textAlign: 'center',
+    },
+  });
