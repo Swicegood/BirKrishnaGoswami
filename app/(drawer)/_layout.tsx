@@ -123,6 +123,7 @@ export default function DrawerLayout() {
         drawerType: "front",
         drawerStyle: {
           width: "70%",
+          maxWidth: 400,
         },
       }}
     >
