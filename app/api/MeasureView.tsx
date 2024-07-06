@@ -21,7 +21,7 @@ const MeasureView: React.FC<MeasureViewProps> = ({ children, onSetOrientation, o
     useEffect(() => {
         setOrientation(orientation === 'LANDSCAPE' ? 'PORTRAIT' : 'LANDSCAPE');
         onSetOrientation(orientation);
-        console.log('MeasureView orientation: ', orientation)
+        console.log(`${new Date().toISOString()} MeasureView orientation: ${orientation}`);
         onSetWidth(width);
     }, [width]);
 
