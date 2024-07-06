@@ -6,6 +6,7 @@ import {
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from '../api/firebase';
 import MeasureView from '../api/MeasureView';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -109,7 +110,7 @@ const TravelScreen = () => {
       } catch (error) {
         console.error("Failed to get documents:", error);
       }
-      
+
       try {
         if (nextdoc) {
           console.log("currentDocNextQuery", nextdoc.date);
@@ -194,6 +195,24 @@ const TravelScreen = () => {
     };
   };
 
+  const getImageHeight = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        return width * 0.3;
+      }
+      return width * 0.4;
+    }
+    return orientation === 'LANDSCAPE' ? 160 : 260;
+  }
+
+  const getImageWidth = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      return getImageHeight() * 1.78;
+    }
+    return width;
+  }
+
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -206,14 +225,29 @@ const TravelScreen = () => {
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <MeasureView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
-          <Image
-            source={require('../../assets/images/Trave_Plane.png')}
-            style={{
-              width: width,
-              height: (isTablet() || Platform.OS === 'web') ? 300 : orientation === 'LANDSCAPE' ? 160 : 250,
-              resizeMode: (isTablet() || Platform.OS === 'web' || orientation === 'LANDSCAPE') ? 'contain' : 'cover'
-            }}
-          />
+          {(Platform.OS === 'web' || isTablet() || orientation === 'LANDSCAPE') ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+              <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+              <Image
+                source={require('../../assets/images/Trave_Plane.png')}
+                style={{
+                  width: getImageWidth(),
+                  height:  getImageHeight(),
+                  resizeMode: (orientation === 'LANDSCAPE') ? 'contain' : 'cover'
+                }}
+              />
+              <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+            </View>
+          ) : (
+            <Image
+              source={require('../../assets/images/Trave_Plane.png')}
+              style={{
+                width: width,
+                height: (orientation === 'LANDSCAPE') ? 160 : 250,
+                resizeMode: (orientation === 'LANDSCAPE') ? 'contain' : 'cover'
+              }}
+            />
+          )}
         </MeasureView>
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
@@ -221,7 +255,7 @@ const TravelScreen = () => {
             <Text style={styles.textText}>{text}</Text>
           ) : (
             orientation === 'LANDSCAPE' ? (
-              <Text style={{...styles.textText, paddingLeft: 100, paddingRight: 100}}>{text}</Text>
+              <Text style={{ ...styles.textText, paddingLeft: 100, paddingRight: 100 }}>{text}</Text>
             ) : (
               <Text style={styles.textText}>{text}</Text>
             )
@@ -278,6 +312,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#E53935',
     padding: 10,
+  },
+  fill: {
+    backgroundColor: '#E53935',
   },
   textText: {
     fontSize: 20,

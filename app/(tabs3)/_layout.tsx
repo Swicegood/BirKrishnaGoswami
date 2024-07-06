@@ -2,29 +2,70 @@ import React, { useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { View, Image, Dimensions } from 'react-native';
+import { View, Image, Dimensions, Platform   } from 'react-native';
 import MeasureView from '../api/MeasureView';
 
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  const isLandscape = Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+  console.log('isTablet: ', isLandscape);
+  return isLandscape
+}
 
 export default function TabLayout() {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
 
-  const onSetOrientation = (orientation) => {
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
     setOrientation(orientation);
   };
 
   const onSetWidth = (width) => {
     setWidth(width);
   }
+
+  const getImageWidth = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        return width * 0.6;
+      }
+      return width;
+    }
+    if (orientation === 'LANDSCAPE') {
+      return width * 0.33;
+    }
+    return width;
+  }
+
+  const getImageHeight = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      return getImageWidth() * .346;
+    }
+    if (orientation === 'LANDSCAPE') {
+      return getImageWidth() * .346;
+    }
+    return 160;
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
         {(orientation === 'PORTRAIT' ? (
-          <Image source={require('../../assets/images/Vyasa_Puja.png')} style={{ width: width, height: 160, resizeMode: 'cover' }} />
+          <Image source={require('../../assets/images/Vyasa_Puja.png')} style={{ width: getImageWidth(), height: getImageHeight(), resizeMode: 'cover' }} />
         ) : (
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-          <Image source={require('../../assets/images/Vyasa_Puja.png')} style={{ width: width * 0.8, height: 220, resizeMode: 'cover' }} />
+            <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+            <Image source={require('../../assets/images/Vyasa_Puja.png')} style={{ width: getImageWidth(), height: getImageHeight(), resizeMode: 'cover' }} />
+            <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
           </View>
         ))}
       </MeasureView>

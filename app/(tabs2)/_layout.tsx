@@ -17,21 +17,55 @@ export default function TabLayout() {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
 
-  const onSetOrientation = (orientation) => {
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
+    }
     setOrientation(orientation);
   };
 
   const onSetWidth = (width) => {
     setWidth(width);
   }
+
+  const getImageWidth = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        return width * 0.6;
+      }
+      return width;
+    }
+    if (orientation === 'LANDSCAPE') {
+      return width * 0.33;
+    }
+    return width;
+  }
+
+  const getImageHeight = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      return getImageWidth() * .346;
+    }
+    if (orientation === 'LANDSCAPE') {
+      return getImageWidth() * .346;
+    }
+    return 160;
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-        {(orientation === 'PORTRAIT' ? (
-          <Image source={require('../../assets/images/Memories.png')} style={{ width: width, height: isTablet() ? 200 : 160, resizeMode: 'cover' }} />
+      {(orientation === 'PORTRAIT' ? (
+          <Image source={require('../../assets/images/Memories.png')} style={{ width: getImageWidth(), height: getImageHeight(), resizeMode: 'cover' }} />
         ) : (
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-          <Image source={require('../../assets/images/Memories.png')} style={{ width: width * 0.8, height: Platform.OS == 'web' ? 240 :220, resizeMode: 'contain' }} />
+            <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+            <Image source={require('../../assets/images/Memories.png')} style={{ width: getImageWidth(), height: getImageHeight(), resizeMode: 'cover' }} />
+            <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
           </View>
         ))}
       </MeasureView>

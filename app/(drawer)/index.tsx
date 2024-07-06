@@ -9,18 +9,20 @@ import {
   ImageStyle,
   Dimensions,
   Linking,
-  useWindowDimensions,
   ImageBackground,
   Platform,
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'expo-router';
 import { collection, query, getDocs } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
 import { db } from '../api/firebase';
 import MeasureView from '../api/MeasureView';
+import debounce from 'lodash/debounce';
+
+const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/Thought_of_the_Day.png'), link: '../QuoteScreen' },
@@ -34,13 +36,20 @@ const ENTRIES = [
 const windowWidth = Dimensions.get('window').width;
 const sliderHeight = windowWidth / 3;
 
+const isTablet = () => {
+  const { width, height } = Dimensions.get('window');
+  const aspectRatio = width / height;
+  const isLandscape = Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
+  return isLandscape;
+}
+
 export default function TabOneScireen() {
   const [value, setValue] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0); // Add this state variable
   const [whatsAppUrl, setWhatsAppUrl] = useState('https://chat.whatsapp.com/FaPXfrT3qBLBSxd04TZr9X');
   const [updateKey, setUpdateKey] = useState(0); // Add a key to force updates
-  const { width, height } = useWindowDimensions();
-  const [iosWidth, setIosWidth] = useState(Dimensions.get('window').width);
+  const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
   const sliderHeight = width / 3;
   const [orientation, setOrientation] = useState(
     Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT'
@@ -50,32 +59,44 @@ export default function TabOneScireen() {
     // Initialize and handle push notifications for non-web platforms
     const expoPushToken = NotificationHandler();
   }
-  const windowDimensions = useWindowDimensions();
 
-  const isLandscape = windowDimensions.width > windowDimensions.height;
+  const handleOrientationChange = () => {
+      const newWidth = Dimensions.get('window').width;
+      const newHeight = Dimensions.get('window').height;
+      const aspectRatio = newWidth / newHeight;
+      const previousAspectRatio = width / height;
+  
+      // Only change orientation if the aspect ratio change is significant
+      if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
+        const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+        setOrientation(newOrientation);
+      }
+  
+      setWidth(newWidth);
+      setHeight(newHeight);
+    }
+  
 
   const onSetWidth = (width) => {
-    console.log('Width set to', width);
-    setIosWidth(width);
-    // Force an update regardless of orientation change
-    setUpdateKey(prevKey => prevKey + 1);
+    setWidth(width);
   }
 
-  useEffect(() => {
-    console.log('Width:', width, 'Height:', height);
-    const newOrientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
-    console.log('Orientation changed to', newOrientation);
-    if (orientation !== newOrientation) {
-      setOrientation(newOrientation);
+
+  const onSetOrientation = (orientation: string) => {
+    if ((Platform.OS === 'android' && !isTablet())) {
+      if (orientation === 'LANDSCAPE') {
+        setOrientation('PORTRAIT');
+      } else {
+        setOrientation('LANDSCAPE');
+      }
+      return;
     }
-    // Force an update regardless of orientation change
-    setUpdateKey(prevKey => prevKey + 1);
-  }, [width, height]);
-
-  const onSetOrientation = (orientation) => {
+    if (Platform.OS === 'web'){
+      handleOrientationChange()
+      return;
+    }
     setOrientation(orientation);
-  };[isLandscape];
-
+  };
 
   useEffect(() => {
     const fetchWhatsAppUrl = async () => {
@@ -95,292 +116,144 @@ export default function TabOneScireen() {
     return (
       <Link href={item.link}>
         <View style={styles.slide}>
-          {Platform.OS === 'ios' ? (
-            <Image source={item.image} style={styles.iosImage} />
-          ) : (
-            <Image source={item.image} style={styles.image} />
-          )}
+          <Image source={item.image} style={{ ...styles.image, width: getImageWidth(), height: getImageHeight() }} />
         </View>
       </Link>
     );
   }
 
-  function renderWideItem({ item, index }: { item: any, index: number }) {
+  const getImageWidth = () => {
+    if (isTablet() || Platform.OS === 'web'){
+      if (orientation === 'LANDSCAPE') {
+        return width * 0.8;
+      }
+      return width;
+    }
+    if (orientation === 'LANDSCAPE') {
+      return width * 0.25;
+    }
+    return width;
+  }
+
+  const getImageHeight = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      return getImageWidth() * .346;
+    }
+    if (orientation === 'LANDSCAPE') {
+      return getImageWidth() * .346;
+    }
+    return 160;
+  }
+
+  const getTopPosition = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        return width * .8 / 3 - 30;
+      }
+      return width / 2.5;
+    }
+    if (orientation === 'LANDSCAPE') {
+      return width * .8 / 3 - 30;
+    }
+  }
+
+  const getLeftPosition = () => {
+    if (isTablet() || Platform.OS === 'web') {
+      if (orientation === 'LANDSCAPE') {
+        return width / 3;
+      }
+    }
+    if (orientation === 'LANDSCAPE') {
+      return width / 2.5;
+    }
+    return width / 3;
+  }
+
+  const renderCarousel = () => {
+    const sliderWidth = getImageWidth();
+    const itemWidth = getImageWidth();
+    if (sliderWidth > 0 && itemWidth > 0) {
     return (
-      <Link href={item.link}>
-        <View style={styles.slide}>
-          {Platform.OS === 'ios' ? (
-            <Image source={item.image} style={styles.iosImageWide} />
-          ) : (
-            <Image source={item.image} style={styles.imageWide} />
-          )}
-        </View>
-      </Link>
+      <Carousel
+        data={ENTRIES}
+        renderItem={renderItem}
+        sliderWidth={sliderWidth}
+        itemWidth={itemWidth}
+        autoplay={true}
+        autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
+        loop={true}
+        loopClonesPerSide={5}
+        onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
+      />
     );
   }
-
-  const styles = StyleSheet.create<Styles>({
-    carousel: {
-      marginBottom: 20,
-    },
-    slide: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#9DD6EB',
-    },
-    title: {
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-    image: {
-      width: width,
-      height: sliderHeight,
-      resizeMode: 'cover',
-    },
-    imageWide: {
-      width: width * .8,
-      height: width * .8 / 3,
-      resizeMode: 'cover',
-    },
-    iosImage: {
-      width: iosWidth,
-      height: iosWidth / 3,
-      resizeMode: 'cover',
-    },
-    iosImageWide: {
-      width: iosWidth * .8,
-      height: iosWidth * .8 / 3,
-      resizeMode: 'cover',
-    },
-
-    safeArea: {
-      flex: 1,
-      backgroundColor: '#FFFDF8',
-    },
-    container: {
-      flex: 1,
-      backgroundColor: '#FFFDF8',
-    },
-    header: {
-      height: 60,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'coral',
-
-    },
-    menuButton: {
-      position: 'absolute',
-      left: 10,
-      top: 15,
-    },
-    menuText: {
-      fontSize: 28,
-    },
-    headerText: {
-      fontSize: 24,
-      fontWeight: 'bold',
-    },
-    buttonRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      marginVertical: 5,
-    },
-    buttonContainer: {
-      alignItems: 'center',
-      width: 100, // Set a fixed width
-    },
-    buttonImage: {
-      width: 178, // Set your desired image width
-      height: 100, // Set your desired image height
-      marginBottom: 8, // Space between image and text
-      borderRadius: 5, // Adjust this value as needed
-    },
-    buttonText: {
-      color: '#7e2b18',
-      fontWeight: 'bold',
-      textAlign: 'center',
-      marginLeft: -20,
-      marginRight: -20,
-      fontFamily: 'OblikBold',
-    },
-    footer: {
-      width: '100%',
-      height: 80,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      backgroundColor: 'transparent',
-      paddingLeft: 20, // Add this
-      paddingRight: 60, // Add this
-      paddingBottom: 10, // Add this
-    },
-    footerButton: {
-      width: 36, // Adjust this value as needed
-      height: 36, // This is 50% of the footer height
-      borderRadius: 18, // This should be half of the button width/height
-    },
-    footerButtonBig: {
-      width: 44, // Adjust this value as needed
-      height: 44, // This is 50% of the footer height
-      borderRadius: 22, // This should be half of the button width/height
-      marginLeft: -5,
-    },
-    footerText: {
-      color: 'maroon',
-      fontWeight: 'bold',
-      fontSize: 10,
-      fontFamily: 'OblikBold',
-      marginLeft: -10,
-      marginRight: -10,
-      textAlign: 'center',
-    },
-  });
+    return null;
+  }
 
   return (
     <>
       <SafeAreaView style={styles.safeArea}>
-        {(Platform.OS === 'ios') ? (
-          <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-            {orientation === 'PORTRAIT' ? (
-              <View style={styles.carousel}>
-                <Carousel
-                  data={ENTRIES}
-                  renderItem={renderItem}
-                  sliderWidth={iosWidth}
-                  itemWidth={iosWidth}
-                  autoplay={true}
-                  autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
-                  loop={true}
-                  loopClonesPerSide={5}
-                  onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
+        <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+          {(orientation === 'PORTRAIT') ? (
+            <View style={styles.carousel}>
+              {renderCarousel()}
+              <View style={{ position: 'absolute', top: getTopPosition(), left: getLeftPosition(), backgroundColor: 'transparent' }}>
+                <Pagination // Add this component
+                  dotsLength={ENTRIES.length}
+                  activeDotIndex={activeSlide}
+                  containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
+                  dotStyle={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 5,
+                    marginHorizontal: 0,
+                    backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
+                  }}
+                  inactiveDotStyle={{
+                    backgroundColor: 'white' // Change this to the color you want for the inactive dots
+                  }}
+                  inactiveDotOpacity={0.4}
+                  inactiveDotScale={0.6}
                 />
-                <View style={{ position: 'absolute', top: (iosWidth / 3) - 30, left: (iosWidth / 3), backgroundColor: 'transparent' }}>
-                  <Pagination // Add this component
-                    dotsLength={ENTRIES.length}
-                    activeDotIndex={activeSlide}
-                    containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
-                    dotStyle={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 5,
-                      marginHorizontal: 0,
-                      backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
-                    }}
-                    inactiveDotStyle={{
-                      backgroundColor: 'white' // Change this to the color you want for the inactive dots
-                    }}
-                    inactiveDotOpacity={0.4}
-                    inactiveDotScale={0.6}
-                  />
-                </View>
               </View>
-            ) : (
-              <View style={{ marginBottom: 70}}>
-                <Carousel
-                  data={ENTRIES}
-                  renderItem={renderWideItem}
-                  sliderWidth={iosWidth * .8}
-                  itemWidth={iosWidth * .8}
-                  autoplay={true}
-                  autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
-                  loop={true}
-                  loopClonesPerSide={5}
-                  onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
+            </View>
+          ) : (
+            <View style={{ ...styles.carousel, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+              <Carousel
+                data={ENTRIES}
+                renderItem={renderItem}
+                sliderWidth={getImageWidth()}
+                itemWidth={getImageWidth()}
+                autoplay={true}
+                autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
+                loop={true}
+                loopClonesPerSide={5}
+                onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
+              />
+              <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
+              <View style={{ position: 'absolute', top: getTopPosition(), left: getLeftPosition(), backgroundColor: 'transparent' }}>
+                <Pagination // Add this component
+                  dotsLength={ENTRIES.length}
+                  activeDotIndex={activeSlide}
+                  containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
+                  dotStyle={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 5,
+                    marginHorizontal: 0,
+                    backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
+                  }}
+                  inactiveDotStyle={{
+                    backgroundColor: 'white' // Change this to the color you want for the inactive dots
+                  }}
+                  inactiveDotOpacity={0.4}
+                  inactiveDotScale={0.6}
                 />
-                <View style={{ position: 'absolute', top: iosWidth * .8 / 3 - 30, left: iosWidth / 2.5, backgroundColor: 'transparent' }}>
-                  <Pagination // Add this component
-                    dotsLength={ENTRIES.length}
-                    activeDotIndex={activeSlide}
-                    containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
-                    dotStyle={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 5,
-                      marginHorizontal: 0,
-                      backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
-                    }}
-                    inactiveDotStyle={{
-                      backgroundColor: 'white' // Change this to the color you want for the inactive dots
-                    }}
-                    inactiveDotOpacity={0.4}
-                    inactiveDotScale={0.6}
-                  />
-                </View>
               </View>
-            )}
-          </MeasureView>
-        ) : (
-          <React.Fragment>
-            {(orientation === 'PORTRAIT') ? (
-              <View style={styles.carousel}>
-                <Carousel
-                  data={ENTRIES}
-                  renderItem={renderItem}
-                  sliderWidth={width}
-                  itemWidth={width}
-                  autoplay={true}
-                  autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
-                  loop={true}
-                  loopClonesPerSide={5}
-                  onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
-                />
-                <View style={{ position: 'absolute', top: sliderHeight - 30, left: width / 3, backgroundColor: 'transparent' }}>
-                  <Pagination // Add this component
-                    dotsLength={ENTRIES.length}
-                    activeDotIndex={activeSlide}
-                    containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
-                    dotStyle={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 5,
-                      marginHorizontal: 0,
-                      backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
-                    }}
-                    inactiveDotStyle={{
-                      backgroundColor: 'white' // Change this to the color you want for the inactive dots
-                    }}
-                    inactiveDotOpacity={0.4}
-                    inactiveDotScale={0.6}
-                  />
-                </View>
-              </View>
-            ) : (
-              <View style={{ flex:1, alignItems:'center', justifyContent: 'center'}}>
-                <Carousel
-                  data={ENTRIES}
-                  renderItem={renderWideItem}
-                  sliderWidth={width * .8}
-                  itemWidth={width * .8}
-                  autoplay={true}
-                  autoplayInterval={3000} // Change this to adjust the delay (in milliseconds)
-                  loop={true}
-                  loopClonesPerSide={5}
-                  onSnapToItem={(index) => setActiveSlide(index)} // Add this prop
-                />
-                <View style={{ position: 'absolute', top: width * .8 / 3 - 30, left: width / 2.5, backgroundColor: 'transparent' }}>
-                  <Pagination // Add this component
-                    dotsLength={ENTRIES.length}
-                    activeDotIndex={activeSlide}
-                    containerStyle={{ backgroundColor: 'transparent', paddingVertical: 0, marginTop: 10, marginBottom: 10 }}
-                    dotStyle={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 5,
-                      marginHorizontal: 0,
-                      backgroundColor: 'rgba(169, 89, 45, 0.92)' // Change this to the color you want for the active dot
-                    }}
-                    inactiveDotStyle={{
-                      backgroundColor: 'white' // Change this to the color you want for the inactive dots
-                    }}
-                    inactiveDotOpacity={0.4}
-                    inactiveDotScale={0.6}
-                  />
-                </View>
-              </View>
-            )}
-          </React.Fragment>
-        )}
-
+            </View>
+          )}
+        </MeasureView>
         <ScrollView style={styles.container}>
           {/* Header */}
           {orientation === 'PORTRAIT' ? (
@@ -610,10 +483,10 @@ export default function TabOneScireen() {
       {/* Footer */}
       <ImageBackground
         source={require('../../assets/images/Footer.png')} // replace with your image path
-        style={{...styles.footer, width: Platform.OS === 'ios' ? iosWidth : width}}
+        style={{ ...styles.footer, width: width }}
         resizeMode="cover" // or "contain" depending on your needs
       >
-        <View style={{...styles.footer, width: Platform.OS === 'ios' ? iosWidth : width}}>
+        <View style={{ ...styles.footer, width: width }}>
           <Link href="./ChantingScreen" asChild>
             <TouchableOpacity style={styles.footerButton}>
               <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton} />
@@ -647,33 +520,130 @@ export default function TabOneScireen() {
 
   );
 
-
-  // Style definitions
-  interface Styles {
-    slide: ViewStyle;
-    carousel: ViewStyle;
-    title: TextStyle;
-    image: ImageStyle;
-    safeArea: ViewStyle;
-    container: ViewStyle;
-    header: ViewStyle;
-    menuButton: ViewStyle;
-    menuText: TextStyle;
-    headerText: TextStyle;
-    buttonRow: ViewStyle;
-    buttonContainer: ViewStyle;
-    buttonImage: ImageStyle;
-    buttonText: TextStyle;
-    footer: ViewStyle;
-    footerButton: ViewStyle;
-    footerButtonBig: ViewStyle;
-    footerText: TextStyle;
-    imageWide: ImageStyle;
-    iosImage: ImageStyle;
-    iosImageWide: ImageStyle;
-  }
-
-
-
 }
 
+// Style definitions
+interface Styles {
+  slide: ViewStyle;
+  carousel: ViewStyle;
+  title: TextStyle;
+  image: ImageStyle;
+  safeArea: ViewStyle;
+  container: ViewStyle;
+  header: ViewStyle;
+  menuButton: ViewStyle;
+  menuText: TextStyle;
+  headerText: TextStyle;
+  buttonRow: ViewStyle;
+  buttonContainer: ViewStyle;
+  buttonImage: ImageStyle;
+  buttonText: TextStyle;
+  footer: ViewStyle;
+  footerButton: ViewStyle;
+  footerButtonBig: ViewStyle;
+  footerText: TextStyle;
+  imageWide: ImageStyle;
+}
+
+const styles = StyleSheet.create<Styles>({
+  carousel: {
+    marginBottom: 20,
+  },
+  slide: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#9DD6EB',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  image: {
+    resizeMode: 'cover',
+  },
+  imageWide: {
+    resizeMode: 'cover',
+  },
+
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFDF8',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFDF8',
+  },
+  header: {
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'coral',
+
+  },
+  menuButton: {
+    position: 'absolute',
+    left: 10,
+    top: 15,
+  },
+  menuText: {
+    fontSize: 28,
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 5,
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    width: 100, // Set a fixed width
+  },
+  buttonImage: {
+    width: 178, // Set your desired image width
+    height: 100, // Set your desired image height
+    marginBottom: 8, // Space between image and text
+    borderRadius: 5, // Adjust this value as needed
+  },
+  buttonText: {
+    color: '#7e2b18',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginLeft: -20,
+    marginRight: -20,
+    fontFamily: 'OblikBold',
+  },
+  footer: {
+    width: '100%',
+    height: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+    paddingLeft: 20, // Add this
+    paddingRight: 60, // Add this
+    paddingBottom: 10, // Add this
+  },
+  footerButton: {
+    width: 36, // Adjust this value as needed
+    height: 36, // This is 50% of the footer height
+    borderRadius: 18, // This should be half of the button width/height
+  },
+  footerButtonBig: {
+    width: 44, // Adjust this value as needed
+    height: 44, // This is 50% of the footer height
+    borderRadius: 22, // This should be half of the button width/height
+    marginLeft: -5,
+  },
+  footerText: {
+    color: 'maroon',
+    fontWeight: 'bold',
+    fontSize: 10,
+    fontFamily: 'OblikBold',
+    marginLeft: -10,
+    marginRight: -10,
+    textAlign: 'center',
+  },
+});
