@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Image, Text, StyleSheet, Share, Pressable,
   TouchableOpacity, ActivityIndicator, Platform, Dimensions, View
@@ -12,7 +12,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import { StatusBar } from 'expo-status-bar';
 import { httpsCallable } from 'firebase/functions';
+import { collection, query, getDocs } from "firebase/firestore";
+import { db } from "./api/firebase"
 import MeasureView from './api/MeasureView';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 interface GetYouTubeVideosRequest {
   channelId: string;
@@ -34,6 +37,7 @@ interface FirebaseFunctionError {
   details?: any; // The details can vary depending on the error
 }
 
+const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 const isTablet = () => {
   const { width, height } = Dimensions.get('window');
@@ -50,82 +54,66 @@ const LiveScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [videoHeight, setVideoHeight] = useState(Dimensions.get('window').width * 9 / 16); // initialize with a number
   const [videoWidth, setVideoWidth] = useState(Dimensions.get('window').width); // initialize with a number
-
-  const NAVBAR_HEIGHT = 56;
-
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
   const [height, setHeight] = useState(Dimensions.get('window').height);
+  const [channelID, setChannelID] = useState('UCLiuTwQ-ap30PbKzprrN2Hg');
 
- let subscription;
+  const NAVBAR_HEIGHT = 56;
 
-  useEffect(() => {
-    
-    if (! isTablet()) {
-    getVideoHeight().then(setVideoHeight); // set the initial height when the component mounts
-    getVideoWidth().then(setVideoWidth); // set the initial width when the component mounts
+  const handleOrientationChange = () => {
+    const newWidth = Dimensions.get('window').width;
+    const newHeight = Dimensions.get('window').height;
+    const aspectRatio = newWidth / newHeight;
+    const previousAspectRatio = width / height;
+
+    // Only change orientation if the aspect ratio change is significant
+    if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
+      const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+      setOrientation(newOrientation);
     }
-    subscription = ScreenOrientation.addOrientationChangeListener(handleOrientationChange);
 
-    return () => {
-      if (subscription) {
-        ScreenOrientation.removeOrientationChangeListener(subscription);
-      }
-    };
-  }, []);
-
-  function handleOrientationChange() {
-    getVideoHeight().then(setVideoHeight);
-    getVideoWidth().then(setVideoWidth);
+    setWidth(newWidth);
+    setHeight(newHeight);
+    console.log('HandleOrientation Called :', orientation);
   }
 
-  async function getVideoHeight() {
-    const orientation = await ScreenOrientation.getOrientationAsync();
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
 
-    if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+  const onSetOrientation = useCallback((orientation: string) => {
+    if (Platform.OS === 'android' && !isTablet()) {
+      setOrientation(orientation === 'LANDSCAPE' ? 'PORTRAIT' : 'LANDSCAPE');
+    } else if (Platform.OS === 'web') {
+      handleOrientationChange(orientation);
+    } else {
+      setOrientation(orientation);
+    }
+    console.log('onSetOrientation called :', orientation);
+  }, [setOrientation]);
+
+  const onSetWidth = (newWidth) => {
+    console.log('onSetWidth called :', newWidth);
+    setWidth(newWidth);
+  };
+
+  async function getVideoHeight() {
+    if (orientation === 'PORTRAIT') {
       // In portrait mode, set height based on screen width and aspect ratio
-      return screenWidth * 9 / 16;
+      setVideoHeight(width * 5 / 8);
     } else {
       // In landscape mode, set height to screen height
-      return screenHeight - NAVBAR_HEIGHT;
+      setVideoHeight((width * 5 / 8) - NAVBAR_HEIGHT);
     }
   }
 
   async function getVideoWidth() {
-    const orientation = await ScreenOrientation.getOrientationAsync();
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
-
-    if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
+    if (orientation === 'PORTRAIT') {
       // In portrait mode, set height based on screen width and aspect ratio
-      return screenWidth;
+      setVideoWidth(width);
     } else {
       // In landscape mode, set height to screen height
-      return (screenHeight - NAVBAR_HEIGHT) * 16 / 9;
+      setVideoWidth(((width * 9 / 16) - NAVBAR_HEIGHT) * 16 / 9);
     }
   }
-
-
-
-  const onSetWidth = (width: number) => {
-    console.log('LiveScreen width: ', width);
-    setWidth(width);
-  };
-
-  const onSetOrientation = (newOrientation: string) => {
-    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
-      if (newOrientation === 'LANDSCAPE') {
-        setOrientation('PORTRAIT');
-      } else {
-        setOrientation('LANDSCAPE');
-      }
-      return;
-    }
-    setOrientation(newOrientation);
-        setHeight(Dimensions.get('window').height);
-  };
 
 
   useEffect(() => {
@@ -136,28 +124,44 @@ const LiveScreen = () => {
   }, []);
 
   useEffect(() => {
-    const fetchVideos = async () => {
-      const getLiveVideo = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getLiveVideo');
-      const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
-      try {
-        const result = await getLiveVideo(request);
-        const response: GetYouTubeVideosResponse = result.data;
-        console.log("live videos", response);
-        setVideo(response);
-      } catch (error) {
-        console.error("Error calling the function: ", error.message);
-        if (error.message === "not-found") {
-          console.log("No live video found");
-          setError("No live video found");
+    const fetchData = async () => {
+      // Get playlist id from firebase
+      const q = query(collection(db, 'main-channel-id'));
+      // Get the first document
+      const doc = await getDocs(q);
+      // Playlist ID is doc id
+      const fetchedChannelID = doc.docs[0].id;
+      console.log("fetchedChannelID", fetchedChannelID)
+      setChannelID(fetchedChannelID);
+
+      // Fetch videos after setting channel ID
+      const fetchVideos = async () => {
+        const getLiveVideo = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getLiveVideo');
+        const request: GetYouTubeVideosRequest = { channelId: fetchedChannelID || channelID };
+        try {
+          const result = await getLiveVideo(request);
+          const response: GetYouTubeVideosResponse = result.data;
+          console.log("live videos", response);
+          setVideo(response);
+        } catch (error: unknown) {
+          // Safely check for error properties
+          const message = (error as { message?: string }).message;
+          console.error("Error calling the function: ", message);
+          if (message === "not-found") {
+            console.log("No live video found");
+            setError("No live video found");
+          }
+        } finally {
+          setIsLoading(false);
         }
-      } finally {
-        setIsLoading(false);
-      }
+      };
+
+      // Call fetchVideos inside fetchData to ensure channelID is set
+      await fetchVideos();
     };
 
-    fetchVideos();
+    fetchData();
   }, []);
-
 
   const shareYouTubeVideo = async (url) => {
     try {
@@ -191,7 +195,7 @@ const LiveScreen = () => {
         <StatusBar style="light" />
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-            <View style={{ backgroundColor: 'white', height: Dimensions.get('window').height }}>
+            <View style={{ backgroundColor: 'white', height: '100%' }}>
               <View style={styles.header}>
                 {navigation.canGoBack() && (
                   <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} style={styles.leftItem}>
@@ -221,6 +225,16 @@ const LiveScreen = () => {
     );
   }
 
+  if (videoWidth === 0 || videoHeight === 0) {
+    return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size="large" color="#ED4D4E" />
+    </View>
+    );
+  }
+
+  console.log("videoWidth", (orientation === 'LANDSCAPE' ? (((width * 9 / 16) - NAVBAR_HEIGHT) * 16 / 9) : width), "VideoHeight", videoHeight)
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.header}>
@@ -240,20 +254,20 @@ const LiveScreen = () => {
           </View>
         </View>
       </View>
+      <View style={{flex: (orientation === 'PORTRAIT') ? 1 : undefined, justifyContent: 'center'}}>
+      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} style={styles.textContainer}>
       <View style={styles.centeredContent}>
-        <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} style={styles.textContainer}>
-
           <YoutubePlayer
-            height={videoHeight}
-            width={videoWidth}
+            height={(orientation === 'LANDSCAPE' ? (width * 5 / 8) : (width * 5 / 8) - NAVBAR_HEIGHT)}
+            width={(orientation === 'LANDSCAPE' ? (((width * 9 / 16) - NAVBAR_HEIGHT) * 16 / 9) : width)}
             play={true}
             videoId={video}
             onReady={() => setIsLoading(false)}
           />
           {isLoading && <ActivityIndicator size="large" color="#ED4D4E" />}
-        </MeasureView>
       </View>
-
+      </MeasureView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -318,7 +332,6 @@ const styles = StyleSheet.create({
   },
 
   centeredContent: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
