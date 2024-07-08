@@ -19,8 +19,9 @@ import { Link } from 'expo-router';
 import { collection, query, getDocs } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
 import { db } from '../api/firebase';
-import MeasureView from '../api/MeasureView';
+import GuageView from '../../components/GuageView';
 import * as SafeAreaViewContext from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 
 const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
@@ -56,6 +57,7 @@ export default function TabOneScireen() {
     Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT'
   );
 
+
   if (Platform.OS !== 'web') {
     // Initialize and handle push notifications for non-web platforms
     const expoPushToken = NotificationHandler();
@@ -79,20 +81,17 @@ export default function TabOneScireen() {
   }
 
   const onSetWidth = (newWidth) => {
+    console.log(`${new Date().toISOString()}onSetWidth called: ', ${newWidth}`);
     setWidth(newWidth);
   };
 
-  const onSetOrientation = useCallback((orientation: string) => {
-    if (Platform.OS === 'android' && !isTablet()) {
-      setOrientation(orientation === 'LANDSCAPE' ? 'PORTRAIT' : 'LANDSCAPE');
-    } else if (Platform.OS === 'web') {
+  const onSetOrientation = (orientation: string) => {
+    if (Platform.OS === 'web') {
       handleOrientationChange(orientation);
     } else {
       setOrientation(orientation);
     }
-    setUpdateKey(prevKey => prevKey + 1);
-    console.log('onSetOrientation called :', orientation);
-  }, [setOrientation, setUpdateKey]);
+  };
 
   useEffect(() => {
     console.log('Orientation changed to:', orientation);
@@ -100,18 +99,7 @@ export default function TabOneScireen() {
 
   useEffect(() => {
     if (!isOrientationInitialized) {
-      if (Platform.OS === 'web') {
-        setIsOrientationInitialized(true);
-      } else if (Platform.OS === 'ios') {
-        if (initialOrientation === 'PORTRAIT') {
-          setIsOrientationInitialized(true);
-        } else {
-          setIsOrientationInitialized(true);
-        }
-      } else {
-        // setOrientation(initialOrientation)
-        setIsOrientationInitialized(true);
-      }
+      setIsOrientationInitialized(true);
     }
   }, []);
 
@@ -222,7 +210,7 @@ export default function TabOneScireen() {
   return (
     <>
       <SafeAreaView style={styles.safeArea}>
-        <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+        <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
           {(orientation === 'PORTRAIT') ? (
             <View style={styles.carousel}>
               {renderCarousel()}
@@ -240,7 +228,7 @@ export default function TabOneScireen() {
               </View>
             </View>
           )}
-        </MeasureView>
+        </GuageView>
         <ScrollView style={styles.container}>
           {/* Header */}
           {orientation === 'PORTRAIT' ? (
@@ -469,41 +457,41 @@ export default function TabOneScireen() {
       </SafeAreaView>
       {/* Footer */}
       <SafeAreaViewContext.SafeAreaView edges={['left', 'right']}>
-      <ImageBackground
-        source={require('../../assets/images/Footer.png')} // replace with your image path
-        style={{ ...styles.footer, width: width }}
-        resizeMode="cover" // or "contain" depending on your needs
-      >
-        <View style={{ ...styles.footer, width: width }}>
-          <Link href="./ChantingScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton} />
-              <Text style={styles.footerText}>CHANTING</Text>
+        <ImageBackground
+          source={require('../../assets/images/Footer.png')} // replace with your image path
+          style={{ ...styles.footer, width: width }}
+          resizeMode="cover" // or "contain" depending on your needs
+        >
+          <View style={{ ...styles.footer, width: width }}>
+            <Link href="./ChantingScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/Chanting.png')} style={styles.footerButton} />
+                <Text style={styles.footerText}>CHANTING</Text>
+              </TouchableOpacity>
+            </Link>
+            <Link href="./(drawer)/BioScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/About_Footer.png')} style={styles.footerButton} />
+                <Text style={styles.footerText}>ABOUT</Text>
+              </TouchableOpacity>
+            </Link>
+            <Link href="./LiveScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/Live.png')} style={styles.footerButtonBig} />
+              </TouchableOpacity>
+            </Link>
+            <Link href="./DonationScreen" asChild>
+              <TouchableOpacity style={styles.footerButton}>
+                <Image source={require('../../assets/images/Donation.png')} style={styles.footerButton} />
+                <Text style={styles.footerText}>DONATION</Text>
+              </TouchableOpacity>
+            </Link>
+            <TouchableOpacity style={styles.footerButton} onPress={() => { Linking.openURL(whatsAppUrl) /* Handle button press */ }}>
+              <Image source={require('../../assets/images/WhatsApp.png')} style={styles.footerButton} />
+              <Text style={styles.footerText}>WHATSAPP</Text>
             </TouchableOpacity>
-          </Link>
-          <Link href="./(drawer)/BioScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/About_Footer.png')} style={styles.footerButton} />
-              <Text style={styles.footerText}>ABOUT</Text>
-            </TouchableOpacity>
-          </Link>
-          <Link href="./LiveScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/Live.png')} style={styles.footerButtonBig} />
-            </TouchableOpacity>
-          </Link>
-          <Link href="./DonationScreen" asChild>
-            <TouchableOpacity style={styles.footerButton}>
-              <Image source={require('../../assets/images/Donation.png')} style={styles.footerButton} />
-              <Text style={styles.footerText}>DONATION</Text>
-            </TouchableOpacity>
-          </Link>
-          <TouchableOpacity style={styles.footerButton} onPress={() => { Linking.openURL(whatsAppUrl) /* Handle button press */ }}>
-            <Image source={require('../../assets/images/WhatsApp.png')} style={styles.footerButton} />
-            <Text style={styles.footerText}>WHATSAPP</Text>
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
+          </View>
+        </ImageBackground>
       </SafeAreaViewContext.SafeAreaView>
     </>
 

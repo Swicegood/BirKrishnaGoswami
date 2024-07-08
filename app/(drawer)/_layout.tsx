@@ -152,14 +152,6 @@ export default function DrawerLayout() {
         }}
       />
       <Drawer.Screen
-        name="downloads" // This is the name of the page and must match the url from root
-        options={{
-          drawerLabel: 'Downloads',
-          title: 'Downloads',
-          header: () => <CustomBackHeader title='DOWNLOADS' />,
-        }}
-      />
-      <Drawer.Screen
         name="index"
         options={{
           drawerLabel: 'Home',
