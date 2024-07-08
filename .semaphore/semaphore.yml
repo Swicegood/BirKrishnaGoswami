@@ -20,6 +20,7 @@ blocks:
             - npm install
             - npm install expo
             - npm install expo-build-properties 
+            - npx expo-cli install expo-build-properties
             - npx expo export -p web
 
   - name: Deploy
