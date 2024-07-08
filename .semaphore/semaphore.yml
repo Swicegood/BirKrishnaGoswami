@@ -28,4 +28,7 @@ blocks:
           commands:
             - checkout
             - ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
-            - scp -r dist/* $VPS_USER@$VPS_IP:/path/to/your/apache/webroot/
+            - scp -r dist/* $VPS_USER@$VPS_IP:/public_html/
+      secrets:
+        - name: VPS_IP
+        - name: VPS_USER
