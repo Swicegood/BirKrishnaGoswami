@@ -21,8 +21,6 @@ blocks:
             - npm install expo
             - npx expo install expo-build-properties 
             - ls
-      secrets:
-       - name: VPS
 
   - name: Deploy
     task:
@@ -33,5 +31,4 @@ blocks:
             - ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
             - 'scp -r dist/* $VPS_USER@$VPS_IP:/public_html/'
       secrets:
-        - name: VPS_IP
-        - name: VPS_USER
+        - name: VPS
