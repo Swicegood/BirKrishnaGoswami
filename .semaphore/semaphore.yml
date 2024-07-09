@@ -31,6 +31,6 @@ blocks:
             - ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
             - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             - chmod 600 ~/.ssh/id_rsa
-            - scp -i ~/.ssh/id_rsa -r dist/* $VPS_USER@$VPS_IP:/public_html/'
+            - 'scp -i ~/.ssh/id_rsa -r dist/* $VPS_USER@$VPS_IP:/public_html/'
       secrets:
         - name: VPS
