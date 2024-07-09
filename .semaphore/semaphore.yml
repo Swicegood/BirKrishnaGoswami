@@ -29,8 +29,7 @@ blocks:
           commands:
             - checkout
             - ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
-            - chmod 600 ~/.ssh/id_rsa
-            - ssh-add ~/.ssh/id_rsa
-            - 'scp -i ~/.ssh/id_rsa -r dist/* $VPS_USER@$VPS_IP:/public_html/'
+            - chmod 600 ~/.ssh/id_rsa_birkrishnagoswami
+            - 'scp -i ~/.ssh/id_rsa_birkrishnagoswami -r dist/* $VPS_USER@$VPS_IP:/public_html/'
       secrets:
         - name: VPS
