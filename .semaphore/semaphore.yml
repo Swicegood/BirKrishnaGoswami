@@ -23,6 +23,6 @@ blocks:
             - touch dist/test.html
             - ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
             - chmod 600 ~/.ssh/id_rsa_birkrishnagoswami
-            - 'scp -i ~/.ssh/id_rsa_birkrishnagoswami -r dist/* $VPS_USER@$VPS_IP:/public_html/'
+            - 'scp -i ~/.ssh/id_rsa_birkrishnagoswami -r dist/* $VPS_USER@$VPS_IP:public_html/'
       secrets:
         - name: VPS
