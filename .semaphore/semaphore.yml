@@ -19,8 +19,7 @@ blocks:
             - npm --version
             - npm install
             - node -e "const fs = require('fs'); const config = JSON.parse(fs.readFileSync('app.json', 'utf8')); if (config.expo && config.expo.plugins) { config.expo.plugins = config.expo.plugins.filter(plugin => !Array.isArray(plugin) || plugin[0] !== 'expo-build-properties'); fs.writeFileSync('app.json', JSON.stringify(config, null, 2)); }"
-            - mkdir dist
-            - touch dist/test.html
+            - npx expo export -p web
             - ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
             - chmod 600 ~/.ssh/id_rsa_birkrishnagoswami
             - 'scp -i ~/.ssh/id_rsa_birkrishnagoswami -r dist/* $VPS_USER@$VPS_IP:public_html/'
