@@ -1,251 +1,123 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Image, Text, StyleSheet, Share, Pressable,
-  TouchableOpacity, ActivityIndicator, SafeAreaView, Platform, Dimensions, View
-} from 'react-native';
-import YoutubePlayer from 'react-native-youtube-iframe';
-import * as ScreenOrientation from 'expo-screen-orientation';
-import { functions } from './api/firebase';
-import { useNavigation } from 'expo-router';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Entypo from '@expo/vector-icons/Entypo';
-import { StatusBar } from 'expo-status-bar';
-import { httpsCallable } from 'firebase/functions';
-import MeasureView from './api/MeasureView';
 
-interface GetYouTubeVideosRequest {
-  channelId: string;
+import React, { useEffect, useState } from 'react';
+import { Link, router } from 'expo-router';
+import { collection, query, getDocs } from "firebase/firestore";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { db } from './api/firebase';
+
+
+function customEncodeURI(str) {
+  return encodeURIComponent(str).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29');
 }
 
-interface Video {
-  id: string;
-  title: string;
-}
-
-interface GetYouTubeVideosResponse {
-  video: Video;
-}
-
-const isTablet = () => {
-  const { width, height } = Dimensions.get('window');
-  const aspectRatio = width / height;
-  const isLandscape = Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
-  console.log('isTablet: ', isLandscape);
-  return isLandscape;
-};
-
-const LiveScreen = () => {
-  const navigation = useNavigation();
-  const [video, setVideo] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+const YearScreen = () => {
+  const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
-  const [width, setWidth] = useState(Dimensions.get('window').width);
-  const [height, setHeight] = useState(Dimensions.get('window').height);
-
-  const onSetWidth = (width: number) => {
-    console.log('LiveScreen width: ', width);
-    setWidth(width);
-  };
-
-  const onSetOrientation = (newOrientation: string) => {
-    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
-      if (newOrientation === 'LANDSCAPE') {
-        setOrientation('PORTRAIT');
-      } else {
-        setOrientation('LANDSCAPE');
-      }
-      return;
-    }
-    setOrientation(newOrientation);
-  };
 
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      document.body.style.overflow = 'auto';
-      document.documentElement.style.overflow = 'auto';
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchVideos = async () => {
-      const getLiveVideo = httpsCallable<GetYouTubeVideosRequest, GetYouTubeVideosResponse>(functions, 'getLiveVideo');
-      const request: GetYouTubeVideosRequest = { channelId: 'UCLiuTwQ-ap30PbKzprrN2Hg' };
-      try {
-        const result = await getLiveVideo(request);
-        const response: GetYouTubeVideosResponse = result.data;
-        console.log("live videos", response);
-        setVideo(response.video.id);
-      } catch (error) {
-        console.error("Error calling the function: ", error.message);
-        if (error.message === "not-found") {
-          console.log("No live video found");
-          setError("No live video found");
+    const fetchData = async () => {
+      const q = query(collection(db, 'audio-tracks'));
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs.reduce((acc, doc) => {
+        if (doc.data().date) {
+          const date = doc.data().date.toDate(); // Convert Firestore Timestamp to JavaScript Date
+          const year = date.getFullYear();
+          const monthNames = ["1  Jan", "2  Feb", "3  Mar", "4  Apr", "5  May", "6 Jun", "7 Jul", "8 Aug", "9 Sep", "10 Oct", "11 Nov", "12 Dec"];
+          const month = monthNames[date.getMonth()];
+          if (!acc[year]) acc[year] = {};
+          if (!acc[year][month]) acc[year][month] = [];
+          acc[year][month].push(customEncodeURI(doc.data().url));
+        } else {
+          if (!acc['Unknown']) acc['Unknown'] = {};
+          if (!acc['Unknown']['Unknown']) acc['Unknown']['Unknown'] = [];
+          acc['Unknown']['Unknown'].push(customEncodeURI(doc.data().url));
         }
-      } finally {
-        setIsLoading(false);
-      }
+        return acc;
+      }, {});
+      setData(data);
+      setIsLoading(false);
+      Object.keys(data).forEach(year => {
+        console.log("Year: ", year, "Length: ", Object.keys(data[year]).length);
+      });
     };
-
-    fetchVideos();
+    fetchData();
   }, []);
 
-  const getVideoHeight = () => {
-    return orientation === 'PORTRAIT' ? width * 9 / 16 : height;
-  };
-
-  const getVideoWidth = () => {
-    return orientation === 'PORTRAIT' ? width : height * 16 / 9;
-  };
-
-  const shareYouTubeVideo = async (url) => {
-    try {
-      const result = await Share.share({
-        message: 'Check out this cool video on YouTube!',
-        url: url
-      });
-    } catch (error) {
-      console.error('Error sharing YouTube video:', error);
-    }
-  };
-
-  if (error || !video) {
+  if (isLoading) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
-        <View style={styles.header}>
-          {navigation.canGoBack() && (
-            <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}} style={styles.leftItem}>
-              <FontAwesome name="angle-left" size={32} color="white" />
-            </TouchableOpacity>
-          )}
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>LIVE STREAMING</Text>
-          </View>
-          <View style={styles.rightItem}>
-            <View style={styles.circle}>
-              <TouchableOpacity onPress={() => shareYouTubeVideo('https://www.youtube.com/watch?v=' + video)}>
-                <Entypo name="share" size={26} color="#ED4D4E" fontWeight='bold' />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View style={styles.container}>
-          <Image source={require('../assets/images/video-monetiztion-not-available.jpg')} style={{ width: width, height: 200 }} />
-          <View style={styles.subTextContainer}>
-            <Text style={styles.subText}>Live Streaming is not available right now!</Text>
-            <Text style={styles.subText}> Please try again later. </Text>
-          </View>
-        </View>
-      </SafeAreaView>
+      <View style={styles.musicContainer}>
+        <ActivityIndicator size="large" color="#ED4D4E" />
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-        <View style={styles.header}>
-          {navigation.canGoBack() && (
-            <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}} style={styles.leftItem}>
-              <FontAwesome name="angle-left" size={32} color="white" />
-            </TouchableOpacity>
-          )}
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>LIVE STREAMING</Text>
-          </View>
-          <View style={styles.rightItem}>
-            <View style={styles.circle}>
-              <TouchableOpacity onPress={() => shareYouTubeVideo('https://www.youtube.com/watch?v=' + video)}>
-                <Entypo name="share" size={26} color="#ED4D4E" fontWeight='bold' />
-              </TouchableOpacity>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+    <ScrollView style={{ paddingBottom: 200 }}>
+      <View>
+        {Object.keys(data).sort((a, b) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : Number(a) - Number(b)).map((year) => (
+          <TouchableOpacity 
+            style={styles.container} 
+            key={year}
+            onPress={() => router.push(`MonthScreen?year=${String(year)}&dataString=${JSON.stringify(data[year])}`)}
+          >
+            <View style={styles.playButton}>
+              {/* Replace with your play icon */}
+              <Image source={require('../assets/images/folder.png')} style={styles.playIcon} />
             </View>
-          </View>
-        </View>
-        <View style={styles.playerContainer}>
-          <YoutubePlayer
-            height={getVideoHeight()}
-            width={getVideoWidth()}
-            play={true}
-            videoId={video}
-            onReady={() => setIsLoading(false)}
-          />
-          {isLoading && <ActivityIndicator size="large" color="#ED4D4E" />}
-        </View>
-      </MeasureView>
-    </SafeAreaView>
+            <View style={styles.textContainer}>
+              <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>{year}</Text>
+            </View>
+            <Text style={styles.countText}>{Object.keys(data[year])?.length || year}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
+    </GestureHandlerRootView>
   );
-};
-
+}
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#993D39',
-  },
   container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  header: {
-    height: 60,
     flexDirection: 'row',
+    padding: 10,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    backgroundColor: '#ED4D4E',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc', // Adjust color as needed
+    backgroundColor: 'white',
   },
-  titleContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  leftItem: {
-    zIndex: 1,
-    fontSize: 28,
-    color: 'white',
-  },
-  rightItem: {
-    backgroundColor: 'transparent',
-  },
-  subText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-    textAlign: 'center',
-    margin: 10,
-  },
-  playerContainer: {
+  musicContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'black',
   },
-  circle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'white',
+  countText: {
+    position: 'absolute',
+    right: 30,
+  },
+  playButton: {
+    marginRight: 30,
+    // Add your styles for the button, such as size, backgroundColor, etc.
+  },
+  playIcon: {
+    width: 70, // Adjust size as needed
+    height: 70, // Adjust size as needed
+  },
+  textContainer: {
+    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
   },
-  subTextContainer: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.60,
-    shadowRadius: 20,
-    elevation: 5,
+  titleText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    // Adjust style as needed
+  },
+  dateText: {
+    fontSize: 14,
+    color: 'grey',
+    // Adjust style as needed
   },
 });
 
-export default LiveScreen;
+export default YearScreen;
