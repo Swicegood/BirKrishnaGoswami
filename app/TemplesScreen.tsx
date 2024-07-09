@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Dimensions, FlatList, Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { Dimensions, FlatList, Image, TouchableOpacity, StyleSheet,
+  Platform, Text } from 'react-native';
 import { Link } from 'expo-router';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
-import { collection, query, orderBy, limit, getDocs, where, addDoc } from "firebase/firestore";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from './api/firebase';
 
 const screenWidth = Dimensions.get('window').width;
@@ -58,6 +59,16 @@ const GalleryComponent = () => {
       numColumns={2}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item, index }) => {
+        if (Platform.OS === 'web') {
+          return (<Link href={{ pathname: "./CustomImageGalleryScreen", params: { captionsSlice: item.description+'\n'+(item.location ? item.location.replace(/,/g, '') : ''), imagesSlice: item.url } }} asChild>
+            <TouchableOpacity style={{ padding: 20, borderRadius: 10 }}>
+              <Image defaultSource={placeholderImage} source={{ uri: item.url }} style={{ width: (screenWidth / 2) - 40, height: 170, borderRadius: 10 }} />
+              <Text style={styles.text} >{item.location}</Text>
+              <Text style={[styles.text, { flexShrink: 1 }]}>{item.description}</Text>
+            </TouchableOpacity>
+          </Link>
+          );
+        }
         return (<Link href={{ pathname: "./PhotosScreen", params: { captionsSlice: item.description+'\n'+(item.location ? item.location.replace(/,/g, '') : ''), imagesSlice: item.url } }} asChild>
             <TouchableOpacity style={{ padding: 20, borderRadius: 10 }}>
               <Image defaultSource={placeholderImage} source={{ uri: item.url }} style={{ width: (screenWidth / 2) - 40, height: 170, borderRadius: 10 }} />
