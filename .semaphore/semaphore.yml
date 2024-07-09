@@ -18,8 +18,8 @@ blocks:
             - node --version
             - npm --version
             - npm install
-            - npm install expo
-            -  npx expo export --platform web --clear
+            - node -e "const fs = require('fs'); const config = JSON.parse(fs.readFileSync('app.json', 'utf8')); if (config.expo && config.expo.plugins) { config.expo.plugins = config.expo.plugins.filter(plugin => !Array.isArray(plugin) || plugin[0] !== 'expo-build-properties'); fs.writeFileSync('app.json', JSON.stringify(config, null, 2)); }"
+            - npx expo export --platform web --clear --no-install
 
   - name: Deploy
     task:
