@@ -19,8 +19,7 @@ blocks:
             - npm --version
             - npm install
             - npm install expo
-            - npx expo install expo-build-properties 
-            - npx expo export -p web
+            -  npx expo export --platform web --clear
 
   - name: Deploy
     task:
