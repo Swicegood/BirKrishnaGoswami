@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, Image, TouchableOpacity,
-  ActivityIndicator, FlatList, Dimensions, Platform, ScrollView
+  ActivityIndicator, FlatList, Dimensions, Platform, Linking
 } from 'react-native';
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
@@ -99,19 +99,15 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
       <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }, Platform.OS === 'web' && { marginBottom: 150 }]}>
         {Platform.OS === 'web' ? (
           <React.Fragment>
-            <Link href={{ pathname: item.contenturl }} asChild>
-              <Image
-                source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
-                style={styles.image}
-                onLoad={() => handleImageLoad(item.key)}
-              />
-            </Link>
+            <Image
+              source={isImageLoaded ? { uri: item.imgurl } : placeholderImage}
+              style={styles.image}
+              onLoad={() => handleImageLoad(item.key)}
+            />
             <Text style={styles.itemText}>{item.title}</Text>
-            <Link href={{ pathname: item.contenturl }} asChild>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>READ NOW</Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(item.contenturl)}>
+              <Text style={styles.buttonText}>READ NOW</Text>
+            </TouchableOpacity>
           </React.Fragment>
         ) : (
           <>

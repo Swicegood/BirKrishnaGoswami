@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, Image, TouchableOpacity,
-  ActivityIndicator, FlatList, SafeAreaView, Dimensions, Platform, ScrollView
+  ActivityIndicator, FlatList, Linking, Dimensions, Platform, ScrollView
 } from 'react-native';
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from './api/firebase';
@@ -79,29 +79,35 @@ const PurchaseScreen = () => {
     const { itemWidth, itemHeight } = getItemDimensions();
     return (
       <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }]}>
-        { (Platform.OS === 'web') ? (
-          <Link href={{ pathname: item.buyurl }} asChild>
+        {(Platform.OS === 'web') ? (
+          <React.Fragment>
             <Image
-              source={{ uri: item.imgurl || placeholderImage }}
+              source={{ uri: item.imgurl } || placeholderImage}
               style={styles.image}
             />
-          </Link>
+            <Text style={styles.itemText}>{item.title}</Text>
+            <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(item.buyurl)}>
+              <Text style={styles.buttonText}>PURCHASE BOOK</Text>
+            </TouchableOpacity>
+          </React.Fragment>
         ) : (
-        <Link href={{ pathname: item.buyurl }} asChild>
-          <TouchableOpacity>
-            <Image
-              source={{ uri: item.imgurl || placeholderImage }}
-              style={styles.image}
-            />
-          </TouchableOpacity>
-        </Link>
+          <React.Fragment>
+            <Link href={{ pathname: item.buyurl }} asChild>
+              <TouchableOpacity>
+                <Image
+                  source={{ uri: item.imgurl || placeholderImage }}
+                  style={styles.image}
+                />
+              </TouchableOpacity>
+            </Link>
+            <Text style={styles.itemText}>{item.title}</Text>
+            <Link href={{ pathname: item.buyurl }} asChild>
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>PURCHASE BOOK</Text>
+              </TouchableOpacity>
+            </Link>
+          </React.Fragment>
         )}
-        <Text style={styles.itemText}>{item.title}</Text>
-        <Link href={{ pathname: item.buyurl }} asChild>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>PURCHASE BOOK</Text>
-          </TouchableOpacity>
-        </Link>
       </View>
     );
   };
