@@ -5,12 +5,12 @@ import { Link } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './api/firebase';
+import GuageView from '../components/GuageView';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import mockPlaylistData from '../components/mockPlaylistData';
-import GuageView from '../components/GuageView';
+import useIsMobileWeb from '../hooks/useIsMobileWeb'; // Adjust the import path as needed
 
 const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
-
 interface GetYouTubeVideosRequest {
   playlistId: string;
   nextPageToken?: string;
@@ -47,11 +47,14 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [videoHeight, setVideoHeight] = useState<number>(0);
   const [videoWidth, setVideoWidth] = useState<number>(0);
-  const [nextPageToken, setNextPageToken] = useState(null);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+
   const [isLastPage, setIsLastPage] = useState(false);
   const [pageAlreadyLoaded, setPageAlreadyLoaded] = useState(false);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
+  const isMobileWeb = useIsMobileWeb();
 
   const USE_MOCK_DATA = false;
 
@@ -60,7 +63,6 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
     setWidth(width);
   };
 
-const [height, setHeight] = useState(Dimensions.get('window').height);
   const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 
@@ -200,7 +202,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
       const orientation = await ScreenOrientation.getOrientationAsync();
       const screenWidth = Dimensions.get('window').width;
       const screenHeight = Dimensions.get('window').height;
-  
+
       if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
         return screenWidth * 9 / 16;
       } else {
@@ -211,13 +213,13 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
       return 0;
     }
   }
-  
+
   async function getVideoWidth() {
     try {
       const orientation = await ScreenOrientation.getOrientationAsync();
       const screenWidth = Dimensions.get('window').width;
       const screenHeight = Dimensions.get('window').height;
-  
+
       if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
         return screenWidth;
       } else {
@@ -229,106 +231,119 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     }
   }
 
-  const renderItem = ({ item }: { item: Video }) => (
-    <Link href={{ pathname: '/YoutubePlayer', params: { id: item.id } }} asChild>
+  const renderVideoItem = (item: Video) => (
+    <Link key={item.id} href={{ pathname: '/YoutubePlayer', params: { id: item.id } }} asChild>
       <TouchableOpacity style={{ paddingTop: 10 }}>
         <VideoItem
           title={item.title}
           lastModified={item.dateModified}
           thumbnail={item.thumbnailUrl}
           id={item.id}
-          imageStyle={(isTablet() || Platform.OS === 'web')
-            ? { width: width / 4, height: width * 1.5 / 10 }
-            : (orientation === 'LANDSCAPE')
-              ? { width: width / 5 }
-              : { width: width / 2.2 }}
+          imageStyle={
+            width / 4 > 150
+              ? { width: width / 4, height: (width / 4) * 0.5625 }
+              : { width: width / 2 - 20, height: ((width / 2 - 20) * 0.5625) }
+          }
         />
       </TouchableOpacity>
     </Link>
   );
 
-  const renderHeader = () => (
-    <View style={{ height: 0, width: videoWidth }}>
-      {/* Render your header content here */}
-    </View>
-  );
-
   const renderFooter = () => {
     if (isLastPage) {
-      return (
-        <View>
-          <Text style={{ textAlign: 'center', marginTop: 10 }}>No more videos to load</Text>
-          <View style={{ height: 50, width: videoWidth }} />
-        </View>
-      );
+      return <Text style={styles.footerText}>No more videos to load</Text>;
     }
     if (pageAlreadyLoaded) {
-      return (
-        <View>
-          <Text style={{ textAlign: 'center', marginTop: 10 }}>Loading...</Text>
-          <View style={{ height: 50, width: videoWidth }} />
-        </View>
-      );
-    } else {
-      return (
-        <View>
-          <TouchableOpacity onPress={loadMoreVideos}>
-            <Text style={styles.text}>SHOW MORE</Text>
-          </TouchableOpacity>
-          <View style={{ height: 50, width: videoWidth }} />
-        </View>
-      );
+      return <ActivityIndicator size="large" color="#ED4D4E" />;
     }
+    return (
+      <TouchableOpacity onPress={loadMoreVideos}>
+        <Text style={styles.showMoreText}>SHOW MORE</Text>
+      </TouchableOpacity>
+    );
   };
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#ED4D4E" />
       </View>
     );
   }
-
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-      <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
-        <FlatList
-          data={videos}
-          renderItem={renderItem}
-          ListHeaderComponent={renderHeader}
-          ListFooterComponent={renderFooter}
-          keyExtractor={item => item.id}
-          numColumns={1}
-          contentContainerStyle={styles.flatListContent}
-          ListEmptyComponent={<Text style={styles.noResultsText}>No videos found</Text>}
-          scrollEnabled={Platform.OS !== 'web'}
-        />
-      </ListComponent>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} flex={1}>
+        {isMobileWeb ? (
+          <ScrollView
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {videos.length === 0 ? (
+              <Text style={styles.noResultsText}>No videos found</Text>
+            ) : (
+              <>
+                {videos.map(renderVideoItem)}
+                {renderFooter()}
+              </>
+            )}
+            <View style={{ height: 120 }} />
+          </ScrollView>
+        ) : (
+
+          <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+          <FlatList
+            data={videos}
+            renderItem={({ item }) => renderVideoItem(item)}
+            keyExtractor={item => item.id}
+            numColumns={1}
+            contentContainerStyle={styles.flatListContent}
+            ListEmptyComponent={<Text style={styles.noResultsText}>No videos found</Text>}
+            ListFooterComponent={renderFooter}
+            scrollEnabled={Platform.OS !== 'web'}
+          />
+          </ListComponent>
+        )}
     </GuageView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollViewContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 120,
   },
   webContainer: {
     height: 'calc(100vh - 70px)',
     overflowY: 'auto' as 'auto',
-    paddingBottom: 240,
+    paddingBottom: 120,
   },
   flatListContent: {
     paddingHorizontal: 10,
+    paddingBottom: 120,
   },
-  text: {
+  showMoreText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: 'maroon',
     textAlign: 'center',
     fontFamily: 'UbuntuRegular',
     marginTop: 10,
+    marginBottom: 20,
+  },
+  footerText: {
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 20,
   },
   noResultsText: {
     fontSize: 18,
