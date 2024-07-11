@@ -6,6 +6,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from '../api/firebase';
 import GuageView from '../../components/GuageView';
 import mockYoutubeData from '../../components/mockYoutubeData';
+import useIsMobileWeb from '../../hooks/useIsMobileWeb'; // Adjust the import path as needed
 
 interface GetYouTubeVideosRequest {
   channelId: string;
@@ -39,7 +40,10 @@ const RecentUploadsScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
+  const isMobileWeb = useIsMobileWeb();
 
+  console.log('isMobileWeb: ', isMobileWeb);
   const USE_MOCK_DATA = false; // Set this to false when you want to use real API calls
 
   const onSetWidth = (width: number) => {
@@ -47,7 +51,6 @@ const RecentUploadsScreen = () => {
     setWidth(width);
   };
 
-const [height, setHeight] = useState(Dimensions.get('window').height);
   const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 
@@ -120,19 +123,19 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     fetchVideos();
   }, []);
 
-  const renderItem = ({ item }: { item: Video }) => (
-    <Link href={{ pathname: '/YoutubePlayer', params: { id: item.id } }} asChild>
+  const renderVideoItem = (item: Video) => (
+    <Link key={item.id} href={{ pathname: '/YoutubePlayer', params: { id: item.id } }} asChild>
       <TouchableOpacity style={{ paddingTop: 10 }}>
         <VideoItem
           title={item.title}
           lastModified={item.dateModified}
           thumbnail={item.thumbnailUrl}
           id={item.id}
-          imageStyle={(isTablet() || Platform.OS === 'web')
-            ? { width: width / 4, height: width * 1.5 / 10 }
-            : (orientation === 'LANDSCAPE')
-              ? { width: width / 5 }
-              : { width: width / 2.2 }}
+          imageStyle={
+            width / 4 > 150
+            ? { width: width / 4, height: (width / 4) * 0.5625 }
+            : { width: width / 2 - 20, height: ((width / 2 - 20) * 0.5625) }
+          }
         />
       </TouchableOpacity>
     </Link>
@@ -145,23 +148,36 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
       </View>
     );
   }
-
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-      <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
-        <FlatList
-          data={videos}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          numColumns={1}
-          contentContainerStyle={styles.flatListContent}
-          ListEmptyComponent={<Text style={styles.noResultsText}>No videos found</Text>}
-          ListFooterComponent={<View style={{ height: 20 }} />}
-          scrollEnabled={Platform.OS !== 'web'}
-        />
-      </ListComponent>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} flex={1}>
+        {isMobileWeb ? (
+          <ScrollView
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {videos.length === 0 ? (
+              <Text style={styles.noResultsText}>No videos found</Text>
+            ) : (
+              videos.map(renderVideoItem)
+            )}
+            <View style={{ height: 120 }} />
+          </ScrollView>
+        ) : (
+          <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+          <FlatList
+            data={videos}
+            renderItem={({ item }) => renderVideoItem(item)}
+            keyExtractor={item => item.id}
+            numColumns={1}
+            contentContainerStyle={styles.flatListContent}
+            ListEmptyComponent={<Text style={styles.noResultsText}>No videos found</Text>}
+            ListFooterComponent={<View style={{ height: 120 }} />}
+            scrollEnabled={Platform.OS !== 'web'}
+          />
+        </ListComponent>
+        )}
     </GuageView>
   );
 };
@@ -169,6 +185,9 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
+  },
+  scrollViewContent: {
+    paddingHorizontal: 10,
   },
   webContainer: {
     height: 'calc(100vh - 70px)',
