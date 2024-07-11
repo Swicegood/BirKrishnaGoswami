@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState, ReactNode } from 'react'
 import { LayoutChangeEvent, StyleSheet, View, Dimensions, Platform } from 'react-native'
 import { useDebouncedCallback } from '../hooks'
 
-interface MeasureViewProps {
+interface GuageViewProps {
     children: ReactNode;
     onSetOrientation: (orientation: string) => void;
     onSetWidth: (width: number) => void;
@@ -25,7 +25,7 @@ const isSmallTablet = () => {
     return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9) && Math.min(width, height) < 820;
 }
 
-const MeasureView: React.FC<MeasureViewProps> = ({ children, onSetOrientation, onSetWidth }) => {
+const GuageView: React.FC<GuageViewProps> = ({ children, onSetOrientation, onSetWidth }) => {
     const [width, setWidth] = useState(Dimensions.get('window').width);
     const [updateKey, setUpdateKey] = useState(0);
 
@@ -45,14 +45,14 @@ const MeasureView: React.FC<MeasureViewProps> = ({ children, onSetOrientation, o
             orientation = 'PORTRAIT';
         }
 
-        console.log(`${new Date().toISOString()} MeasureView orientation: ${orientation}`);
+        console.log(`${new Date().toISOString()}GuageView orientation: ${orientation}`);
         onSetOrientation(orientation);
         onSetWidth(width);
     }, [updateKey]);
 
     const [setDebouncedWidth] = useDebouncedCallback(
         (newWidth: number) => {
-            console.log(`${new Date().toISOString()} MeasureView setWidth: ${newWidth}`);
+            console.log(`${new Date().toISOString()}GuageView setWidth: ${newWidth}`);
             setWidth(newWidth)
             setUpdateKey(updateKey + 1);
         },
@@ -79,4 +79,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MeasureView
+export default GuageView
