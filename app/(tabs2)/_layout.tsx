@@ -3,7 +3,7 @@ import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { View, Image, Dimensions, Platform } from 'react-native';
-import MeasureView from '../api/MeasureView';
+import GuageView from '../../components/GuageView';
 
 const isTablet = () => {
   const { width, height } = Dimensions.get('window');
@@ -58,7 +58,7 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1 }}>
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       {(orientation === 'PORTRAIT' ? (
           <Image source={require('../../assets/images/Memories.png')} style={{ width: getImageWidth(), height: getImageHeight(), resizeMode: 'cover' }} />
         ) : (
@@ -68,7 +68,7 @@ export default function TabLayout() {
             <View style={{ backgroundColor: '#E53935', width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
           </View>
         ))}
-      </MeasureView>
+      </GuageView>
     <View style={{ flex: 1 }}>
     <Tabs screenOptions={{ tabBarActiveTintColor: 'red' }}>
       <Tabs.Screen 

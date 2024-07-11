@@ -7,7 +7,7 @@ import { collection, query, getDocs } from "firebase/firestore";
 import { db } from './api/firebase';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
 import { Link } from 'expo-router';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 interface Book {
   key: string;
@@ -123,7 +123,7 @@ const PurchaseScreen = () => {
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       <ListComponent style={[styles.container, (Platform.OS === 'web' || isTablet()) && styles.webContainer]}>
         <FlatList
           data={data}
@@ -137,7 +137,7 @@ const PurchaseScreen = () => {
           scrollEnabled={Platform.OS !== 'web'}
         />
       </ListComponent>
-    </MeasureView>
+    </GuageView>
   );
 };
 

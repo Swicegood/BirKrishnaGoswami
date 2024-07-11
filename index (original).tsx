@@ -20,7 +20,7 @@ import { Link } from 'expo-router';
 import { collection, query, getDocs, or } from "firebase/firestore";
 import NotificationHandler from '../api/notifications';
 import { db } from '../api/firebase';
-import MeasureView from '../api/MeasureView';
+import GuageView from '../../components/GuageView';
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/Thought_of_the_Day.png'), link: '../QuoteScreen' },
@@ -237,7 +237,7 @@ export default function TabOneScireen() {
       {console.log('Rendering: ', orientation)}
       <SafeAreaView style={styles.safeArea}>
         {(Platform.OS === 'ios') ? (
-          <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+          <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
             {(orientation === 'LANDSCAPE') ? (
               <View style={{ position: 'absolute', top: 0, left: iosWidth * .1, marginBottom: 0 }}>
                 <Carousel
@@ -305,7 +305,7 @@ export default function TabOneScireen() {
                 </View>
               </>
             )}
-          </MeasureView>
+          </GuageView>
         ) : (
           <React.Fragment>
             {(orientation === 'PORTRAIT') ? (

@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, Image, Dimensions, Platform } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import MeasureView from '../app/api/MeasureView';
+import GuageView from './GuageView';
 
 
 type DrawerParamList = {
@@ -45,7 +45,7 @@ function CustomHeader() {
     <>
       <StatusBar style="light" />
       <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
             <Text style={styles.menuText}>☰</Text>
@@ -53,7 +53,7 @@ function CustomHeader() {
           <Image source={require('../assets/images/Crown.png')} style={{ width: 100, height: 85 ,position: 'absolute', top: 0 , left: (width / 2) - 50, zIndex: 1, resizeMode: 'contain' }} />
           <Text style={styles.headerText}></Text>
         </View>
-        </MeasureView>
+        </GuageView>
       </SafeAreaView>
     </>
   );

@@ -21,7 +21,6 @@ import NotificationHandler from '../api/notifications';
 import { db } from '../api/firebase';
 import GuageView from '../../components/GuageView';
 import * as SafeAreaViewContext from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
 
 const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 

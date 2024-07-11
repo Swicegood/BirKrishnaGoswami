@@ -7,7 +7,7 @@ import { Link } from 'expo-router';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from './api/firebase';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -105,7 +105,7 @@ const GalleryComponent = () => {
   );
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       {Platform.OS === 'web' ? (
         <ScrollView style={{ height: '100vh', paddingBottom: 100 }}>
           <View style={{ minHeight: '100%' }}>
@@ -115,7 +115,7 @@ const GalleryComponent = () => {
       ) : (
         renderContent()
       )}
-    </MeasureView>
+    </GuageView>
   );
 };
 

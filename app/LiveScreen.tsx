@@ -14,7 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import { httpsCallable } from 'firebase/functions';
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "./api/firebase"
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 interface GetYouTubeVideosRequest {
@@ -194,7 +194,7 @@ const LiveScreen = () => {
       <>
         <StatusBar style="light" />
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+          <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
             <View style={{ backgroundColor: 'white', height: '100%' }}>
               <View style={styles.header}>
                 {navigation.canGoBack() && (
@@ -219,7 +219,7 @@ const LiveScreen = () => {
                 <Text style={styles.subText}> Please try again later. </Text>
               </View>
             </View>
-          </MeasureView>
+          </GuageView>
         </SafeAreaView >
       </>
     );
@@ -255,7 +255,7 @@ const LiveScreen = () => {
         </View>
       </View>
       <View style={{flex: (orientation === 'PORTRAIT') ? 1 : undefined, justifyContent: 'center'}}>
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} style={styles.textContainer}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} style={styles.textContainer}>
       <View style={styles.centeredContent}>
           <YoutubePlayer
             height={(orientation === 'LANDSCAPE' ? (width * 5 / 8) : (width * 5 / 8) - NAVBAR_HEIGHT)}
@@ -266,7 +266,7 @@ const LiveScreen = () => {
           />
           {isLoading && <ActivityIndicator size="large" color="#ED4D4E" />}
       </View>
-      </MeasureView>
+      </GuageView>
       </View>
     </SafeAreaView>
   );

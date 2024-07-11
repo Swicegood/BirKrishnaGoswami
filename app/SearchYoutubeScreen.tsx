@@ -5,7 +5,7 @@ import { View, FlatList, StyleSheet, TextInput, Image, Text, ActivityIndicator, 
 import { functions } from './api/firebase';
 import { AntDesign } from '@expo/vector-icons';
 import { Link } from 'expo-router';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 import mockYoutubeData from '../components/mockYoutubeData';
 
 interface GetYouTubeVideosRequest {
@@ -121,7 +121,7 @@ const SearchYoutubeVideosScreen = () => {
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       <View style={styles.container}>
         <View style={styles.searchContainer}>
           <TextInput
@@ -157,7 +157,7 @@ const SearchYoutubeVideosScreen = () => {
           </ListComponent>
         )}
       </View>
-    </MeasureView>
+    </GuageView>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, FlatList, Dimensions, ActivityIndicator, Image, Platform, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
@@ -203,7 +203,7 @@ const FolderScreen = () => {
 
   return (
     <HierarchyContext.Provider value={deserializedHierarchy}>
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
         <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
           <FlatList
             data={data}
@@ -217,7 +217,7 @@ const FolderScreen = () => {
             scrollEnabled={Platform.OS !== 'web'}
           />
         </ListComponent>
-      </MeasureView>
+      </GuageView>
     </HierarchyContext.Provider>
   );
 };

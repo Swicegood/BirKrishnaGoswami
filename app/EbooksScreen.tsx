@@ -7,7 +7,7 @@ import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
 import { Link } from 'expo-router';
 import { db } from './api/firebase';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 interface EBooksScreenProps {
   vponly?: boolean;
@@ -147,7 +147,7 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
   const numColumns = Platform.OS === 'web' ? 4 : (isTablet() || orientation === 'LANDSCAPE' ? 3 : 2);
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       <View style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
         <FlatList
           data={data}
@@ -163,7 +163,7 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
           windowSize={5}
         />
       </View>
-    </MeasureView>
+    </GuageView>
   );
 };
 

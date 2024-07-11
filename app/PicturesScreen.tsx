@@ -3,7 +3,7 @@ import { Dimensions, FlatList, Image, TouchableOpacity, Platform, ScrollView, Vi
 import { Link, useLocalSearchParams } from 'expo-router';
 import { getAllFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 // Function to split array into chunks
 const chunkArray = (myArray: string[], chunk_size: number): string[][] => {
@@ -102,7 +102,7 @@ const PicturesScreen = () => {
   );
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       {Platform.OS === 'web' ? (
         <ScrollView style={{ height: '100vh' }}>
           <View style={{ minHeight: '100%' }}>
@@ -112,7 +112,7 @@ const PicturesScreen = () => {
       ) : (
         renderContent()
       )}
-    </MeasureView>
+    </GuageView>
   );
 };
 

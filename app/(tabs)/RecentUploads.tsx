@@ -4,7 +4,7 @@ import VideoItem from '../../components/VideoItem';
 import { Link } from 'expo-router';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../api/firebase';
-import MeasureView from '../api/MeasureView';
+import GuageView from '../../components/GuageView';
 import mockYoutubeData from '../../components/mockYoutubeData';
 
 interface GetYouTubeVideosRequest {
@@ -130,7 +130,7 @@ const RecentUploadsScreen = () => {
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
         <FlatList
           data={videos}
@@ -143,7 +143,7 @@ const RecentUploadsScreen = () => {
           scrollEnabled={Platform.OS !== 'web'}
         />
       </ListComponent>
-    </MeasureView>
+    </GuageView>
   );
 };
 

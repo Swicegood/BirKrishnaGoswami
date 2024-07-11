@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from '../api/firebase';
-import MeasureView from '../api/MeasureView';
+import GuageView from '../../components/GuageView';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 function formatDate(dateString) {
@@ -224,7 +224,7 @@ const TravelScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <MeasureView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
+        <GuageView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
           {(Platform.OS === 'web' || isTablet() || orientation === 'LANDSCAPE') ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
               <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
@@ -248,7 +248,7 @@ const TravelScreen = () => {
               }}
             />
           )}
-        </MeasureView>
+        </GuageView>
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
           {(Platform.OS === 'web' || isTablet()) ? (

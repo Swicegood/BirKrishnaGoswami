@@ -7,7 +7,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from './api/firebase';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import mockPlaylistData from '../components/mockPlaylistData';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 
@@ -273,7 +273,7 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
         <FlatList
           data={videos}
@@ -287,7 +287,7 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
           scrollEnabled={Platform.OS !== 'web'}
         />
       </ListComponent>
-    </MeasureView>
+    </GuageView>
   );
 };
 

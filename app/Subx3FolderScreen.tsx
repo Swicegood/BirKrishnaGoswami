@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Link, useLocalSearchParams, useFocusEffect, router } from 'expo-router';
 import CustomHeaderMain from '../components/CustomHeaderMain';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
@@ -158,7 +158,7 @@ const Subx3FolderScreen = () => {
   return (
     <>
       <CustomHeaderMain title={category} />
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
         <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
           <FlatList
             data={subCategories}
@@ -172,7 +172,7 @@ const Subx3FolderScreen = () => {
             scrollEnabled={Platform.OS !== 'web'}
           />
         </ListComponent>
-      </MeasureView>
+      </GuageView>
     </>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions, SafeAreaView, Platform } from 'react-native';
-import MeasureView from '../api/MeasureView';
+import GuageView from '../../components/GuageView';
 
 const BioScreen = () => {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
@@ -52,7 +52,7 @@ const BioScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
         {orientation === 'PORTRAIT' ? (
           <>
             <Image
@@ -97,7 +97,7 @@ const BioScreen = () => {
             </View>
           </ScrollView>
         )}
-      </MeasureView>
+      </GuageView>
     </SafeAreaView>
   );
 };

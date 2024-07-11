@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, 
   SafeAreaView, Dimensions, ScrollView, Platform } from 'react-native';
 import { Link } from 'expo-router';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 const isTablet = () => {
   const { width, height } = Dimensions.get('window');
@@ -48,7 +48,7 @@ const AudioStartScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
         {orientation === 'PORTRAIT' ? (
           <ScrollView style={scrollViewStyle}>
             <View>
@@ -122,7 +122,7 @@ const AudioStartScreen: React.FC = () => {
             </View>
           </ScrollView>
         )}
-      </MeasureView>
+      </GuageView>
     </SafeAreaView>
   );
 };

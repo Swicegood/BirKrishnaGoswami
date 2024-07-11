@@ -8,7 +8,7 @@ import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import Swiper from 'react-native-swiper';
 import { db } from './api/firebase';
 import RenderHTML from 'react-native-render-html';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 const contentWidth = Dimensions.get('window').width;
 
@@ -84,7 +84,7 @@ const BlogScreen = () => {
 
   const renderBlogPost = (post, index) => (
     <ScrollView style={styles.container} key={index}>
-      <MeasureView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
+      <GuageView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
         <Image
           source={require('../assets/images/Blog_Puppets.png')}
           style={{
@@ -93,7 +93,7 @@ const BlogScreen = () => {
             resizeMode: (isTablet() || Platform.OS === 'web' || orientation === 'LANDSCAPE') ? 'contain' : 'cover'
           }}
         />
-      </MeasureView>
+      </GuageView>
       <Text style={styles.date}>{formatDate(post.date)}</Text>
       <Text style={styles.title}>{post.title.toUpperCase()}</Text>
       <View style={styles.textContainer}>

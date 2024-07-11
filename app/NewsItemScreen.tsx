@@ -4,7 +4,7 @@ import {
   ScrollView, Image, Dimensions, SafeAreaView, Platform
 } from 'react-native';
 import { useLocalSearchParams, Link } from 'expo-router';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 
 const isTablet = () => {
   const { width, height } = Dimensions.get('window');
@@ -68,7 +68,7 @@ const NewsItemScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
         {orientation === 'PORTRAIT' ? (
           <ScrollView style={scrollViewStyle}>
             <Image 
@@ -110,7 +110,7 @@ const NewsItemScreen = () => {
             </View>
           </ScrollView>
         )}
-      </MeasureView>
+      </GuageView>
     </SafeAreaView>
   );
 };

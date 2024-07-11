@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from './api/firebase';
-import MeasureView from './api/MeasureView';
+import GuageView from '../components/GuageView';
 const defaultImage = require('../assets/images/Quote.png');
 
 
@@ -291,7 +291,7 @@ const QuoteScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.quoteContainer}>
-        <MeasureView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
+        <GuageView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
           {(Platform.OS === 'web' || isTablet() || orientation === 'LANDSCAPE') ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
               <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
@@ -315,7 +315,7 @@ const QuoteScreen = () => {
               style={{ width: width, height: orientation === 'LANDSCAPE' ? 160 : 260, resizeMode: (orientation == 'LANDSCAPE') ? 'contain' : 'cover' }}
             />
           )}
-        </MeasureView>
+        </GuageView>
         <View style={styles.content}>
           <Text style={styles.date}>{formatDate(date)}</Text>
           {(Platform.OS === 'web' || isTablet()) ? <Text style={styles.quoteText}>{quote}</Text> :

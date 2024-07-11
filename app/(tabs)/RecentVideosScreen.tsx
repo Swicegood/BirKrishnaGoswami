@@ -7,7 +7,7 @@ import PlaylistItem from '../../components/PlaylistItem'; // Import the Playlist
 import React, { useState, useEffect } from 'react';
 import { useFocusEffect, Link } from 'expo-router'
 import { functions } from '../api/firebase';
-import MeasureView from '../api/MeasureView';
+import GuageView from '../../components/GuageView';
 
 
 
@@ -135,7 +135,7 @@ const RecentVideoScreen = () => {
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <MeasureView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
         <FlatList
           data={playlists}
@@ -148,7 +148,7 @@ const RecentVideoScreen = () => {
           scrollEnabled={Platform.OS !== 'web'}
         />
       </ListComponent>
-    </MeasureView>
+    </GuageView>
   );
 };
 
