@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, Image, ScrollView,
 import { Link } from 'expo-router';
 import GuageView from '../components/GuageView';
 
+const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
+
 const isTablet = () => {
   const { width, height } = Dimensions.get('window');
   const aspectRatio = width / height;
@@ -22,17 +24,30 @@ const BooksScreen: React.FC = () => {
     setWidth(width);
   };
 
-  const onSetOrientation = (orientation: string) => {
-    if ( ( Platform.OS === 'android' && ! isTablet() ) ||  Platform.OS === 'web') {
-      if (orientation === 'LANDSCAPE') {
-        setOrientation('PORTRAIT');
-      } else {
-        setOrientation('LANDSCAPE');
-      }
-      return;
+ const onSetOrientation = (orientation: string) => {
+if (Platform.OS === 'web') {
+handleOrientationChange(orientation);
+} else {
+setOrientation(orientation);
+}
+};
+
+  const handleOrientationChange = () => {
+    const newWidth = Dimensions.get('window').width;
+    const newHeight = Dimensions.get('window').height;
+    const aspectRatio = newWidth / newHeight;
+    const previousAspectRatio = width / height;
+
+    // Only change orientation if the aspect ratio change is significant
+    if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
+      const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+      setOrientation(newOrientation);
     }
-    setOrientation(orientation);
-  };
+
+    setWidth(newWidth);
+    setHeight(newHeight);
+    console.log('HandleOrientation Called :', orientation);
+  }
 
   useEffect(() => {
     if (Platform.OS === 'web') {
