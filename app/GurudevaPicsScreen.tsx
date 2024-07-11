@@ -8,6 +8,7 @@ import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96h
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from './api/firebase';
 import GuageView from '../components/GuageView';
+import useIsMobileWeb from '../hooks/useIsMobileWeb';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -43,6 +44,7 @@ const GalleryComponent = () => {
   const [height, setHeight] = useState(Dimensions.get('window').height);
   const aspectRatio = width / height;
   const [numColumns, setNumColumns] = useState(2);
+  const isMobileWeb = useIsMobileWeb();
 
 
   useEffect(() => {
@@ -73,18 +75,38 @@ const GalleryComponent = () => {
     setWidth(width);
   }
 
+  const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
+
+
+
+  const handleOrientationChange = () => {
+    const newWidth = Dimensions.get('window').width;
+    const newHeight = Dimensions.get('window').height;
+    const aspectRatio = newWidth / newHeight;
+    const previousAspectRatio = width / height;
+
+    // Only change orientation if the aspect ratio change is significant
+    if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
+      const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+      setOrientation(newOrientation);
+    }
+
+    setWidth(newWidth);
+    setHeight(newHeight);
+    console.log('HandleOrientation Called :', orientation);
+  }
+
+
   const onSetOrientation = (orientation: string) => {
-    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
-      setOrientation(orientation === 'LANDSCAPE' ? 'PORTRAIT' : 'LANDSCAPE');
+    if (Platform.OS === 'web') {
+      handleOrientationChange(orientation);
     } else {
       setOrientation(orientation);
     }
-    return;
-    setOrientation(orientation);
-  }
+  };
 
   useEffect(() => {
-    setNumColumns(orientation === 'LANDSCAPE' || Platform.OS === 'web' ? 4 : isTablet() ? 3 : 2);
+    setNumColumns(orientation === 'LANDSCAPE' ? 4 : isTablet() ? 3 : 2);
   }, [orientation]);
 
   const renderContent = () => (
@@ -96,7 +118,7 @@ const GalleryComponent = () => {
         renderItem={({ item, index }) => (
           <Link href={{ pathname: "./PicturesScreen", params: { id: item.id } }} asChild>
             <TouchableOpacity style={{ padding: 20, borderRadius: 10 }}>
-              <Image source={item.url ? { uri: item.url } : placeholderImage} style={{ width: isTablet() || Platform.OS === 'web' ? (width / numColumns) - 40 : (screenWidth / 2) - 40, height: isTablet() || Platform.OS == 'web' ? 280 : 170, borderRadius: 10 }} />
+              <Image source={item.url ? { uri: item.url } : placeholderImage} style={{ width: isTablet() || Platform.OS === 'web' ? (width / numColumns) - 40 : (screenWidth / 2) - 40, height: isMobileWeb ? 150 : isTablet() || Platform.OS == 'web' ? 280 : 170, borderRadius: 10 }} />
               <Text style={[styles.text, { flexShrink: 1 }]}>{item.description}</Text>
             </TouchableOpacity>
           </Link>

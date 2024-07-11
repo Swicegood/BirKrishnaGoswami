@@ -6,7 +6,9 @@ import { Link } from 'expo-router';
 import { getAllFiles } from './api/apiWrapper';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png'; // replace with your placeholder image path
 import GuageView from '../components/GuageView';
+import useIsMobileWeb from '../hooks/useIsMobileWeb';
 
+const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 // Function to split array into chunks
 const chunkArray = (myArray: string[], chunk_size: number): string[][] => {
@@ -40,23 +42,38 @@ const GalleryComponent = () => {
   const [height, setHeight] = useState(Dimensions.get('window').height);
   const [width, setWidth] = useState(Dimensions.get('window').width);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
+  const isMobileWeb = useIsMobileWeb();
 
   const onSetWidth = (width: number) => {
     console.log('width: ', width);
     setWidth(width);
   }
 
-  const onSetOrientation = (orientation: string) => {
-    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
-      if (orientation === 'LANDSCAPE') {
-        setOrientation('PORTRAIT');
-      } else {
-        setOrientation('LANDSCAPE');
-      }
-      return;
+  const handleOrientationChange = () => {
+    const newWidth = Dimensions.get('window').width;
+    const newHeight = Dimensions.get('window').height;
+    const aspectRatio = newWidth / newHeight;
+    const previousAspectRatio = width / height;
+
+    // Only change orientation if the aspect ratio change is significant
+    if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
+      const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+      setOrientation(newOrientation);
     }
-    setOrientation(orientation);
+
+    setWidth(newWidth);
+    setHeight(newHeight);
+    console.log('HandleOrientation Called :', orientation);
   }
+
+
+  const onSetOrientation = (orientation: string) => {
+    if (Platform.OS === 'web') {
+      handleOrientationChange(orientation);
+    } else {
+      setOrientation(orientation);
+    }
+  };
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', onChange);
@@ -66,7 +83,7 @@ const GalleryComponent = () => {
   }, []);
 
   useEffect(() => {
-    setNumColumns(orientation === 'LANDSCAPE' || Platform.OS === 'web' ? 4 : isTablet() ? 3 : 2);
+    setNumColumns(orientation === 'LANDSCAPE' ? 4 : isTablet() ? 3 : 2);
   }, [orientation]);
 
   function getOrientation() {
