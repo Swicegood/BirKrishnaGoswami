@@ -38,6 +38,7 @@ const NewsItemScreen = () => {
 
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
 
   const onSetWidth = (width: number) => {
     console.log('NewsItemScreen width: ', width);
