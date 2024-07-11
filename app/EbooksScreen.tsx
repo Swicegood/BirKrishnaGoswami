@@ -34,21 +34,41 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
   const [width, setWidth] = useState(Dimensions.get('window').width);
   const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
 
+
   const onSetWidth = (width: number) => {
     console.log('EBooksScreen width: ', width);
     setWidth(width);
   };
 
-  const onSetOrientation = (orientation: string) => {
-    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
-      if (orientation === 'LANDSCAPE') {
-        setOrientation('PORTRAIT');
-      } else {
-        setOrientation('LANDSCAPE');
-      }
-      return;
+  const [height, setHeight] = useState(Dimensions.get('window').height);
+  const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
+
+
+
+  const handleOrientationChange = () => {
+    const newWidth = Dimensions.get('window').width;
+    const newHeight = Dimensions.get('window').height;
+    const aspectRatio = newWidth / newHeight;
+    const previousAspectRatio = width / height;
+
+    // Only change orientation if the aspect ratio change is significant
+    if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
+      const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+      setOrientation(newOrientation);
     }
-    setOrientation(orientation);
+
+    setWidth(newWidth);
+    setHeight(newHeight);
+    console.log('HandleOrientation Called :', orientation);
+  }
+
+
+  const onSetOrientation = (orientation: string) => {
+    if (Platform.OS === 'web') {
+      handleOrientationChange(orientation);
+    } else {
+      setOrientation(orientation);
+    }
   };
 
   useEffect(() => {
