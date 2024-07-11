@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState, ReactNode } from 'react'
-import { LayoutChangeEvent, StyleSheet, View, Dimensions, Platform } from 'react-native'
+import { LayoutChangeEvent, StyleSheet, View, Dimensions, Platform, ViewStyle } from 'react-native'
 import { useDebouncedCallback } from '../hooks'
 
 interface GuageViewProps {
     children: ReactNode;
     onSetOrientation: (orientation: string) => void;
     onSetWidth: (width: number) => void;
+    flex?: number;
 }
 
 const isTablet = () => {
@@ -25,7 +26,7 @@ const isSmallTablet = () => {
     return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9) && Math.min(width, height) < 820;
 }
 
-const GuageView: React.FC<GuageViewProps> = ({ children, onSetOrientation, onSetWidth }) => {
+const GuageView: React.FC<GuageViewProps> = ({ children, onSetOrientation, onSetWidth, flex }) => {
     const [width, setWidth] = useState(Dimensions.get('window').width);
     const [updateKey, setUpdateKey] = useState(0);
 
@@ -67,8 +68,12 @@ const GuageView: React.FC<GuageViewProps> = ({ children, onSetOrientation, onSet
         [setDebouncedWidth]
     )
 
+    const containerStyle: ViewStyle = {
+        ...(flex !== undefined && { flex }),
+    };
+
     return (
-        <View onLayout={handleLayout} style={styles.container}>
+        <View onLayout={handleLayout} style={[styles.container, containerStyle]}>
             {children}
         </View>
     )
@@ -76,6 +81,7 @@ const GuageView: React.FC<GuageViewProps> = ({ children, onSetOrientation, onSet
 
 const styles = StyleSheet.create({
     container: {
+        // Base styles can be added here if needed
     },
 });
 

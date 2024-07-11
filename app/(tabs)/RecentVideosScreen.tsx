@@ -8,6 +8,8 @@ import React, { useState, useEffect } from 'react';
 import { useFocusEffect, Link } from 'expo-router'
 import { functions } from '../api/firebase';
 import GuageView from '../../components/GuageView';
+import useIsMobileWeb from '../../hooks/useIsMobileWeb'; // Adjust the import path as needed
+
 
 
 
@@ -49,11 +51,11 @@ const RecentVideoScreen = () => {
     console.log('RecentVideoScreen width: ', width);
     setWidth(width);
   };
-
-const [height, setHeight] = useState(Dimensions.get('window').height);
+  const isMobileWeb = useIsMobileWeb(); // Use the custom hook to determine if the device is mobile
+  const [height, setHeight] = useState(Dimensions.get('window').height);
   const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
-
+  console.log('isMobileWeb: ', isMobileWeb);
 
   const handleOrientationChange = () => {
     const newWidth = Dimensions.get('window').width;
@@ -129,18 +131,22 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     }, [])
   );
 
-  const renderItem = ({ item }: { item: Playlist }) => (
-
-    <Link href={{ pathname: '../PlaylistScreen', params: { id: item.id } }} asChild>
-
+  const renderPlaylistItem = (item) => (
+    <Link key={item.id} href={{ pathname: '../PlaylistScreen', params: { id: item.id } }} asChild>
       <TouchableOpacity style={{ paddingTop: 10 }}>
-        <PlaylistItem title={item.title} lastModified={item.dateModified} thumbnail={item.thumbnailUrl} id={item.id} imageStyle={(isTablet() || Platform.OS === 'web')
-          ? { width: width / 4, height: width * 1.5 / 10 }
-          : (orientation === 'LANDSCAPE')
-            ? { width: width / 5 }
-            : { width: width / 2.2 }} />
+        <PlaylistItem
+          title={item.title}
+          lastModified={item.dateModified}
+          thumbnail={item.thumbnailUrl}
+          id={item.id}
+          imageStyle={
+            width / 4 > 150
+              ? { width: width / 4, height: (width / 4) * 0.5625 }
+              : { width: width / 2 - 20, height: ((width / 2 - 20) * 0.5625) }
+          }
+        />
       </TouchableOpacity>
-    </Link >
+    </Link>
   );
 
   if (isLoading) {
@@ -154,19 +160,33 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
   const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
-    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-      <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
-        <FlatList
-          data={playlists}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          numColumns={1}
-          contentContainerStyle={styles.flatListContent}
-          ListEmptyComponent={<Text style={styles.noResultsText}>No playlists found</Text>}
-          ListFooterComponent={<View style={{ height: 20 }} />} // Add this line
-          scrollEnabled={Platform.OS !== 'web'}
-        />
-      </ListComponent>
+    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} flex={1}>
+      {isMobileWeb ? (
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {playlists.length === 0 ? (
+            <Text style={styles.noResultsText}>No playlists found</Text>
+          ) : (
+            playlists.map(renderPlaylistItem)
+          )}
+          <View style={{ height: 120 }} />
+        </ScrollView>
+      ) : (
+        <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+          <FlatList
+            data={playlists}
+            renderItem={({ item }) => renderPlaylistItem(item)}
+            keyExtractor={item => item.id}
+            numColumns={1}
+            contentContainerStyle={styles.flatListContent}
+            ListEmptyComponent={<Text style={styles.noResultsText}>No playlists found</Text>}
+            ListFooterComponent={<View style={{ height: 20 }} />} // Add this line
+            scrollEnabled={Platform.OS !== 'web'}
+          />
+        </ListComponent>
+      )}
     </GuageView>
   );
 };
@@ -181,6 +201,9 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   flatListContent: {
+    paddingHorizontal: 10,
+  },
+  scrollViewContent: {
     paddingHorizontal: 10,
   },
   noResultsText: {
