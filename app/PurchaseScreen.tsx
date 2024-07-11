@@ -8,6 +8,7 @@ import { db } from './api/firebase';
 import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96hbgsm3dx9f5s9dtnqlglf4.png';
 import { Link } from 'expo-router';
 import GuageView from '../components/GuageView';
+import useIsMobileWeb from '../hooks/useIsMobileWeb';
 
 interface Book {
   key: string;
@@ -27,13 +28,15 @@ const PurchaseScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const isMobileWeb = useIsMobileWeb();
+  const [numColumns, setNumColumns] = useState(2);
 
   const onSetWidth = (width: number) => {
     console.log('PurchaseScreen width: ', width);
     setWidth(width);
   };
 
-const [height, setHeight] = useState(Dimensions.get('window').height);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
   const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 
@@ -79,9 +82,13 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     fetchBooks();
   }, []);
 
+  useEffect(() => {
+    setNumColumns(orientation === 'LANDSCAPE' ? 4 : isTablet() ? 3 : 2);
+  }, [orientation]);
+
   const getItemDimensions = () => {
     let itemWidth, itemHeight;
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && !isMobileWeb) {
       itemWidth = width / 4;
       //itemHeight = width / 3;
     } else if (isTablet()) {
@@ -95,8 +102,11 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
   };
 
   const renderItem = ({ item }: { item: Book }) => {
+
     const { itemWidth, itemHeight } = getItemDimensions();
+    
     return (
+
       <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }]}>
         {(Platform.OS === 'web') ? (
           <React.Fragment>
@@ -110,22 +120,20 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
             </TouchableOpacity>
           </React.Fragment>
         ) : (
-          <React.Fragment>
-            <Link href={{ pathname: item.buyurl }} asChild>
+          <View style={{ paddingTop: isTablet() && 70}}>
               <TouchableOpacity>
                 <Image
                   source={{ uri: item.imgurl || placeholderImage }}
                   style={styles.image}
                 />
               </TouchableOpacity>
-            </Link>
             <Text style={styles.itemText}>{item.title}</Text>
             <Link href={{ pathname: item.buyurl }} asChild>
               <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>PURCHASE BOOK</Text>
               </TouchableOpacity>
             </Link>
-          </React.Fragment>
+          </View>
         )}
       </View>
     );
@@ -143,19 +151,21 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
 
   return (
     <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-      <ListComponent style={[styles.container, (Platform.OS === 'web' || isTablet()) && styles.webContainer]}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.key}
-          numColumns={Platform.OS === 'web' ? 3 : (orientation === 'LANDSCAPE' ? 3 : 2)}
-          key={Platform.OS === 'web' ? 3 : (orientation === 'LANDSCAPE' ? 3 : 2)}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.contentContainer}
-          ListFooterComponent={<View style={{ height: 120 }} />}
-          scrollEnabled={Platform.OS !== 'web'}
-        />
-      </ListComponent>
+
+
+        <View style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.key}
+            numColumns={numColumns}
+            key={numColumns}
+            columnWrapperStyle={styles.columnWrapper}
+            contentContainerStyle={styles.contentContainer}
+            ListFooterComponent={<View style={{ height: 120 }} />}
+
+          />
+        </View>
     </GuageView>
   );
 };
@@ -168,6 +178,10 @@ const styles = StyleSheet.create({
     height: 'calc(100vh - 70px)',
     overflowY: 'auto' as 'auto',
     paddingTop: 20,
+  },
+  scrollViewContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 120,
   },
   columnWrapper: {
     justifyContent: 'space-between',
@@ -205,6 +219,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: 'white',
+  },
+  noResultsText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

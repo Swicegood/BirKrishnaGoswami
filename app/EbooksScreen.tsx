@@ -8,6 +8,7 @@ import placeholderImage from '../assets/images/placeholder-podq8jasdkjc0jdfrw96h
 import { Link } from 'expo-router';
 import { db } from './api/firebase';
 import GuageView from '../components/GuageView';
+import useIsMobileWeb from '../hooks/useIsMobileWeb';
 
 interface EBooksScreenProps {
   vponly?: boolean;
@@ -33,6 +34,8 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
   const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
+  const isMobileWeb = useIsMobileWeb();
+  const [numColumns, setNumColumns] = useState(2);
 
 
   const onSetWidth = (width: number) => {
@@ -92,9 +95,14 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
     fetchBooks();
   }, [vponly]);
 
+  useEffect(() => {
+    setNumColumns(orientation === 'LANDSCAPE' ? 4 : isTablet() ? 3 : 2);
+  }, [orientation]);
+
+
   const getItemDimensions = () => {
     let itemWidth, itemHeight;
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && !isMobileWeb) {
       itemWidth = width / 4;
       itemHeight = width / 3;
     } else if (isTablet()) {
@@ -163,8 +171,6 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
       </View>
     );
   }
-
-  const numColumns = Platform.OS === 'web' ? 4 : (isTablet() || orientation === 'LANDSCAPE' ? 3 : 2);
 
   return (
     <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
