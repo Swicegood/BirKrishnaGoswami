@@ -1,11 +1,9 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import {
-  View, Text, StyleSheet, Image, TouchableOpacity,
-  ActivityIndicator, Dimensions, Platform, ScrollView, FlatList
-} from 'react-native';
-import { Link, useLocalSearchParams, useFocusEffect, router } from 'expo-router';
+import { Text, View, StyleSheet, TouchableOpacity, FlatList, Dimensions, ActivityIndicator, Image, Platform } from 'react-native';
+import { Link, useLocalSearchParams } from 'expo-router';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 import GuageView from '../components/GuageView';
+import useIsMobileWeb from '../hooks/useIsMobileWeb';
 
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
@@ -42,7 +40,7 @@ function buildCategoryList(hierarchy: Record<string, any>, parent: string): stri
 const isTablet = () => {
   const { width, height } = Dimensions.get('window');
   const aspectRatio = width / height;
-  return Math.min(width, height) >= 600 && (aspectRatio > 1.6 || aspectRatio < 0.64);
+  return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
 };
 
 const Subx3FolderScreen = () => {
@@ -52,13 +50,15 @@ const Subx3FolderScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
+  const isMobileWeb = useIsMobileWeb();
+  const [numColumns, setNumColumns] = useState(2);
 
   const onSetWidth = (width: number) => {
     console.log('Subx3FolderScreen width: ', width);
     setWidth(width);
   };
 
-const [height, setHeight] = useState(Dimensions.get('window').height);
   const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 
@@ -77,13 +77,11 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
 
     setWidth(newWidth);
     setHeight(newHeight);
-    console.log('HandleOrientation Called :', orientation);
-  }
-
+  };
 
   const onSetOrientation = (orientation: string) => {
     if (Platform.OS === 'web') {
-      handleOrientationChange(orientation);
+      handleOrientationChange();
     } else {
       setOrientation(orientation);
     }
@@ -116,13 +114,15 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
       return unique;
     }, [] as SubCategory[]);
     setSubCategories(uniqueSubcategories);
-    console.log("Subx3FolderScreenUniqSubCat", uniqueSubcategories);
     setIsLoading(false);
   }, [localHierarchy]);
+  useEffect(() => {
+    setNumColumns(orientation === 'LANDSCAPE' ? 4 : isTablet() ? 3 : 2);
+  }, [orientation]);
 
   const getItemDimensions = () => {
     let itemWidth, itemHeight;
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && !isMobileWeb) {
       itemWidth = width / 4;
       itemHeight = width / 2;
     } else if (isTablet()) {
@@ -138,7 +138,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
   const renderItem = ({ item }: { item: SubCategory }) => {
     const { itemWidth, itemHeight } = getItemDimensions();
     return (
-      <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }]}>
+      <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }, Platform.OS === 'web' && (isMobileWeb ? orientation === 'LANDSCAPE' ? { marginBottom: 20 } : { marginBottom: 0 } : { marginBottom: 150 })]}>
         <Link
           href={{
             pathname: "FilesScreen",
@@ -151,8 +151,8 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
         >
           <TouchableOpacity>
             <View style={(Platform.OS === 'web') ? {} : styles.imageView}>
-              {(Platform.OS === 'web' ? (
-                <Image source={images[item.title] || item.image} style={{...styles.image, width: width / 5}} resizeMode="contain" />
+            {(Platform.OS === 'web' ? (
+            <Image source={images[item.title] || item.image} style={{...styles.image, width: isMobileWeb && orientation === 'LANDSCAPE' ? width / 6 : width / 5}} resizeMode="contain" />
               ) : (
                 <Image source={images[item.title] || item.image} style={styles.image} resizeMode="cover" />
               ))}
@@ -172,25 +172,24 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     );
   }
 
-  const ListComponent = Platform.OS === 'web' ? ScrollView : View;
 
   return (
     <>
       <CustomHeaderMain title={category} />
       <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-        <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+      <View style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
           <FlatList
             data={subCategories}
             renderItem={renderItem}
             keyExtractor={(item) => item.key}
-            numColumns={Platform.OS === 'web' ? 4 : (isTablet() || orientation === 'LANDSCAPE' ? 4 : 2)}
-            key={Platform.OS === 'web' ? 4 : (isTablet() || orientation === 'LANDSCAPE' ? 4 : 2)}
+            numColumns={numColumns}
+            key={numColumns}
             columnWrapperStyle={styles.columnWrapper}
             contentContainerStyle={styles.contentContainer}
             ListFooterComponent={<View style={{ height: 20 }} />}
             scrollEnabled={Platform.OS !== 'web'}
           />
-        </ListComponent>
+        </View>
       </GuageView>
     </>
   );
@@ -203,6 +202,7 @@ const styles = StyleSheet.create({
   webContainer: {
     height: '100vh',
     overflowY: 'auto' as 'auto',
+    paddingBottom: 100,
   },
   columnWrapper: {
     justifyContent: 'space-between',
