@@ -6,7 +6,7 @@ import {
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from '../api/firebase';
 import GuageView from '../../components/GuageView';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import useIsMobileWeb from '../../hooks/useIsMobileWeb';
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -39,6 +39,7 @@ const TravelScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const isMobileWeb = useIsMobileWeb();
 
   const onSetWidth = (width: number) => {
     console.log('TravelScreen width: ', width);
@@ -70,7 +71,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
 
   const onSetOrientation = (orientation: string) => {
     if (Platform.OS === 'web') {
-      handleOrientationChange(orientation);
+      handleOrientationChange();
     } else {
       setOrientation(orientation);
     }
@@ -217,6 +218,9 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
   const getImageHeight = () => {
     if (isTablet() || Platform.OS === 'web') {
       if (orientation === 'LANDSCAPE') {
+        if (isMobileWeb){
+          return width * 0.1;
+        }
         return width * 0.3;
       }
       return width * 0.4;
@@ -244,7 +248,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <GuageView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
-          {(Platform.OS === 'web' || isTablet() || orientation === 'LANDSCAPE') ? (
+          {orientation === 'LANDSCAPE' ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
               <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
               <Image

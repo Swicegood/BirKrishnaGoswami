@@ -6,6 +6,7 @@ import {
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import { db } from './api/firebase';
 import GuageView from '../components/GuageView';
+import useIsMobileWeb from '../hooks/useIsMobileWeb';
 const defaultImage = require('../assets/images/Quote.png');
 
 
@@ -56,6 +57,7 @@ const QuoteScreen = () => {
   const [image, setImage] = useState(`https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/quotes/${dateToDayNumber(date)}.png`);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const isMobileWeb = useIsMobileWeb();
 
   const onSetWidth = (width: number) => {
     console.log('QuoteScreen width: ', width);
@@ -87,7 +89,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
 
   const onSetOrientation = (orientation: string) => {
     if (Platform.OS === 'web') {
-      handleOrientationChange(orientation);
+      handleOrientationChange();
     } else {
       setOrientation(orientation);
     }
@@ -286,6 +288,9 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
   const getImageHeight = () => {
     if (isTablet() || Platform.OS === 'web') {
       if (orientation === 'LANDSCAPE') {
+        if (isMobileWeb){
+          return width * 0.1;
+        }
         return width * 0.3;
       }
       return width * 0.4;
@@ -295,7 +300,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
 
   const getImageWidth = () => {
     if (isTablet() || Platform.OS === 'web') {
-      return getImageHeight() * 1.44;
+      return getImageHeight() * 4 / 3;
     }
     return width;
   }
@@ -311,7 +316,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     <View style={{ flex: 1 }}>
       <View style={styles.quoteContainer}>
         <GuageView onSetWidth={onSetWidth} onSetOrientation={onSetOrientation}>
-          {(Platform.OS === 'web' || isTablet() || orientation === 'LANDSCAPE') ? (
+          {(orientation === 'LANDSCAPE' || isTablet() || (Platform.OS === 'web' && !isMobileWeb)) ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
               <View style={{ ...styles.fill, width: (width - getImageWidth()) / 2, height: getImageHeight() }} />
               <Image
