@@ -37,7 +37,7 @@ const isTablet = () => {
   return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
 };
 
-const SearchYoutubeVideosScreen = () => {
+const SearchYouTubeScreen = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
@@ -265,4 +265,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchYoutubeVideosScreen;
+export default SearchYouTubeScreen;
