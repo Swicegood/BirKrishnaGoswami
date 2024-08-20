@@ -15,6 +15,8 @@ import { httpsCallable } from 'firebase/functions';
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "./api/firebase"
 import GuageView from '../components/GuageView';
+
+import useIsMobileWeb from '../hooks/useIsMobileWeb';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 interface GetYouTubeVideosRequest {
@@ -59,7 +61,7 @@ const LiveScreen = () => {
   const [height, setHeight] = useState(Dimensions.get('window').height);
   const [channelID, setChannelID] = useState('UCLiuTwQ-ap30PbKzprrN2Hg');
 
-  const NAVBAR_HEIGHT = 56;
+  const NAVBAR_HEIGHT = Platform.OS === 'ios' ? 80 : 56;
 
   const handleOrientationChange = () => {
     const newWidth = Dimensions.get('window').width;
@@ -75,6 +77,8 @@ const LiveScreen = () => {
 
     setWidth(newWidth);
     setHeight(newHeight);
+    getVideoHeight();
+    getVideoWidth();
     console.log('HandleOrientation Called :', orientation);
   }
 
@@ -101,7 +105,7 @@ const LiveScreen = () => {
       setVideoHeight(width * 5 / 8);
     } else {
       // In landscape mode, set height to screen height
-      setVideoHeight((width * 5 / 8) - NAVBAR_HEIGHT);
+      setVideoHeight(width * 5 / 8);
     }
   }
 
@@ -227,9 +231,9 @@ const LiveScreen = () => {
 
   if (videoWidth === 0 || videoHeight === 0) {
     return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color="#ED4D4E" />
-    </View>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ED4D4E" />
+      </View>
     );
   }
 
@@ -254,19 +258,17 @@ const LiveScreen = () => {
           </View>
         </View>
       </View>
-      <View style={{flex: (orientation === 'PORTRAIT') ? 1 : undefined, justifyContent: 'center'}}>
-      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} style={styles.textContainer}>
-      <View style={styles.centeredContent}>
-          <YoutubePlayer
-            height={(orientation === 'LANDSCAPE' ? (width * 5 / 8) : (width * 5 / 8) - NAVBAR_HEIGHT)}
-            width={(orientation === 'LANDSCAPE' ? (((width * 9 / 16) - NAVBAR_HEIGHT) * 16 / 9) : width)}
-            play={true}
-            videoId={video}
-            onReady={() => setIsLoading(false)}
-          />
-          {isLoading && <ActivityIndicator size="large" color="#ED4D4E" />}
-      </View>
-      </GuageView>
+      <View style={{ flex: (orientation === 'PORTRAIT') ? 1 : undefined, justifyContent: 'center' }}>
+        <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+          <View style={styles.centeredContent}>
+            <YoutubePlayer
+              height={videoHeight}
+              width={videoWidth}
+              play={true}
+              videoId={video}
+            />
+          </View>
+        </GuageView>
       </View>
     </SafeAreaView>
   );
