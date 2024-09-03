@@ -28,7 +28,8 @@ import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { isLoaded } from "expo-font";
 import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
-import { or } from "firebase/firestore";
+import * as Clipboard from 'expo-clipboard';
+import { isSearchBarAvailableForCurrentPlatform } from "react-native-screens";
 
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 
@@ -125,7 +126,38 @@ const AudioScreen = () => {
     }
   };
 
+
+  const mailAudioLink = async (url: string) => {
+    if (navigator.share) {
+      // Web Share API is supported
+      try {
+        await navigator.share({
+          title: 'Check out this audio file',
+          text: 'I thought you might be interested in this audio file.',
+          url: url
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      // Web Share API is not supported, fallback to clipboard
+      try {
+        await Clipboard.setStringAsync(url);
+        Alert.alert(
+          'Link Copied',
+          "The audio link has been copied to your clipboard. You can now paste it wherever you'd like to share it.",
+          [{ text: 'OK' }]
+        );
+      } catch (error) {
+        console.error('Failed to copy text: ', error);
+        Alert.alert('Error', 'Failed to copy the link. Please try again.');
+      }
+    }
+  };
+
+
   const shareAudioFile = async (fileUri) => {
+    console.log('Sharing audio file:', fileUri);
     try {
       const shareOptions = {
         title: 'Share audio file',
@@ -408,11 +440,21 @@ const AudioScreen = () => {
               )}
 
               <View style={styles.rightItem}>
-                <View style={styles.circle}>
-                  <TouchableOpacity onPress={() => shareAudioLink(file.url)}>
-                    <Entypo name="share" size={26} color="orange" fontWeight='bold' />
-                  </TouchableOpacity>
-                </View>
+                {isMobileWeb ? (
+                  <></>
+                ) : (
+                  <View style={styles.circle}>
+                    {Platform.OS === 'web' ? (
+                      <TouchableOpacity onPress={() => file.url && mailAudioLink(file.url)}>
+                        <Entypo name="share" size={26} color="orange" fontWeight='bold' />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity onPress={() => file.url && shareAudioLink(file.url)}>
+                        <Entypo name="share" size={26} color="orange" fontWeight='bold' />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
               </View>
             </View>
             <View style={styles.content}>

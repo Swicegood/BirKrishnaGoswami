@@ -93,6 +93,8 @@ const images = {
   Jaiva_Dharma: require('../assets/images/Jaiva_Dharma.png'),
   Ramananda_Samvada: require('../assets/images/Ramananda_Samvada.png'),
   Camatkara_Candrika: require('../assets/images/Camatkara_Candrika.png'),
+  Dasa_Mula_Tattva: require('../assets/images/Dasa_Mula_Tattva.png'),
+  Dana_Keli_Kaumudi: require('../assets/images/Dana_Keli_Kaumudi.png'),
 };
 
 
