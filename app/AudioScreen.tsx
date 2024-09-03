@@ -30,6 +30,8 @@ import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
 import { or } from "firebase/firestore";
 
+const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+
 const { width: screenWidth } = Dimensions.get("window");
 
 const isTablet = () => {
@@ -393,7 +395,7 @@ const AudioScreen = () => {
         source={orientation === 'PORTRAIT'
           ? require('../assets/images/1798742_10202693562240691_5596557541863920908_njpg.png')
           : require('../assets/images/1798742_10202693562240691_5596557541863920908_nx1280jpg.jpg')}
-          style={orientation === 'PORTRAIT' ? { width: width, height: height } : Platform.OS === 'web' ? { width: width, height: height} : {width: '100%', height: '100%'}}
+        style={orientation === 'PORTRAIT' ? { width: width, height: height } : Platform.OS === 'web' ? { width: width, height: height } : { width: '100%', height: '100%' }}
       >
         <View style={styles.musicContainer}>
 
@@ -466,41 +468,95 @@ const AudioScreen = () => {
                   <ForwardIcon />
                 </TouchableOpacity>
                 {Platform.OS !== 'android' && (
-                  <TouchableOpacity
-                    style={styles.downloadButton}
-                    onPress={async () => {
-                      if (isFileDownloaded) {
-                        Alert.alert('Downloaded', 'This file is already downloaded');
-                        shareAudioFile(`${FileSystem.cacheDirectory}${file.title}.mp3`);
-                        return;
-                      }
-                      // Check if external storage is available and accessible
-                      const fileUri = `${FileSystem.cacheDirectory}${file.title}.mp3`;
-
-                      const downloadResumable = FileSystem.createDownloadResumable(
-                        url,
-                        fileUri,
-                        {},
-                        (downloadProgress) => {
-                          const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
-                          console.log(`Download progress: ${progress * 100}%`);
-                          setDownloadProgress(progress);
+                  Platform.OS === 'web' ? (
+                    <TouchableOpacity
+                      style={styles.downloadButton}
+                      onPress={async () => {
+                        if (isFileDownloaded) {
+                          Alert.alert('Downloaded', 'This file is already downloaded');
+                          return;
                         }
-                      );
+                        try {
+                          setDownloadProgress(0);
+                          // Fetch the file through the proxy
+                          const response = await fetch(PROXY_URL + url);
+                          const contentLength = response.headers.get('Content-Length');
+                          const total = parseInt(contentLength, 10);
+                          let loaded = 0;
 
-                      try {
-                        const { uri } = await downloadResumable.downloadAsync();
-                        console.log('Finished downloading to ', uri);
-                        Alert.alert('Download Complete', `Finished downloading to ${uri}`);
-                        setIsFileDownloaded(true);
-                      } catch (e) {
-                        console.error(e);
-                      }
-                    }}
-                    disabled={!sound}
-                  >
-                    <Icon name="get-app" size={40} color="#FFF" />
-                  </TouchableOpacity>
+                          const reader = response.body.getReader();
+                          const chunks = [];
+
+                          while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            chunks.push(value);
+                            loaded += value.length;
+                            setDownloadProgress(loaded / total);
+                          }
+
+                          const blob = new Blob(chunks, { type: 'audio/mpeg' });
+                          const blobUrl = window.URL.createObjectURL(blob);
+
+                          const link = document.createElement('a');
+                          link.href = blobUrl;
+                          link.download = `${file.title}.mp3`;
+
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+
+                          window.URL.revokeObjectURL(blobUrl);
+
+                          setIsFileDownloaded(true);
+                          setDownloadProgress(1);
+                        } catch (error) {
+                          console.error('Download failed:', error);
+                          Alert.alert('Download Failed', 'There was an error downloading the file.');
+                          setDownloadProgress(0);
+                        }
+                      }}
+                      disabled={!sound}
+                    >
+                      <Icon name="get-app" size={40} color="#FFF" />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.downloadButton}
+                      onPress={async () => {
+                        if (isFileDownloaded) {
+                          Alert.alert('Downloaded', 'This file is already downloaded');
+                          shareAudioFile(`${FileSystem.cacheDirectory}${file.title}.mp3`);
+                          return;
+                        }
+                        // Check if external storage is available and accessible
+                        const fileUri = `${FileSystem.cacheDirectory}${file.title}.mp3`;
+
+                        const downloadResumable = FileSystem.createDownloadResumable(
+                          url,
+                          fileUri,
+                          {},
+                          (downloadProgress) => {
+                            const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+                            console.log(`Download progress: ${progress * 100}%`);
+                            setDownloadProgress(progress);
+                          }
+                        );
+
+                        try {
+                          const { uri } = await downloadResumable.downloadAsync();
+                          console.log('Finished downloading to ', uri);
+                          Alert.alert('Download Complete', `Finished downloading to ${uri}`);
+                          setIsFileDownloaded(true);
+                        } catch (e) {
+                          console.error(e);
+                        }
+                      }}
+                      disabled={!sound}
+                    >
+                      <Icon name="get-app" size={40} color="#FFF" />
+                    </TouchableOpacity>
+                  )
                 )}
               </View>
             </View>
