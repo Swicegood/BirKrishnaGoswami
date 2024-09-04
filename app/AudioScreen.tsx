@@ -440,11 +440,13 @@ const AudioScreen = () => {
               )}
 
               <View style={styles.rightItem}>
-                {isMobileWeb ? (
-                  <></>
-                ) : (
-                  <View style={styles.circle}>
-                    {Platform.OS === 'web' ? (
+                <View style={styles.circle}>
+                  {isMobileWeb ? (
+                    <TouchableOpacity onPress={() => file.url && mailAudioLink(file.url)}>
+                      <Entypo name="share" size={26} color="orange" fontWeight='bold' />
+                    </TouchableOpacity>
+                  ) : (
+                    Platform.OS === 'web' ? (
                       <TouchableOpacity onPress={() => file.url && mailAudioLink(file.url)}>
                         <Entypo name="share" size={26} color="orange" fontWeight='bold' />
                       </TouchableOpacity>
@@ -452,9 +454,9 @@ const AudioScreen = () => {
                       <TouchableOpacity onPress={() => file.url && shareAudioLink(file.url)}>
                         <Entypo name="share" size={26} color="orange" fontWeight='bold' />
                       </TouchableOpacity>
-                    )}
-                  </View>
-                )}
+                    )
+                  )}
+                </View> ̰
               </View>
             </View>
             <View style={styles.content}>
