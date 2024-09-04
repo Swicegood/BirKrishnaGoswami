@@ -456,7 +456,7 @@ const AudioScreen = () => {
                       </TouchableOpacity>
                     )
                   )}
-                </View> ̰
+                </View>
               </View>
             </View>
             <View style={styles.content}>
