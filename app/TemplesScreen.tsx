@@ -36,6 +36,7 @@ const GalleryComponent = () => {
           newImages.push({
             url: data.url,
             description: data.description,
+            desc_line_2: data.desc_line_2,
             location: data.location,
             date: data.date,
           });
@@ -65,6 +66,7 @@ const GalleryComponent = () => {
               <Image defaultSource={placeholderImage} source={{ uri: item.url }} style={{ width: (screenWidth / 2) - 40, height: 170, borderRadius: 10 }} />
               <Text style={styles.text} >{item.location}</Text>
               <Text style={[styles.text, { flexShrink: 1 }]}>{item.description}</Text>
+              <Text style={[styles.text, { flexShrink: 1 }]}>{item.desc_line_2}</Text>
             </TouchableOpacity>
           </Link>
           );
@@ -74,6 +76,7 @@ const GalleryComponent = () => {
               <Image defaultSource={placeholderImage} source={{ uri: item.url }} style={{ width: (screenWidth / 2) - 40, height: 170, borderRadius: 10 }} />
               <Text style={styles.text} >{item.location}</Text>
               <Text style={[styles.text, { flexShrink: 1 }]}>{item.description}</Text>
+              <Text style={[styles.text, { flexShrink: 1 }]}>{item.desc_line_2}</Text>
             </TouchableOpacity>
           </Link>
         );

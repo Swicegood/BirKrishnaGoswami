@@ -11,7 +11,7 @@
 
 // Enable CORS using the `cors` express middleware.
 
-const functions = require('firebase-functions');
+const functions = require('firebase-functions/v1');
 const axios = require('axios');
 const cors = require('cors')({origin: true}); // This will allow all domains to access the function
 
