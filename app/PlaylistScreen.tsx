@@ -26,6 +26,7 @@ interface Video {
 interface GetYouTubeVideosResponse {
   videos: Video[];
   nextPageToken: string;
+  items: any[];
 }
 
 interface FirebaseFunctionError {
@@ -138,8 +139,8 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
 
         vids.forEach(video => {
           const title = video.snippet.title;
-          const thumbnailUrl = video.snippet.thumbnails.default.url;
-          const dateModified = video.contentDetails.videoPublishedAt;
+          const thumbnailUrl = video.snippet?.thumbnails?.default?.url || 'No thumbnail';
+          const dateModified = video.contentDetails?.videoPublishedAt || 'No dateTNo Date';
           const id = video.contentDetails.videoId;
           setVideos(vids => [...vids, { id, title, thumbnailUrl, dateModified }]);
         });
@@ -159,6 +160,7 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
       return;
     }
     setIsLoading(true);
+    setPageAlreadyLoaded(true)
 
     if (USE_MOCK_DATA) {
       // For mock data, we'll just set isLastPage to true
@@ -175,26 +177,29 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
         let vids = response.items;
 
         const nextPageToken = response.nextPageToken;
-        setNextPageToken(nextPageToken);
-        if (!nextPageToken) {
+        if (nextPageToken) {
+          setNextPageToken(nextPageToken);
+        } else {
+          console.warn('nextPageToken is undefined');
           setIsLastPage(true);
         }
 
         vids.forEach(video => {
           const title = video.snippet.title;
-          const thumbnailUrl = video.snippet.thumbnails.default.url;
-          const dateModified = video.contentDetails.videoPublishedAt;
+          const thumbnailUrl = video.snippet?.thumbnails?.default?.url || 'No thumbnail';
+          const dateModified = video.contentDetails?.videoPublishedAt || 'No dateTNo Date';
           const id = video.contentDetails.videoId;
           setVideos(vids => [...vids, { id, title, thumbnailUrl, dateModified }]);
         });
 
         setIsLoading(false);
+        console.log('isloading set to ', isLoading);
       } catch (error: any) {
         console.error("Error calling the function: ", error.message);
         setIsLoading(false);
       }
     }
-    setPageAlreadyLoaded(true);
+    setPageAlreadyLoaded(false);
   };
 
   async function getVideoHeight() {
@@ -274,24 +279,24 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
 
   return (
     <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth} flex={1}>
-        {isMobileWeb ? (
-          <ScrollView
-            contentContainerStyle={styles.scrollViewContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {videos.length === 0 ? (
-              <Text style={styles.noResultsText}>No videos found</Text>
-            ) : (
-              <>
-                {videos.map(renderVideoItem)}
-                {renderFooter()}
-              </>
-            )}
-            <View style={{ height: 120 }} />
-          </ScrollView>
-        ) : (
+      {isMobileWeb ? (
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {videos.length === 0 ? (
+            <Text style={styles.noResultsText}>No videos found</Text>
+          ) : (
+            <>
+              {videos.map(renderVideoItem)}
+              {renderFooter()}
+            </>
+          )}
+          <View style={{ height: 120 }} />
+        </ScrollView>
+      ) : (
 
-          <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+        <ListComponent style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
           <FlatList
             data={videos}
             renderItem={({ item }) => renderVideoItem(item)}
@@ -302,8 +307,8 @@ const PlaylistScreen = ({ id: propId }: { id?: string }) => {
             ListFooterComponent={renderFooter}
             scrollEnabled={Platform.OS !== 'web'}
           />
-          </ListComponent>
-        )}
+        </ListComponent>
+      )}
     </GuageView>
   );
 };

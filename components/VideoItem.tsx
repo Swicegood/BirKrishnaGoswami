@@ -13,6 +13,15 @@ interface VideoItemProps {
   lastModifiedStyle?: TextStyle;
 }
 
+const isValidUrl = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (_) {
+    return false;
+  }
+};
+
 const VideoItem: React.FC<VideoItemProps> = ({
   title,
   lastModified,
@@ -26,7 +35,10 @@ const VideoItem: React.FC<VideoItemProps> = ({
 }) => {
   return (
     <View style={[styles.item, containerStyle]}>
-      <Image style={[styles.image, imageStyle]} source={{ uri: thumbnail }} />
+      <Image
+        style={[styles.image, imageStyle]}
+        source={{ uri: isValidUrl(thumbnail) ? thumbnail : '../assets/images/Recent_Uploads.png' }}
+      />
       <View style={[styles.textContainer, textContainerStyle]}>
         <Text style={[styles.title, titleStyle]}>{title.slice(0, 50)}</Text>
         <Text style={[styles.lastModified, lastModifiedStyle]}>Last Modified: {lastModified.split("T")[0]}</Text>
