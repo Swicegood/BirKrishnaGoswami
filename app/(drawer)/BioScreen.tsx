@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions, SafeAreaView, Platform } from 'react-native';
 import GuageView from '../../components/GuageView';
+import { useFocusEffect } from '@react-navigation/native';
 
 const BioScreen = () => {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
@@ -10,6 +11,20 @@ const BioScreen = () => {
     console.log('BioScreen width: ', width)
     setWidth(width);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const unsubscribe = () => {
+        // Push a new entry onto the history stack when the screen comes into focus
+        if (Platform.OS === 'web') {
+          window.history.pushState(null, '');
+        }
+      };
+
+      unsubscribe();
+      return () => unsubscribe();
+    }, [])
+  );
 
   const isTablet = () => {
     const { width, height } = Dimensions.get('window');
