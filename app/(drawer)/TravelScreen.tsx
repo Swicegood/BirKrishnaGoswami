@@ -7,6 +7,7 @@ import { collection, query, orderBy, limit, getDocs, where } from "firebase/fire
 import { db } from '../api/firebase';
 import GuageView from '../../components/GuageView';
 import useIsMobileWeb from '../../hooks/useIsMobileWeb';
+import { useFocusEffect } from '@react-navigation/native';
 
 function formatDate(dateString) {
   if (!dateString || dateString.split('/').length !== 3) {
@@ -46,10 +47,23 @@ const TravelScreen = () => {
     setWidth(width);
   };
 
-const [height, setHeight] = useState(Dimensions.get('window').height);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
   const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const unsubscribe = () => {
+        // Push a new entry onto the history stack when the screen comes into focus
+        if (Platform.OS === 'web') {
+          window.history.pushState(null, '');
+        }
+      };
 
+      unsubscribe();
+      return () => unsubscribe();
+    }, [])
+  );
+ 
 
   const handleOrientationChange = () => {
     const newWidth = Dimensions.get('window').width;
