@@ -346,6 +346,19 @@ export default function TabOneScireen() {
                   </TouchableOpacity>
                 </Link>
               </View>
+
+              <View style={styles.buttonRow}>
+                {/* Button components */}
+                <Link href="../(tabs3)/VPPlaylistScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Vyasa-Puja-Button.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>VYASA PUJA</Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
             </React.Fragment>
           ) : (
             <>
@@ -447,6 +460,18 @@ export default function TabOneScireen() {
                     <Text style={styles.buttonText}>BOOKS</Text>
                   </TouchableOpacity>
                 </Link>
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="../(tabs3)/VPPlaylistScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Vyasa-Puja-Button.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>VYASA PUJA</Text>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
               </View>
             </>
           )
