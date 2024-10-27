@@ -82,8 +82,7 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
         .map((doc) => {
           const data = doc.data();
           if (!vponly || (vponly && data.renderorder > 50)) {
-            let modifiedUrl = data.imgurl.replace('.png', '.jpg');
-            return { ...data, imgurl: modifiedUrl, key: doc.id };
+            return { ...data, imgurl: data.imgurl, key: doc.id };
           }
           return null;
         })
