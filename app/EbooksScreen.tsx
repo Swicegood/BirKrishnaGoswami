@@ -81,7 +81,7 @@ const EBooksScreen = ({ vponly = false }: EBooksScreenProps) => {
       const result = querySnapshot.docs
         .map((doc) => {
           const data = doc.data();
-          if (!vponly || (vponly && data.renderorder > 99)) {
+          if (!vponly || (vponly && data.renderorder > 50)) {
             let modifiedUrl = data.imgurl.replace('.png', '.jpg');
             return { ...data, imgurl: modifiedUrl, key: doc.id };
           }
