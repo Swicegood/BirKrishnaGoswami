@@ -23,6 +23,7 @@ const images = {
   Audio_Books: require('../assets/images/Audio_Books.png'),
   Course: require('../assets/images/Course.png'),
   Bhagavad_Gita: require('../assets/images/Bhagavad_Gita.png'),
+  Music: require('../assets/images/Music.jpg'),
   Chaitanya_Charitamrita: require('../assets/images/Chaitanya_Charitamrita.png'),
   Nectar_of_Devotion: require('../assets/images/Nectar_of_Devotion.png'),
   Nectar_of_Instruction: require('../assets/images/Nectar_of_Instruction.png'),
@@ -144,15 +145,15 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
       const renames: Record<string, string> = { 
         // Take the first half of the list and map it to the second half
         ...Object.fromEntries(renamesList.slice(0, renamesList.length / 2).map((value, index) => [value, renamesList[renamesList.length / 2 + index]])),
-        // Take the second half of the list and map it to the first half
-        ...Object.fromEntries(renamesList.slice(renamesList.length / 2).map((value, index) => [value, renamesList[index]])),
       };
-      files.forEach(file => {
-        const newUrl = renames[file.url] || null;
-        file.fakeUrl = newUrl;
-      }
-      );
-      const hierarchy = files.map(file => {
+      const updatedFiles = files.map(file => {
+        const newUrl = renames?.[file.url] || null;
+        return {
+          ...file,
+          fakeUrl: newUrl,
+        };
+      });
+      const hierarchy = updatedFiles.map(file => {
         const hierarchyFromUrl = extractHierarchyFromUrl(file.fakeUrl || file.url);
         return disambiguate(hierarchyFromUrl);
       });
