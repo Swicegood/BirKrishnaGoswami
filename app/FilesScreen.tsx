@@ -11,6 +11,7 @@ interface File {
   parentFolder?: string;
   title: string;
   url: string;
+  fakeUrl: string | null;
   date: string;
 }
 
@@ -42,9 +43,22 @@ const FilesScreen = () => {
         };
       });
 
+      const renamesList = await getAllFiles('renamesList', 'renames');
+      const renames: Record<string, string> = { 
+        // Take the first half of the list and map it to the second half
+        ...Object.fromEntries(renamesList.slice(0, renamesList.length / 2).map((value, index) => [value, renamesList[renamesList.length / 2 + index]])),
+        // Take the second half of the list and map it to the first half
+        ...Object.fromEntries(renamesList.slice(renamesList.length / 2).map((value, index) => [value, renamesList[index]])),
+      };
+      allFiles.forEach(file => {
+        const newUrl = renames[file.url] || null;
+        file.fakeUrl = newUrl;
+      }
+      );
+
       // Populate file.category with the name of the immediate parent folder derived from each url
       const categorizedFiles = allFiles.map(file => {
-        const urlParts = file.url.split('/');
+        const urlParts = file.fakeUrl? file.fakeUrl.split('/') : file.url.split('/');
         const folder = urlParts[urlParts.length - 2]; // Get second last element
         if (urlParts.length < 3) {
           return { ...file, category: folder };

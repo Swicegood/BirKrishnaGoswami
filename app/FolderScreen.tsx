@@ -13,6 +13,7 @@ interface File {
   category: string;
   title: string;
   url: string;
+  fakeUrl: string | null;
   image: string;
 }
 
@@ -139,8 +140,20 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
   useEffect(() => {
     (async () => {
       const files: File[] = (await getAllFiles('audioFilesList', 'mp3Files')).map(url => ({ url }));
+      const renamesList = await getAllFiles('renamesList', 'renames');
+      const renames: Record<string, string> = { 
+        // Take the first half of the list and map it to the second half
+        ...Object.fromEntries(renamesList.slice(0, renamesList.length / 2).map((value, index) => [value, renamesList[renamesList.length / 2 + index]])),
+        // Take the second half of the list and map it to the first half
+        ...Object.fromEntries(renamesList.slice(renamesList.length / 2).map((value, index) => [value, renamesList[index]])),
+      };
+      files.forEach(file => {
+        const newUrl = renames[file.url] || null;
+        file.fakeUrl = newUrl;
+      }
+      );
       const hierarchy = files.map(file => {
-        const hierarchyFromUrl = extractHierarchyFromUrl(file.url);
+        const hierarchyFromUrl = extractHierarchyFromUrl(file.fakeUrl || file.url);
         return disambiguate(hierarchyFromUrl);
       });
       console.log("Hierarchy", hierarchy[40]);

@@ -58,5 +58,4 @@ async function getAllFiles(docId, cacheKey) {
   }
 }
 
-
 export { getAllFiles };
