@@ -40,7 +40,7 @@ const PicturesScreen = () => {
   };
 
   const onSetOrientation = (orientation: string) => {
-    if ((Platform.OS === 'android' && !isTablet()) || Platform.OS === 'web') {
+    if (Platform.OS === 'web') {
       setOrientation(orientation === 'LANDSCAPE' ? 'PORTRAIT' : 'LANDSCAPE');
     } else {
       setOrientation(orientation);
