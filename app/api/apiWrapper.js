@@ -58,4 +58,28 @@ async function getAllFiles(docId, cacheKey) {
   }
 }
 
+export async function getListenedPositions() {
+  try {
+    const jsonValue = await AsyncStorage.getItem("@playedSongs");
+    if (!jsonValue) {
+      return {};
+    }
+    const playedSongs = JSON.parse(jsonValue); 
+    const positions = {};
+
+    // Convert playedSongs array to a map { [url]: last position }
+    for (const entry of playedSongs) {
+      // Make sure we have an actual URL
+      if (entry?.song?.url) {
+        positions[entry.song.url] = entry.position;
+      }
+    }
+
+    return positions;
+  } catch (error) {
+    console.error("Error retrieving listened positions:", error);
+    return {};
+  }
+}
+
 export { getAllFiles };

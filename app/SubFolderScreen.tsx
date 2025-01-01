@@ -4,6 +4,7 @@ import { Link, useLocalSearchParams } from 'expo-router';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
+import { getListenedPositions } from '../app/api/apiWrapper';
 
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
@@ -12,6 +13,7 @@ interface SubCategory {
   title: string;
   image: any;
   parents: any;
+  hasListenedTrack?: boolean;
 }
 
 const images = {
@@ -129,6 +131,23 @@ const isTablet = () => {
   return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
 };
 
+function checkIfSubcategoryListened(
+  subcategory: string,
+  listenedMap: Record<string, number>
+): boolean {
+  for (const [url, position] of Object.entries(listenedMap)) {
+    if (position > 0) {
+      // Parse the 4th level from the URL
+      const parts = url.split('/').filter(Boolean); 
+      const extracted = parts[6]; // e.g. the 7th item if 0-based index
+      if (extracted === subcategory) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 const SubFolderScreen = () => {
   const { hierarchy: localHierarchy, category } = useLocalSearchParams<{ category: string; hierarchy: string }>();
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
@@ -172,33 +191,42 @@ const SubFolderScreen = () => {
   };
 
   useEffect(() => {
-    let deserializedHierarchy: Record<string, any> = {};
-    try {
-      if (localHierarchy !== null) {
-        deserializedHierarchy = JSON.parse(localHierarchy);
+    const initializeScreen = async () => {
+      let deserializedHierarchy: Record<string, any> = {};
+      try {
+        if (localHierarchy !== null) {
+          deserializedHierarchy = JSON.parse(localHierarchy);
+        }
+      } catch (error) {
+        console.log("Hierarchy Failed");
+        return;
       }
-    } catch (error) {
-      console.log("Hierarchy Failed");
-      return;
-    }
-    setDeserializedHierarchy(deserializedHierarchy);
-    let subcategories: SubCategory[] = [];
-    if (category !== null && deserializedHierarchy !== null) {
-      subcategories = buildCategoryList(deserializedHierarchy, category).map((subcategory, index): SubCategory => ({
-        title: subcategory,
-        key: index.toString(),
-        image: placeholderImage,
-        parents: deserializedHierarchy[index],
-      }));
-    }
-    const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {
-      if (unique.findIndex(item => item.title === subcategory.title) === -1) {
-        unique.push(subcategory);
+      setDeserializedHierarchy(deserializedHierarchy);
+
+      const listenedMap = await getListenedPositions();
+
+      let subcategories: SubCategory[] = [];
+      if (category !== null && deserializedHierarchy !== null) {
+        subcategories = buildCategoryList(deserializedHierarchy, category).map((subcategory, index) => ({
+          title: subcategory,
+          key: index.toString(),
+          image: placeholderImage,
+          parents: deserializedHierarchy[index],
+          hasListenedTrack: checkIfSubcategoryListened(subcategory, listenedMap),
+        }));
       }
-      return unique;
-    }, [] as SubCategory[]);
-    setSubCategories(uniqueSubcategories);
-    setIsLoading(false);
+
+      const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {
+        if (unique.findIndex(item => item.title === subcategory.title) === -1) {
+          unique.push(subcategory);
+        }
+        return unique;
+      }, [] as SubCategory[]);
+      setSubCategories(uniqueSubcategories);
+      setIsLoading(false);
+    };
+
+    initializeScreen();
   }, [localHierarchy]);
 
   useEffect(() => {
@@ -220,7 +248,7 @@ const SubFolderScreen = () => {
     return { itemWidth, itemHeight };
   };
 
-  const renderItem = ({ item }: { item: SubCategory }) => {
+  const renderItem = ({ item }: { item: SubCategory & { hasListenedTrack?: boolean } }) => {
     const { itemWidth, itemHeight } = getItemDimensions();
     return (
       <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }, Platform.OS === 'web' && (isMobileWeb ? orientation === 'LANDSCAPE' ? { marginBottom: 20 } : { marginBottom: 0 } : { marginBottom: 150 })]}>
@@ -238,6 +266,9 @@ const SubFolderScreen = () => {
               ) : (
                 <Image source={images[item.title] || item.image} style={styles.image} resizeMode="cover" />
               ))}
+              {item.hasListenedTrack && (
+                <View style={styles.greenDot} />
+              )}
             </View>
           </TouchableOpacity>
         </Link>
@@ -324,6 +355,16 @@ const styles = StyleSheet.create({
     fontFamily: 'OblikBold',
     color: 'maroon',
     textAlign: 'center',
+  },
+  greenDot: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'lime', // neon green
+    zIndex: 1,
   },
 });
 

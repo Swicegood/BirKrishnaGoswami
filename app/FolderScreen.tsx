@@ -4,6 +4,7 @@ import { Link } from 'expo-router';
 import { getAllFiles } from '../app/api/apiWrapper';
 import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
+import { getListenedPositions } from '../app/api/apiWrapper';
 
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
@@ -92,6 +93,23 @@ const isTablet = () => {
   return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
 };
 
+function computeListenedFoldersFrom(listenedMap: Record<string, number>): Set<string> {
+  const listenedFolders = new Set<string>();
+
+  for (const [url, position] of Object.entries(listenedMap)) {
+    if (position > 0) {
+      const parts = url.split('/').filter(Boolean);
+      // The "3rd level" is parts[2] if zero-based indexing
+      const folderName = parts[5];
+      if (folderName) {
+        listenedFolders.add(folderName);
+      }
+    }
+  }
+
+  return listenedFolders;
+}
+
 const FolderScreen = () => {
   const [folders, setFolders] = useState<string[]>([]);
   const [hierarchy, setHierarchy] = useState<Record<string, any>[]>([]);
@@ -161,7 +179,15 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
       setHierarchy(hierarchy);
       setDeserializedHierarchy(hierarchy);
       const categories = buildCategoryList(hierarchy, 1);
-      const uniqueCategories = Array.from(new Set(categories));
+      const listenedMap = await getListenedPositions();
+      const listenedFolders = computeListenedFoldersFrom(listenedMap);
+      console.log("listenedFolders", listenedFolders);
+      const uniqueCategories = Array.from(new Set(categories))
+        .map(folderName => ({
+          name: folderName,
+          hasListenedTrack: listenedFolders.has(folderName),  // some logic from your compute
+        }));
+
       setFolders(uniqueCategories);
       setIsLoading(false);
     })();
@@ -198,7 +224,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     return { itemWidth, itemHeight };
   };
 
-  const renderItem = ({ item }: { item: { key: string, category: string, image: any } }) => {
+  const renderItem = ({ item }: { item: { key: string; category: string; image: any; hasListenedTrack?: boolean } }) => {
     const { itemWidth, itemHeight } = getItemDimensions();
     return (
       <View style={[styles.itemContainer, { width: itemWidth, height: itemHeight }, Platform.OS === 'web' && (isMobileWeb ? orientation === 'LANDSCAPE' ? {marginBottom: 20 } : { marginBottom: 0 } : { marginBottom: 150 })]}>
@@ -216,6 +242,9 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
               ) : (
                 <Image source={images[item.category] || item.image} style={styles.image} resizeMode="cover" />
               ))}
+              {item.hasListenedTrack && (
+                <View style={styles.greenDot} />
+              )}
             </View>
           </TouchableOpacity>
         </Link>
@@ -232,10 +261,11 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     );
   }
 
-  const data = folders.map((folder, index) => ({
+  const data = folders.map((folderObj, index) => ({
     key: String(index),
-    category: folder || 'Loading...',
+    category: folderObj.name || 'Loading...',
     image: placeholderImage,
+    hasListenedTrack: folderObj.hasListenedTrack ?? false,
   }));
 
 
@@ -309,6 +339,16 @@ const styles = StyleSheet.create({
     fontFamily: 'OblikBold',
     color: 'maroon',
     textAlign: 'center',
+  },
+  greenDot: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'lime', // neon green
+    zIndex: 1,
   },
 });
 
