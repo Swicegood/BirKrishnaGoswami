@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, ActivityIndi
 import { getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from './api/firebase';
 import CustomHeaderMain from '../components/CustomHeaderMain';
+import { getListenedPositions } from '../app/api/apiWrapper';
 
 interface File {
   category: string;
@@ -13,6 +14,7 @@ interface File {
   url: string;
   fakeUrl: string | null;
   date: string;
+  hasListenedTrack: boolean;
 }
 
 
@@ -22,7 +24,6 @@ const FilesScreen = () => {
   const [files, setFiles] = useState<File[]>([]);
   const { category } = useLocalSearchParams<{ category: string }>();
   const [isLoading, setIsLoading] = useState(true);
-
   console.log("FileSccreenCat", category);
   useEffect(() => {
     (async () => {
@@ -43,6 +44,8 @@ const FilesScreen = () => {
         };
       });
 
+      const listenedMap = await getListenedPositions();
+
       const renamesList = await getAllFiles('renamesList', 'renames');
       const renames: Record<string, string> = { 
         // Take the first half of the list and map it to the second half
@@ -53,6 +56,10 @@ const FilesScreen = () => {
       allFiles.forEach(file => {
         const newUrl = renames[file.url] || null;
         file.fakeUrl = newUrl;
+        // Mark hasListenedTrack if position > 0
+        const position = listenedMap[file.fakeUrl || file.url] ?? 0;
+        const hasListenedTrack = position > 0;
+        file.hasListenedTrack = hasListenedTrack;
       }
       );
 
@@ -85,6 +92,7 @@ const FilesScreen = () => {
         // Otherwise, accept the file if file.category === category
         return file.category === category;
       });
+
       const folderFilesWithDate = await Promise.all(folderFiles.map(async file => {
         let docData;
         const q = query(collection(db, "audio-tracks"), where("url", "==", file.url));
@@ -92,13 +100,17 @@ const FilesScreen = () => {
         if (!querySnapshot.empty) {
           docData = querySnapshot.docs[0].data();
         }
-        return { ...file, date: docData?.freindly_date };
+        const friendlyDate = docData?.freindly_date;
+
+        // Mark hasListenedTrack if position > 0
+        const position = listenedMap[file.fakeUrl || file.url] ?? 0;
+        const hasListenedTrack = position > 0;
+
+        return { ...file, date: friendlyDate, hasListenedTrack };
       }));
       setFiles(folderFilesWithDate);
-
-
+      isLoading && setIsLoading(false);
     })();
-    isLoading && setIsLoading(false);
   }, []);
 
   const onPress = (file: File) => {
@@ -112,7 +124,7 @@ const FilesScreen = () => {
       </View>
     );
   }
-  const renderItem = ({ item }: { item: File }) => (
+  const renderItem = ({ item }: { item: File & { hasListenedTrack?: boolean } }) => (
     <View style={styles.container}>
       <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
         <TouchableOpacity style={styles.playButton}>
@@ -128,6 +140,9 @@ const FilesScreen = () => {
         </Text>
         <Text style={styles.dateText}>{item.date}</Text>
       </View>
+      {item.hasListenedTrack && (
+        <View style={styles.greenDot} />
+      )}
     </View>
   );
 
@@ -151,7 +166,8 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc', // Adjust color as needed
+    borderBottomColor: '#ccc',
+    position: 'relative',
   },
   playButton: {
     marginRight: 30,
@@ -174,6 +190,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'grey',
     // Adjust style as needed
+  },
+  greenDot: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'lime',
+    zIndex: 1,
   },
 });
 
