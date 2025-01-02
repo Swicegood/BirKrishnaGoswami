@@ -4,7 +4,7 @@ import { Link, useLocalSearchParams } from 'expo-router';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
-import { getListenedPositions } from '../app/api/apiWrapper';
+import { getListenedPositions, getUpdatedFiles } from '../app/api/apiWrapper';
 
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
@@ -13,6 +13,11 @@ interface SubCategory {
   title: string;
   image: any;
   parents: any;
+}
+
+interface File {
+  url: string;
+  fakeUrl?: string;
 }
 
 const images = {
@@ -76,13 +81,21 @@ const isTablet = () => {
 
 function checkIfSubcategoryListened(
   subcategory: string,
-  listenedMap: Record<string, number>
+  listenedMap: Record<string, number>,
+  updatedFiles: File[]
 ): boolean {
+  // Create a mapping of real URLs to fake URLs
+  const urlMapping = updatedFiles.reduce((acc, file) => {
+    acc[file.url] = file.fakeUrl;
+    return acc;
+  }, {} as Record<string, string>);
+
   for (const [url, position] of Object.entries(listenedMap)) {
     if (position > 0) {
-      // Parse the 4th level from the URL
-      const parts = url.split('/').filter(Boolean);
-      const extracted = parts[7]; // e.g. the 7th item if 0-based index
+      // Find corresponding fake URL
+      const fakeUrl = urlMapping[url];
+      const parts = (fakeUrl || url).split('/').filter(Boolean);
+      const extracted = parts[7]; // Assuming subcategory is at index 6
       if (extracted === subcategory) {
         return true;
       }
@@ -147,6 +160,7 @@ const SubSubFolderScreen = () => {
         return;
       }
       const listenedMap = await getListenedPositions();
+      const updatedFiles = await getUpdatedFiles();
       setDeserializedHierarchy(deserializedHierarchy);
       let subcategories: SubCategory[] = [];
       if (category !== null && deserializedHierarchy !== null) {
@@ -155,7 +169,7 @@ const SubSubFolderScreen = () => {
           key: index.toString(),
           image: placeholderImage,
           parents: deserializedHierarchy[index],
-          hasListenedTrack: checkIfSubcategoryListened(subcategory, listenedMap),
+          hasListenedTrack: checkIfSubcategoryListened(subcategory, listenedMap, updatedFiles),
         }));
       }
       const uniqueSubcategories = subcategories.reduce((unique, subcategory) => {

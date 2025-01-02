@@ -46,7 +46,7 @@ const FilesScreen = () => {
       });
 
       const listenedMap = await getListenedPositions();
-
+      console.log("FileSccreenListenedMap", listenedMap);
       const renamesList = await getAllFiles('renamesList', 'renames');
       const renames: Record<string, string> = { 
         // Take the first half of the list and map it to the second half
@@ -58,7 +58,7 @@ const FilesScreen = () => {
         const newUrl = renames[file.url] || null;
         file.fakeUrl = newUrl;
         // Mark hasListenedTrack if position > 0
-        const position = listenedMap[file.fakeUrl || file.url] ?? 0;
+        const position = listenedMap[file.url] ?? 0;
         const hasListenedTrack = position > 0;
         file.hasListenedTrack = hasListenedTrack;
       }
@@ -104,7 +104,7 @@ const FilesScreen = () => {
         const friendlyDate = docData?.freindly_date;
 
         // Mark hasListenedTrack if position > 0
-        const position = listenedMap[file.fakeUrl || file.url] ?? 0;
+        const position = listenedMap[file.url] ?? 0;
         const hasListenedTrack = position > 0;
 
         return { ...file, date: friendlyDate, hasListenedTrack };
@@ -130,8 +130,8 @@ const FilesScreen = () => {
           const playedSongs = JSON.parse(jsonValue);
 
           for (const entry of playedSongs) {
-            if (entry?.song?.url === (file.fakeUrl || file.url)) {
-              entry.position = 0;
+            if (entry?.song?.url === (file.url)) {
+              playedSongs.splice(playedSongs.indexOf(entry), 1);
             }
           }
 
@@ -167,8 +167,8 @@ const FilesScreen = () => {
                 const playedSongs = JSON.parse(jsonValue);
 
                 for (const entry of playedSongs) {
-                  if (entry?.song?.url === (file.fakeUrl || file.url)) {
-                    entry.position = 0;
+                  if (entry?.song?.url === (file.url)) {
+                    playedSongs.splice(playedSongs.indexOf(entry), 1);
                   }
                 }
 

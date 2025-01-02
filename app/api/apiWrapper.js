@@ -82,4 +82,21 @@ export async function getListenedPositions() {
   }
 }
 
+export async function getUpdatedFiles() {
+  const files = (await getAllFiles('audioFilesList', 'mp3Files')).map(url => ({ url }));
+      const renamesList = await getAllFiles('renamesList', 'renames');
+      const renames = { 
+        // Take the first half of the list and map it to the second half
+        ...Object.fromEntries(renamesList.slice(0, renamesList.length / 2).map((value, index) => [value, renamesList[renamesList.length / 2 + index]])),
+      };
+      const updatedFiles = files.map(file => {
+        const newUrl = renames?.[file.url] || null;
+        return {
+          ...file,
+          fakeUrl: newUrl,
+        };
+  });
+  return updatedFiles;
+}
+
 export { getAllFiles };

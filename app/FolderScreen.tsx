@@ -93,13 +93,22 @@ const isTablet = () => {
   return Math.min(width, height) >= 600 && (aspectRatio > 1.2 || aspectRatio < 0.9);
 };
 
-function computeListenedFoldersFrom(listenedMap: Record<string, number>): Set<string> {
+function computeListenedFoldersFrom(listenedMap: Record<string, number>, updatedFiles: File[]): Set<string> {
   const listenedFolders = new Set<string>();
+
+  // Create a map of real URLs to fake URLs
+  const urlMap = new Map<string, string>();
+  updatedFiles.forEach(file => {
+    if (file.fakeUrl) {
+      urlMap.set(file.url, file.fakeUrl);
+    }
+  });
 
   for (const [url, position] of Object.entries(listenedMap)) {
     if (position > 0) {
-      const parts = url.split('/').filter(Boolean);
-      // The "3rd level" is parts[2] if zero-based indexing
+      // Use the fake URL if one exists for this real URL
+      const urlToUse = urlMap.get(url) || url;
+      const parts = urlToUse.split('/').filter(Boolean);
       const folderName = parts[5];
       if (folderName) {
         listenedFolders.add(folderName);
@@ -180,7 +189,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
       setDeserializedHierarchy(hierarchy);
       const categories = buildCategoryList(hierarchy, 1);
       const listenedMap = await getListenedPositions();
-      const listenedFolders = computeListenedFoldersFrom(listenedMap);
+      const listenedFolders = computeListenedFoldersFrom(listenedMap, updatedFiles);
       console.log("listenedFolders", listenedFolders);
       const uniqueCategories = Array.from(new Set(categories))
         .map(folderName => ({

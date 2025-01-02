@@ -4,7 +4,7 @@ import { Link, useLocalSearchParams } from 'expo-router';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
-import { getListenedPositions } from '../app/api/apiWrapper';
+import { getListenedPositions, getUpdatedFiles } from '../app/api/apiWrapper';
 
 const placeholderImage = require('../assets/images/placeholder_portrait.png');
 
@@ -16,7 +16,12 @@ interface SubCategory {
   hasListenedTrack?: boolean;
 }
 
-const images = {
+interface File {
+  url: string;
+  fakeUrl?: string;
+}
+
+const images: Record<string, any> = {
   Srimad_Bhagavatam: require('../assets/images/Srimad_Bhagavatam.png'),
   "Canto-01": require('../assets/images/Canto-01.jpg'),
   "Canto-02": require('../assets/images/Canto-02.jpg'),
@@ -112,12 +117,16 @@ const images = {
 function buildCategoryList(hierarchy: Record<string, any>, parent: string): string[] {
   const categories: string[] = [];
   const traverse = (node: Record<string, any> | null, currentParent: string) => {
+    if (!node) return;
+
     if (currentParent === parent) {
       categories.push(...Object.keys(node));
     } else {
-      for (const [key, value] of Object.entries(node)) {
-        traverse(value, key);
-      }
+      Object.entries(node).forEach(([key, value]) => {
+        if (value && typeof value === 'object') {
+          traverse(value, key);
+        }
+      });
     }
   };
 
@@ -133,16 +142,26 @@ const isTablet = () => {
 
 function checkIfSubcategoryListened(
   subcategory: string,
-  listenedMap: Record<string, number>
+  listenedMap: Record<string, number>,
+  updatedFiles: File[]
 ): boolean {
+  // Create a mapping of real URLs to fake URLs
+  const urlMapping = updatedFiles.reduce((acc, file) => {
+    acc[file.url] = file.fakeUrl;
+    return acc;
+  }, {} as Record<string, string>);
+
   for (const [url, position] of Object.entries(listenedMap)) {
     if (position > 0) {
-      // Parse the 4th level from the URL
-      const parts = url.split('/').filter(Boolean); 
-      const extracted = parts[6]; // e.g. the 7th item if 0-based index
+      // Find corresponding fake URL
+      const fakeUrl = urlMapping[url];
+      // Parse the fake URL to extract subcategory
+      const parts = (fakeUrl || url).split('/').filter(Boolean);
+      const extracted = parts[6]; // Assuming subcategory is at index 6
       if (extracted === subcategory) {
         return true;
       }
+
     }
   }
   return false;
@@ -204,6 +223,8 @@ const SubFolderScreen = () => {
       setDeserializedHierarchy(deserializedHierarchy);
 
       const listenedMap = await getListenedPositions();
+      const updatedFiles = await getUpdatedFiles();
+
 
       let subcategories: SubCategory[] = [];
       if (category !== null && deserializedHierarchy !== null) {
@@ -212,7 +233,7 @@ const SubFolderScreen = () => {
           key: index.toString(),
           image: placeholderImage,
           parents: deserializedHierarchy[index],
-          hasListenedTrack: checkIfSubcategoryListened(subcategory, listenedMap),
+          hasListenedTrack: checkIfSubcategoryListened(subcategory, listenedMap, updatedFiles),
         }));
       }
 
@@ -262,7 +283,7 @@ const SubFolderScreen = () => {
           <TouchableOpacity>
             <View style={(Platform.OS === 'web') ? {} : styles.imageView}>
               {(Platform.OS === 'web' ? (
-                <Image source={images[item.title] || item.image} style={{...styles.image, width: isMobileWeb && orientation === 'LANDSCAPE' ? width / 6 : width / 5}} resizeMode="contain" />
+                <Image source={images[item.title] || item.image} style={{ ...styles.image, width: isMobileWeb && orientation === 'LANDSCAPE' ? width / 6 : width / 5 }} resizeMode="contain" />
               ) : (
                 <Image source={images[item.title] || item.image} style={styles.image} resizeMode="cover" />
               ))}
@@ -287,21 +308,21 @@ const SubFolderScreen = () => {
 
   return (
     <>
-    <CustomHeaderMain title={category} />
-    <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
-      <View style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
-        <FlatList
-          data={subCategories}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.key}
-          numColumns={numColumns}
-          key={numColumns}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.contentContainer}
-          ListFooterComponent={<View style={{ height: 20 }} />}
-        />
-      </View>
-    </GuageView>
+      <CustomHeaderMain title={category} />
+      <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
+        <View style={[styles.container, Platform.OS === 'web' && styles.webContainer]}>
+          <FlatList
+            data={subCategories}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.key}
+            numColumns={numColumns}
+            key={numColumns}
+            columnWrapperStyle={styles.columnWrapper}
+            contentContainerStyle={styles.contentContainer}
+            ListFooterComponent={<View style={{ height: 20 }} />}
+          />
+        </View>
+      </GuageView>
     </>
   );
 };
