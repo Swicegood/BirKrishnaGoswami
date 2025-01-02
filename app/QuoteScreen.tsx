@@ -10,27 +10,35 @@ import useIsMobileWeb from '../hooks/useIsMobileWeb';
 const defaultImage = require('../assets/images/Quote.png');
 
 
-function formatDate(dateString) {
+function formatDate(dateString: string) {
   if (!dateString || dateString.split('/').length !== 3) {
     return '';
   }
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dateParts = dateString.split('/');
-  const date = new Date(`20${dateParts[2]}`, dateParts[0] - 1, dateParts[1]);
+  const date = new Date(
+    parseInt(`20${dateParts[2]}`, 10),
+    parseInt(dateParts[0], 10) - 1,
+    parseInt(dateParts[1], 10)
+  );
   const month = months[date.getMonth()];
   const day = String(date.getDate());
 
   return `${month} ${day}`;
 }
 
-function dateToDayNumber(dateString) {
+function dateToDayNumber(dateString: string) {
   if (!dateString || dateString.split('/').length !== 3) {
     return 0;
   }
   const dateParts = dateString.split('/');
-  const date = new Date(`20${dateParts[2]}`, dateParts[0] - 1, dateParts[1]);
+  const date = new Date(
+    parseInt(`20${dateParts[2]}`, 10),
+    parseInt(dateParts[0], 10) - 1,
+    parseInt(dateParts[1], 10)
+  );
   const start = new Date(date.getFullYear(), 0, 0);
-  const diff = date - start;
+  const diff = date.getTime() - start.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const day = Math.floor(diff / oneDay);
   console.log("dateString", dateString);
@@ -50,7 +58,7 @@ const isTablet = () => {
 const QuoteScreen = () => {
   const [quote, setQuote] = useState('');
   const [date, setDate] = useState('');
-  const [currentDoc, setCurrentDoc] = useState(null);
+  const [currentDoc, setCurrentDoc] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [atFirstDoc, setAtFirstDoc] = useState(true);
   const [atLastDoc, setAtLastDoc] = useState(false);
@@ -95,7 +103,7 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     }
   };
 
-  const getImageSource = (image) => {
+  const getImageSource = (image: string) => {
     if (typeof image === 'string' && image.startsWith('http')) {
       return { uri: image };
     }
@@ -108,7 +116,11 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
 
   useEffect(() => {
     const fetchQuote = async () => {
-      const q = query(collection(db, 'thought-of-the-days'), orderBy('date', 'desc'), limit(1));
+      const q = query(
+        collection(db, 'thought-of-the-days'),
+        orderBy('processed', 'desc'),
+        limit(1)
+      );
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         // Assuming doc.data() returns an object with text, date, and category
