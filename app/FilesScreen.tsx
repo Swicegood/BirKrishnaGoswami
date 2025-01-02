@@ -120,44 +120,74 @@ const FilesScreen = () => {
 
   // 1) Reset position on long press
   const handleResetPosition = async (file: File) => {
-    Alert.alert(
-      "Reset Track Progress",
-      'You are about to mark this track "unplayed." Your bookmark will be erased. Are you sure?',
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Yes, Reset",
-          onPress: async () => {
-            try {
-              const jsonValue = await AsyncStorage.getItem("@playedSongs");
-              if (!jsonValue) return;
+    if (Platform.OS === 'web') {
+      // For web, use window.confirm
+      if (window.confirm('You are about to mark this track "unplayed." Your bookmark will be erased. Are you sure?')) {
+        try {
+          const jsonValue = await AsyncStorage.getItem("@playedSongs");
+          if (!jsonValue) return;
 
-              const playedSongs = JSON.parse(jsonValue);
+          const playedSongs = JSON.parse(jsonValue);
 
-              for (const entry of playedSongs) {
-                if (entry?.song?.url === (file.fakeUrl || file.url)) {
-                  entry.position = 0;
-                }
-              }
-
-              await AsyncStorage.setItem("@playedSongs", JSON.stringify(playedSongs));
-
-              setFiles(prevFiles => prevFiles.map(f => {
-                if (f.url === file.url) {
-                  return { ...f, hasListenedTrack: false };
-                }
-                return f;
-              }));
-            } catch (error) {
-              console.error("Error resetting position:", error);
+          for (const entry of playedSongs) {
+            if (entry?.song?.url === (file.fakeUrl || file.url)) {
+              entry.position = 0;
             }
           }
+
+          await AsyncStorage.setItem("@playedSongs", JSON.stringify(playedSongs));
+
+          setFiles(prevFiles => prevFiles.map(f => {
+            if (f.url === file.url) {
+              return { ...f, hasListenedTrack: false };
+            }
+            return f;
+          }));
+        } catch (error) {
+          console.error("Error resetting position:", error);
         }
-      ]
-    );
+      }
+    } else {
+      // For native platforms, use Alert
+      Alert.alert(
+        "Reset Track Progress",
+        'You are about to mark this track "unplayed." Your bookmark will be erased. Are you sure?',
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "Yes, Reset",
+            onPress: async () => {
+              try {
+                const jsonValue = await AsyncStorage.getItem("@playedSongs");
+                if (!jsonValue) return;
+
+                const playedSongs = JSON.parse(jsonValue);
+
+                for (const entry of playedSongs) {
+                  if (entry?.song?.url === (file.fakeUrl || file.url)) {
+                    entry.position = 0;
+                  }
+                }
+
+                await AsyncStorage.setItem("@playedSongs", JSON.stringify(playedSongs));
+
+                setFiles(prevFiles => prevFiles.map(f => {
+                  if (f.url === file.url) {
+                    return { ...f, hasListenedTrack: false };
+                  }
+                  return f;
+                }));
+              } catch (error) {
+                console.error("Error resetting position:", error);
+              }
+            }
+          }
+        ]
+      );
+    }
   };
 
   if (isLoading) {
