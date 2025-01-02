@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions, Alert, Platform } from 'react-native';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from './api/firebase';
 import { router } from 'expo-router';
-import { Alert } from 'react-native';
 const windowHeight = Dimensions.get('window').height;
 
 const isTablet = () => {
@@ -40,25 +39,36 @@ const chanting: React.FC = () => {
           <TouchableOpacity 
             style={styles.card}
             onPress={() => {
-              Alert.alert(
-                "Important Notice",
-                "The audio you are about to hear has been verified to be Gurudev when he was a young man in Miami. Please do not be alarmed by how different his voice is.",
-                [
-                  {
-                    text: "Cancel",
-                    style: "cancel"
-                  },
-                  {
-                    text: "Continue",
-                    onPress: () => {
-                      router.push({
-                        pathname: "/AudioScreen",
-                        params: { url: track, title: "Chanting Japa" }
-                      });
+              if (Platform.OS === 'web') {
+                // For web, use window.confirm
+                if (window.confirm("The audio you are about to hear has been verified to be Gurudev when he was a young man in Miami. Please do not be alarmed by how different his voice is.")) {
+                  router.push({
+                    pathname: "/AudioScreen",
+                    params: { url: track, title: "Chanting Japa" }
+                  });
+                }
+              } else {
+                // For native platforms, use Alert
+                Alert.alert(
+                  "Important Notice",
+                  "The audio you are about to hear has been verified to be Gurudev when he was a young man in Miami. Please do not be alarmed by how different his voice is.",
+                  [
+                    {
+                      text: "Cancel",
+                      style: "cancel"
+                    },
+                    {
+                      text: "Continue",
+                      onPress: () => {
+                        router.push({
+                          pathname: "/AudioScreen",
+                          params: { url: track, title: "Chanting Japa" }
+                        });
+                      }
                     }
-                  }
-                ]
-              );
+                  ]
+                );
+              }
             }}
           >
             <Image
