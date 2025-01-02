@@ -55,6 +55,29 @@ const isTablet = () => {
   return isLandscape
 }
 
+// Helper function to convert 'MM/DD/YY' to 'MM/DD/YYYY'
+function convertToFullYearDate(dateString: string): string {
+  const dateParts = dateString.split('/');
+  return `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
+}
+
+// Helper function to shift date by a given number of days (pos/neg)
+function shiftDate(fullYearDate: string, days: number): string {
+  const fullDateParts = fullYearDate.split('/');
+  const shiftedDate = new Date(
+    parseInt(fullDateParts[2], 10),
+    parseInt(fullDateParts[0], 10) - 1,
+    parseInt(fullDateParts[1], 10)
+  );
+  shiftedDate.setDate(shiftedDate.getDate() + days);
+
+  // Return 'MM/DD/YY'
+  const month = String(shiftedDate.getMonth() + 1).padStart(2, '0');
+  const day = String(shiftedDate.getDate()).padStart(2, '0');
+  const year = String(shiftedDate.getFullYear()).slice(-2);
+  return `${month}/${day}/${year}`;
+}
+
 const QuoteScreen = () => {
   const [quote, setQuote] = useState('');
   const [date, setDate] = useState('');
@@ -137,163 +160,131 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
   }, []);
 
   const handleNextQuote = async () => {
-    if (currentDoc) {
-      setAtFirstDoc(false);
-      const currentTimestamp = currentDoc.data().processed;
-      console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
-      const nextQuery = query(
-        collection(db, 'thought-of-the-days'),
-        where('processed', '<', currentTimestamp),
-        orderBy('processed', 'desc'),
-        limit(1)
-      );
-      const nextQuerySnapshot = await getDocs(nextQuery);
+    if (!currentDoc) return;
+    setAtFirstDoc(false);
 
-      if (!nextQuerySnapshot.empty) {
-        const doc = nextQuerySnapshot.docs[0];
-        const date = currentDoc.data().date;
-        console.log("currentDate", date);
+    // Find the next "processed" doc that's older (descending)
+    const currentTimestamp = currentDoc.data().processed;
+    console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
 
-        // Convert the date to "MM/DD/YYYY" format
-        const dateParts = date.split('/');
-        const fullYearDate = `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
+    const nextQuery = query(
+      collection(db, 'thought-of-the-days'),
+      where('processed', '<', currentTimestamp),
+      orderBy('processed', 'desc'),
+      limit(1)
+    );
+    const nextQuerySnapshot = await getDocs(nextQuery);
 
-        // Subtract one day from the current date
-        const fullDateParts = fullYearDate.split('/');
-        const previousDate = new Date(+fullDateParts[2], +fullDateParts[0] - 1, +fullDateParts[1]);
-        previousDate.setDate(previousDate.getDate() - 1);
+    if (!nextQuerySnapshot.empty) {
+      // Currently stored date to shift
+      const currentDate = convertToFullYearDate(currentDoc.data().date);
+      // Subtract one day
+      const previousDateString = shiftDate(currentDate, -1);
+      console.log("previous date", previousDateString);
 
-        // Format the new date to "MM/DD/YY"
-        const previousDateString = `${String(previousDate.getMonth() + 1).padStart(2, '0')}/${String(previousDate.getDate()).padStart(2, '0')}/${String(previousDate.getFullYear()).slice(-2)}`;
-        console.log("previous date", previousDateString);
-        // Fetch the quote for the new date
-
-        let querySnapshot = await getDocs(query(
+      // Fetch documents matching this new date
+      let querySnapshotNewDate = await getDocs(
+        query(
           collection(db, 'thought-of-the-days'),
           where('date', '==', previousDateString),
           orderBy('processed', 'desc')
-        ));
+        )
+      );
 
-        if (querySnapshot.empty) {
-          // If no documents were found for the previous date, query for the next most recent "processed" timestamp
-          querySnapshot = await getDocs(query(
+      // If empty, just get the next "processed" doc
+      if (querySnapshotNewDate.empty) {
+        querySnapshotNewDate = await getDocs(
+          query(
             collection(db, 'thought-of-the-days'),
             where('processed', '<', currentTimestamp),
             orderBy('processed', 'desc'),
             limit(1)
-          ));
-        }
-
-
-        querySnapshot.forEach((doc) => {
-          // Assuming doc.data() returns an object with text, date, and category
-          setQuote((doc.data().totd).replace(/"/g, '').replace(/\n/g, ' '));
-          setDate(doc.data().date);
-
-          console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
-        });
-
-        setCurrentDoc(querySnapshot.docs[0]);
-        setIsLoading(false);
-
+          )
+        );
       }
-      // Check if the current document is the last one
 
-      const nextNextQuery = query(
-        collection(db, 'thought-of-the-days'),
-        where('date', '<', currentDoc.data().date),
-        orderBy('date', 'desc'),
-      );
+      querySnapshotNewDate.forEach((doc) => {
+        setQuote(doc.data().totd.replace(/"/g, '').replace(/\n/g, ' '));
+        setDate(doc.data().date);
+        console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
+      });
 
-      const querySnapshot = await getDocs(nextNextQuery)
-
-      if (querySnapshot.docs.length < 1) {
-        setAtLastDoc(true);
-      } else {
-        setAtLastDoc(false);
-      }
+      setCurrentDoc(querySnapshotNewDate.docs[0]);
+      setIsLoading(false);
     }
+
+    // Check if the current doc is the last one
+    const nextNextQuery = query(
+      collection(db, 'thought-of-the-days'),
+      where('date', '<', currentDoc.data().date),
+      orderBy('date', 'desc')
+    );
+    const querySnapshotCheck = await getDocs(nextNextQuery);
+    setAtLastDoc(querySnapshotCheck.docs.length < 1);
   };
 
   const handlePreviousQuote = async () => {
     setAtLastDoc(false);
-    if (currentDoc) {
-      const currentTimestamp = currentDoc.data().processed;
-      console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
-      const prevQuery = query(
-        collection(db, 'thought-of-the-days'),
-        where('processed', '>', currentTimestamp),
-        orderBy('processed', 'asc'),
-        limit(1)
-      );
-      const prevQuerySnapshot = await getDocs(prevQuery);
+    if (!currentDoc) return;
 
-      if (prevQuerySnapshot.empty) {
-        // If no documents were found for the previous date, query for the next most recent "processed" timestamp
-        setAtFirstDoc(true);
-      }
+    // Find the next newer "processed" doc
+    const currentTimestamp = currentDoc.data().processed;
+    console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
 
-      if (!prevQuerySnapshot.empty) {
-        const doc = prevQuerySnapshot.docs[0];
-        const date = currentDoc.data().date;
-        console.log("currentDate", date);
+    const prevQuery = query(
+      collection(db, 'thought-of-the-days'),
+      where('processed', '>', currentTimestamp),
+      orderBy('processed', 'asc'),
+      limit(1)
+    );
+    const prevQuerySnapshot = await getDocs(prevQuery);
 
-        // Convert the date to "MM/DD/YYYY" format
-        const dateParts = date.split('/');
-        const fullYearDate = `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
+    // If no document found, we're at the first
+    if (prevQuerySnapshot.empty) {
+      setAtFirstDoc(true);
+    } else {
+      // Shift our current date by +1 day
+      const currentDate = convertToFullYearDate(currentDoc.data().date);
+      const nextDateString = shiftDate(currentDate, +1);
+      console.log("previous date", nextDateString);
 
-        // Subtract one day from the current date
-        const fullDateParts = fullYearDate.split('/');
-        const previousDate = new Date(+fullDateParts[2], +fullDateParts[0] - 1, +fullDateParts[1]);
-        previousDate.setDate(previousDate.getDate() + 1);
-
-        // Format the new date to "MM/DD/YY"
-        const previousDateString = `${String(previousDate.getMonth() + 1).padStart(2, '0')}/${String(previousDate.getDate()).padStart(2, '0')}/${String(previousDate.getFullYear()).slice(-2)}`;
-        console.log("previous date", previousDateString);
-        // Fetch the quote for the new date
-
-        let pQuerySnapshot = await getDocs(query(
+      let pQuerySnapshot = await getDocs(
+        query(
           collection(db, 'thought-of-the-days'),
-          where('date', '==', previousDateString),
+          where('date', '==', nextDateString),
           orderBy('processed', 'desc')
-        ));
+        )
+      );
 
-
-        if (pQuerySnapshot.empty) {
-          // If no documents were found for the previous date, query for the next most recent "processed" timestamp
-          pQuerySnapshot = await getDocs(query(
+      // If nothing found, query again by processed
+      if (pQuerySnapshot.empty) {
+        pQuerySnapshot = await getDocs(
+          query(
             collection(db, 'thought-of-the-days'),
             where('processed', '>', currentTimestamp),
             orderBy('processed', 'asc'),
             limit(1)
-          ));
-
-        }
-
-        pQuerySnapshot.forEach((doc) => {
-          // Assuming doc.data() returns an object with text, date, and title
-          setQuote((doc.data().totd).replace(/"/g, '').replace(/\n/g, ' '));
-          setDate(doc.data().date);
-          console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
-        });
-
-        if (pQuerySnapshot.docs[0]) {
-          setCurrentDoc(pQuerySnapshot.docs[0]);
-        }
-
-        const nextPrevQuery = query(
-          collection(db, 'thought-of-the-days'),
-          where('processed', '>', currentDoc.data().processed),
+          )
         );
-
-        const querySnapshot = await getDocs(nextPrevQuery)
-
-        if (querySnapshot.docs.length < 1) {
-          setAtFirstDoc(true);
-        } else {
-          setAtFirstDoc(false);
-        }
       }
+
+      pQuerySnapshot.forEach((doc) => {
+        setQuote(doc.data().totd.replace(/"/g, '').replace(/\n/g, ' '));
+        setDate(doc.data().date);
+        console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
+      });
+
+      if (pQuerySnapshot.docs[0]) {
+        setCurrentDoc(pQuerySnapshot.docs[0]);
+      }
+
+      // Check if we are at the first doc
+      const nextPrevQuery = query(
+        collection(db, 'thought-of-the-days'),
+        where('processed', '>', currentDoc.data().processed)
+      );
+      const querySnapshotCheck = await getDocs(nextPrevQuery);
+      setAtFirstDoc(querySnapshotCheck.docs.length < 1);
     }
   };
 
