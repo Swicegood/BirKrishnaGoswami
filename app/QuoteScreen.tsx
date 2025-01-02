@@ -55,27 +55,21 @@ const isTablet = () => {
   return isLandscape
 }
 
-// Helper function to convert 'MM/DD/YY' to 'MM/DD/YYYY'
-function convertToFullYearDate(dateString: string): string {
-  const dateParts = dateString.split('/');
-  return `${dateParts[0]}/${dateParts[1]}/20${dateParts[2]}`;
-}
-
-// Helper function to shift date by a given number of days (pos/neg)
-function shiftDate(fullYearDate: string, days: number): string {
-  const fullDateParts = fullYearDate.split('/');
-  const shiftedDate = new Date(
-    parseInt(fullDateParts[2], 10),
-    parseInt(fullDateParts[0], 10) - 1,
-    parseInt(fullDateParts[1], 10)
-  );
-  shiftedDate.setDate(shiftedDate.getDate() + days);
-
-  // Return 'MM/DD/YY'
-  const month = String(shiftedDate.getMonth() + 1).padStart(2, '0');
-  const day = String(shiftedDate.getDate()).padStart(2, '0');
-  const year = String(shiftedDate.getFullYear()).slice(-2);
-  return `${month}/${day}/${year}`;
+// Add this helper function near the other date-related functions
+function compareDates(date1: string, date2: string): number {
+  // Convert MM/DD/YY to comparable numbers (YYYYMMDD)
+  const parts1 = date1.split('/');
+  const parts2 = date2.split('/');
+  
+  // Convert YY to YYYY
+  const year1 = parseInt(`20${parts1[2]}`, 10);
+  const year2 = parseInt(`20${parts2[2]}`, 10);
+  
+  // Create comparable numbers (YYYYMMDD)
+  const num1 = (year1 * 10000) + (parseInt(parts1[0], 10) * 100) + parseInt(parts1[1], 10);
+  const num2 = (year2 * 10000) + (parseInt(parts2[0], 10) * 100) + parseInt(parts2[1], 10);
+  
+  return num1 - num2;
 }
 
 const QuoteScreen = () => {
@@ -163,128 +157,74 @@ const [height, setHeight] = useState(Dimensions.get('window').height);
     if (!currentDoc) return;
     setAtFirstDoc(false);
 
-    // Find the next "processed" doc that's older (descending)
     const currentTimestamp = currentDoc.data().processed;
+    const currentDate = currentDoc.data().date;
     console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
 
+    // Get all docs with earlier processed timestamp
     const nextQuery = query(
       collection(db, 'thought-of-the-days'),
       where('processed', '<', currentTimestamp),
-      orderBy('processed', 'desc'),
-      limit(1)
+      orderBy('processed', 'desc')
     );
     const nextQuerySnapshot = await getDocs(nextQuery);
 
-    if (!nextQuerySnapshot.empty) {
-      // Currently stored date to shift
-      const currentDate = convertToFullYearDate(currentDoc.data().date);
-      // Subtract one day
-      const previousDateString = shiftDate(currentDate, -1);
-      console.log("previous date", previousDateString);
-
-      // Fetch documents matching this new date
-      let querySnapshotNewDate = await getDocs(
-        query(
-          collection(db, 'thought-of-the-days'),
-          where('date', '==', previousDateString),
-          orderBy('processed', 'desc')
-        )
-      );
-
-      // If empty, just get the next "processed" doc
-      if (querySnapshotNewDate.empty) {
-        querySnapshotNewDate = await getDocs(
-          query(
-            collection(db, 'thought-of-the-days'),
-            where('processed', '<', currentTimestamp),
-            orderBy('processed', 'desc'),
-            limit(1)
-          )
-        );
-      }
-
-      querySnapshotNewDate.forEach((doc) => {
-        setQuote(doc.data().totd.replace(/"/g, '').replace(/\n/g, ' '));
-        setDate(doc.data().date);
-        console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
-      });
-
-      setCurrentDoc(querySnapshotNewDate.docs[0]);
-      setIsLoading(false);
-    }
-
-    // Check if the current doc is the last one
-    const nextNextQuery = query(
-      collection(db, 'thought-of-the-days'),
-      where('date', '<', currentDoc.data().date),
-      orderBy('date', 'desc')
+    // Filter results to ensure proper date ordering
+    const validDocs = nextQuerySnapshot.docs.filter(doc => 
+      compareDates(doc.data().date, currentDate) < 0
     );
-    const querySnapshotCheck = await getDocs(nextNextQuery);
-    setAtLastDoc(querySnapshotCheck.docs.length < 1);
+
+    if (validDocs.length > 0) {
+      const nextDoc = validDocs[0];
+      setQuote(nextDoc.data().totd.replace(/"/g, '').replace(/\n/g, ' '));
+      setDate(nextDoc.data().date);
+      setCurrentDoc(nextDoc);
+      setIsLoading(false);
+      
+      // Check if this is the last doc
+      const laterDocs = nextQuerySnapshot.docs.filter(doc => 
+        compareDates(doc.data().date, nextDoc.data().date) < 0
+      );
+      setAtLastDoc(laterDocs.length === 0);
+    } else {
+      setAtLastDoc(true);
+    }
   };
 
   const handlePreviousQuote = async () => {
-    setAtLastDoc(false);
     if (!currentDoc) return;
+    setAtLastDoc(false);
 
-    // Find the next newer "processed" doc
     const currentTimestamp = currentDoc.data().processed;
+    const currentDate = currentDoc.data().date;
     console.log("currentTimestamp", currentTimestamp.toDate().toLocaleString());
 
+    // Get all docs with later processed timestamp
     const prevQuery = query(
       collection(db, 'thought-of-the-days'),
       where('processed', '>', currentTimestamp),
-      orderBy('processed', 'asc'),
-      limit(1)
+      orderBy('processed', 'asc')
     );
     const prevQuerySnapshot = await getDocs(prevQuery);
 
-    // If no document found, we're at the first
-    if (prevQuerySnapshot.empty) {
-      setAtFirstDoc(true);
+    // Filter results to ensure proper date ordering
+    const validDocs = prevQuerySnapshot.docs.filter(doc => 
+      compareDates(doc.data().date, currentDate) > 0
+    );
+
+    if (validDocs.length > 0) {
+      const prevDoc = validDocs[0];
+      setQuote(prevDoc.data().totd.replace(/"/g, '').replace(/\n/g, ' '));
+      setDate(prevDoc.data().date);
+      setCurrentDoc(prevDoc);
+      
+      // Check if this is the first doc
+      const earlierDocs = prevQuerySnapshot.docs.filter(doc => 
+        compareDates(doc.data().date, prevDoc.data().date) > 0
+      );
+      setAtFirstDoc(earlierDocs.length === 0);
     } else {
-      // Shift our current date by +1 day
-      const currentDate = convertToFullYearDate(currentDoc.data().date);
-      const nextDateString = shiftDate(currentDate, +1);
-      console.log("previous date", nextDateString);
-
-      let pQuerySnapshot = await getDocs(
-        query(
-          collection(db, 'thought-of-the-days'),
-          where('date', '==', nextDateString),
-          orderBy('processed', 'desc')
-        )
-      );
-
-      // If nothing found, query again by processed
-      if (pQuerySnapshot.empty) {
-        pQuerySnapshot = await getDocs(
-          query(
-            collection(db, 'thought-of-the-days'),
-            where('processed', '>', currentTimestamp),
-            orderBy('processed', 'asc'),
-            limit(1)
-          )
-        );
-      }
-
-      pQuerySnapshot.forEach((doc) => {
-        setQuote(doc.data().totd.replace(/"/g, '').replace(/\n/g, ' '));
-        setDate(doc.data().date);
-        console.log("currentDoc", doc.data().processed.toDate().toLocaleString());
-      });
-
-      if (pQuerySnapshot.docs[0]) {
-        setCurrentDoc(pQuerySnapshot.docs[0]);
-      }
-
-      // Check if we are at the first doc
-      const nextPrevQuery = query(
-        collection(db, 'thought-of-the-days'),
-        where('processed', '>', currentDoc.data().processed)
-      );
-      const querySnapshotCheck = await getDocs(nextPrevQuery);
-      setAtFirstDoc(querySnapshotCheck.docs.length < 1);
+      setAtFirstDoc(true);
     }
   };
 
