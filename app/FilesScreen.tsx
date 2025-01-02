@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { getAllFiles } from '../app/api/apiWrapper';
 import { Link, useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert } from 'react-native';
 import { getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from './api/firebase';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 import { getListenedPositions } from '../app/api/apiWrapper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface File {
   category: string;
@@ -117,6 +118,48 @@ const FilesScreen = () => {
     // Handle file press
   };
 
+  // 1) Reset position on long press
+  const handleResetPosition = async (file: File) => {
+    Alert.alert(
+      "Reset Track Progress",
+      'You are about to mark this track "unplayed." Your bookmark will be erased. Are you sure?',
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Yes, Reset",
+          onPress: async () => {
+            try {
+              const jsonValue = await AsyncStorage.getItem("@playedSongs");
+              if (!jsonValue) return;
+
+              const playedSongs = JSON.parse(jsonValue);
+
+              for (const entry of playedSongs) {
+                if (entry?.song?.url === (file.fakeUrl || file.url)) {
+                  entry.position = 0;
+                }
+              }
+
+              await AsyncStorage.setItem("@playedSongs", JSON.stringify(playedSongs));
+
+              setFiles(prevFiles => prevFiles.map(f => {
+                if (f.url === file.url) {
+                  return { ...f, hasListenedTrack: false };
+                }
+                return f;
+              }));
+            } catch (error) {
+              console.error("Error resetting position:", error);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -128,7 +171,6 @@ const FilesScreen = () => {
     <View style={styles.container}>
       <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
         <TouchableOpacity style={styles.playButton}>
-          {/* Replace with your play icon */}
           <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
         </TouchableOpacity>
       </Link>
@@ -141,7 +183,10 @@ const FilesScreen = () => {
         <Text style={styles.dateText}>{item.date}</Text>
       </View>
       {item.hasListenedTrack && (
-        <View style={styles.greenDot} />
+        <TouchableOpacity 
+          style={styles.greenDot} 
+          onLongPress={() => handleResetPosition(item)}
+        />
       )}
     </View>
   );
