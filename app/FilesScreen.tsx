@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllFiles } from '../app/api/apiWrapper';
 import { Link, useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert, Platform } from 'react-native';
 import { getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from './api/firebase';
 import CustomHeaderMain from '../components/CustomHeaderMain';
@@ -185,7 +185,8 @@ const FilesScreen = () => {
       {item.hasListenedTrack && (
         <TouchableOpacity 
           style={styles.greenDot} 
-          onLongPress={() => handleResetPosition(item)}
+          onPress={Platform.OS === 'web' ? () => handleResetPosition(item) : undefined}
+          onLongPress={Platform.OS !== 'web' ? () => handleResetPosition(item) : undefined}
         />
       )}
     </View>
