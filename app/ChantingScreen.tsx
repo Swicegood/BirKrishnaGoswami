@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
-import { Link } from 'expo-router';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from './api/firebase';
-
+import { router } from 'expo-router';
+import { Alert } from 'react-native';
 const windowHeight = Dimensions.get('window').height;
 
 const isTablet = () => {
@@ -37,16 +37,37 @@ const chanting: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.content}>
-          <Link href={{ pathname: "AudioScreen", params: { url: track, title: "Chanting Japa" } }} asChild>
-          <TouchableOpacity style={styles.card}>
+          <TouchableOpacity 
+            style={styles.card}
+            onPress={() => {
+              Alert.alert(
+                "Important Notice",
+                "The audio you are about to hear has been verified to be Gurudev when he was a young man in Miami. Please do not be alarmed by how different his voice is.",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel"
+                  },
+                  {
+                    text: "Continue",
+                    onPress: () => {
+                      router.push({
+                        pathname: "/AudioScreen",
+                        params: { url: track, title: "Chanting Japa" }
+                      });
+                    }
+                  }
+                ]
+              );
+            }}
+          >
             <Image
               source={require('../assets/images/Chanting_Japa.png')}
-              resizeMode="cover"
+              resizeMode="cover" 
               style={styles.cardImage}
             />
             <Text style={styles.cardText}>Chanting japa 108 times</Text>
           </TouchableOpacity>
-          </Link>
         </View>
       </View>
     </SafeAreaView>
