@@ -65,6 +65,7 @@ const AudioScreen = () => {
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
   const isMobileWeb = useIsMobileWeb();
+  const lastStorageUpdateRef = useRef(0);
 
   const onSetWidth = (width: number) => {
     console.log('QuoteScreen width: ', width);
@@ -355,10 +356,40 @@ const AudioScreen = () => {
     loadPlayedSongs();
   }, []);
 
-  const updateState = throttle((status) => {
+  const updateState = throttle(async (status) => {
     setPosition(status.positionMillis);
-    // ...
-  }, 1000); // Adjust this value as needed
+    
+    // Compare to the value in our ref instead of state
+    const lastUpdate = lastStorageUpdateRef.current;
+    if (Math.abs(status.positionMillis - lastUpdate) >= 30000) {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@playedSongs');
+        let playedSongs = jsonValue ? JSON.parse(jsonValue) : [];
+        
+        // Update or add the current song
+        const songIndex = playedSongs.findIndex(
+          (song) => song.song.title === file.title
+        );
+        
+        const newSong = { song: file, position: status.positionMillis };
+        
+        if (songIndex !== -1) {
+          playedSongs[songIndex] = newSong;
+        } else {
+          playedSongs.push(newSong);
+        }
+        
+        await AsyncStorage.setItem('@playedSongs', JSON.stringify(playedSongs));
+
+        // 3. Update the ref immediately
+        lastStorageUpdateRef.current = status.positionMillis;
+
+        console.log('Position saved to storage:', status.positionMillis);
+      } catch (error) {
+        console.error('Error saving position to storage:', error);
+      }
+    }
+  }, 1000);
 
   useEffect(() => {
     if (sound) {
