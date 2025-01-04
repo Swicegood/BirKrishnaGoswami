@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import { collection, query, getDocs } from "firebase/firestore";
@@ -6,41 +5,71 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } fr
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { db } from './api/firebase';
+import { getListenedPositions } from './api/apiWrapper';
 
+type DataType = {
+  [year: string]: {
+    [month: string]: string[]
+  }
+};
 
-function customEncodeURI(str) {
+function customEncodeURI(str: string) {
   return encodeURIComponent(str).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29');
 }
 
 const YearScreen = () => {
-  const [data, setData] = useState({});
+  const [data, setData] = useState<DataType>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [listenedYears, setListenedYears] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchData = async () => {
-      const q = query(collection(db, 'audio-tracks'));
-      const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.reduce((acc, doc) => {
-        if (doc.data().date) {
-          const date = doc.data().date.toDate(); // Convert Firestore Timestamp to JavaScript Date
-          const year = date.getFullYear();
-          const monthNames = ["1  Jan", "2  Feb", "3  Mar", "4  Apr", "5  May", "6 Jun", "7 Jul", "8 Aug", "9 Sep", "10 Oct", "11 Nov", "12 Dec"];
-          const month = monthNames[date.getMonth()];
-          if (!acc[year]) acc[year] = {};
-          if (!acc[year][month]) acc[year][month] = [];
-          acc[year][month].push(customEncodeURI(doc.data().url));
-        } else {
-          if (!acc['Unknown']) acc['Unknown'] = {};
-          if (!acc['Unknown']['Unknown']) acc['Unknown']['Unknown'] = [];
-          acc['Unknown']['Unknown'].push(customEncodeURI(doc.data().url));
-        }
-        return acc;
-      }, {});
-      setData(data);
-      setIsLoading(false);
-      Object.keys(data).forEach(year => {
-        console.log("Year: ", year, "Length: ", Object.keys(data[year]).length);
-      });
+      try {
+        const listenedPositions = await getListenedPositions();
+        console.log("listenedPositions:", listenedPositions);
+        console.log("Type of listenedPositions:", typeof listenedPositions);
+
+        const q = query(collection(db, 'audio-tracks'));
+        const querySnapshot = await getDocs(q);
+
+        const data = querySnapshot.docs.reduce((acc: DataType, doc) => {
+          const url = doc.data().url;
+
+          if (doc.data().date) {
+            const date = doc.data().date.toDate();
+            const yearString = date.getFullYear().toString();
+            const monthNames = ["1  Jan", "2  Feb", "3  Mar", "4  Apr", "5  May", "6 Jun", "7 Jul", "8 Aug", "9 Sep", "10 Oct", "11 Nov", "12 Dec"];
+            const month = monthNames[date.getMonth()];
+
+            if (!acc[yearString]) acc[yearString] = {};
+            if (!acc[yearString][month]) acc[yearString][month] = [];
+            acc[yearString][month].push(customEncodeURI(url));
+
+            if (url in listenedPositions) {
+              listenedYears.add(yearString);
+            }
+          } else {
+            if (!acc['Unknown']) acc['Unknown'] = {};
+            if (!acc['Unknown']['Unknown']) acc['Unknown']['Unknown'] = [];
+            acc['Unknown']['Unknown'].push(customEncodeURI(url));
+
+            if (url in listenedPositions) {
+              listenedYears.add('Unknown');
+            }
+          }
+          return acc;
+        }, {} as DataType);
+
+        setData(data);
+        setIsLoading(false);
+        setListenedYears(new Set(listenedYears));
+
+        Object.keys(data).forEach(year => {
+          console.log("Year: ", year, "Length: ", Object.keys(data[year]).length);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
     fetchData();
   }, []);
@@ -61,11 +90,19 @@ const YearScreen = () => {
           <TouchableOpacity 
             style={styles.container} 
             key={year}
-            onPress={() => router.push(`MonthScreen?year=${String(year)}&dataString=${JSON.stringify(data[year])}`)}
+            onPress={() => router.push({
+              pathname: 'MonthScreen',
+              params: {
+                year: String(year),
+                dataString: JSON.stringify(data[year])
+              },
+            })}
           >
             <View style={styles.playButton}>
-              {/* Replace with your play icon */}
               <Image source={require('../assets/images/folder.png')} style={styles.playIcon} />
+              {listenedYears.has(year) && (
+                <View style={styles.neonGreenDot} />
+              )}
             </View>
             <View style={styles.textContainer}>
               <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>{year}</Text>
@@ -97,6 +134,7 @@ const styles = StyleSheet.create({
     right: 30,
   },
   playButton: {
+    position: 'relative',
     marginRight: 30,
     // Add your styles for the button, such as size, backgroundColor, etc.
   },
@@ -117,6 +155,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'grey',
     // Adjust style as needed
+  },
+  neonGreenDot: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#39FF14', // neon green
+    bottom: 0,
+    right: 0,
+    zIndex: 10,
+    // Add any margin to adjust spacing, e.g. margin: 2,
   },
 });
 

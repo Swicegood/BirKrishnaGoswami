@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useGlobalSearchParams, Link } from 'expo-router';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -11,14 +13,65 @@ function customDecodeURI(str) {
 const DayScreen = () => {
   const { year, month, dataString } = useGlobalSearchParams();
   const [data, setData] = useState<any[]>([]);
+  const [listenedPositions, setListenedPositions] = useState<{ [url: string]: number }>({});
+
+  const handleResetPosition = async (url: string) => {
+    if (Platform.OS === 'web') {
+      if (window.confirm('You are about to mark this track "unplayed." Your bookmark will be erased. Are you sure?')) {
+        await removeTrackFromStorage(url);
+      }
+    } else {
+      Alert.alert(
+        "Reset Track Progress",
+        'You are about to mark this track "unplayed." Your bookmark will be erased. Are you sure?',
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Yes, Reset", onPress: async () => await removeTrackFromStorage(url) }
+        ]
+      );
+    }
+  };
+
+  const removeTrackFromStorage = async (url: string) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("@playedSongs");
+      if (!jsonValue) return;
+      const playedSongs = JSON.parse(jsonValue);
+
+      // Remove the entry whose url matches
+      for (const entry of playedSongs) {
+        if (entry?.song?.url === url) {
+          playedSongs.splice(playedSongs.indexOf(entry), 1);
+        }
+      }
+      await AsyncStorage.setItem("@playedSongs", JSON.stringify(playedSongs));
+
+      // Also remove from listenedPositions so the dot disappears
+      setListenedPositions(prevPositions => {
+        const newPositions = { ...prevPositions };
+        delete newPositions[url];
+        return newPositions;
+      });
+    } catch (error) {
+      console.error("Error resetting position:", error);
+    }
+  }
 
   useEffect(() => {
+    // Fetch listened positions
+    (async () => {
+      const fetchedListenedPositions = await import('./api/apiWrapper')
+        .then(mod => mod.getListenedPositions());
+      setListenedPositions(fetchedListenedPositions);
+      console.log("listenedPositions for DayScreen:", fetchedListenedPositions);
+    })();
+
     if (!dataString) {
       return;
     }
     const parsedData = JSON.parse(dataString);
     const dataWithTitles = parsedData.map((url: string) => {
-      const title = customDecodeURI(url)?.split('/').pop() || ''; // Extract basename from URL
+      const title = customDecodeURI(url)?.split('/').pop() || '';
       return { url, title, month, year };
     });
     setData(dataWithTitles);
@@ -26,35 +79,46 @@ const DayScreen = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <ScrollView>
-      <View>
-        {data.map((item, index) => (
-          <View style={styles.container} key={index}>
-            <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }} asChild>
-              <TouchableOpacity style={styles.playButton}>
-                {/* Replace with your play icon */}
-                <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
-              </TouchableOpacity>
-            </Link>
-            <View style={styles.textContainer}>
-              <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>
-                {item.title.split('.')[0].replaceAll("_", " ")}
-              </Text>
-              <Text>
-              </Text>
-              <Text style={styles.dateText}>{item.month.slice(2)}/{item.year}</Text>
+      <ScrollView>
+        <View>
+          {data.map((item, index) => (
+            <View style={styles.container} key={index}>
+              {(item.url in listenedPositions) && (
+                <TouchableOpacity
+                  style={styles.neonGreenDot}
+                  onPress={Platform.OS === 'web' ? () => handleResetPosition(item.url) : undefined}
+                  onLongPress={Platform.OS !== 'web' ? () => handleResetPosition(item.url) : undefined}
+                />
+              )}
+              <Link
+                href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title } }}
+                asChild
+              >
+                <TouchableOpacity style={styles.playButton}>
+                  <Image
+                    source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')}
+                    style={styles.playIcon}
+                  />
+                </TouchableOpacity>
+              </Link>
+              <View style={styles.textContainer}>
+                <Text style={styles.titleText} numberOfLines={3} ellipsizeMode='tail'>
+                  {item.title.split('.')[0].replaceAll("_", " ")}
+                </Text>
+                <Text></Text>
+                <Text style={styles.dateText}>{item.month.slice(2)}/{item.year}</Text>
+              </View>
             </View>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+          ))}
+        </View>
+      </ScrollView>
     </GestureHandlerRootView>
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     flexDirection: 'row',
     padding: 10,
     alignItems: 'center',
@@ -63,11 +127,10 @@ const styles = StyleSheet.create({
   },
   playButton: {
     marginRight: 30,
-    // Add your styles for the button, such as size, backgroundColor, etc.
   },
   playIcon: {
-    width: 30, // Adjust size as needed
-    height: 30, // Adjust size as needed
+    width: 30,
+    height: 30,
   },
   textContainer: {
     flex: 1,
@@ -76,12 +139,20 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 14,
     fontWeight: 'bold',
-    // Adjust style as needed
   },
   dateText: {
     fontSize: 14,
     color: 'grey',
-    // Adjust style as needed
+  },
+  neonGreenDot: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#39FF14', // neon green
+    bottom: 20,
+    right: 20,
+    zIndex: 10,
   },
 });
 
