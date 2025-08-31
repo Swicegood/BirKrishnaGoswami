@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Audio, InterruptionModeIOS } from "expo-av";
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
+import { getAllFiles } from './api/apiWrapper';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ForwardIcon from '../components/ForwardIcon';
@@ -45,10 +46,16 @@ const isTablet = () => {
 
 const AudioScreen = () => {
   const navigation = useNavigation();
-  const file = useLocalSearchParams<{ url: string, title: string }>();
+  const file = useLocalSearchParams<{ 
+    url: string, 
+    title: string, 
+    playlist?: string, 
+    currentIndex?: string,
+    category?: string 
+  }>();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const isLoadingNewFile = useRef(false);
@@ -61,7 +68,11 @@ const AudioScreen = () => {
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isFileDownloaded, setIsFileDownloaded] = useState(false);
   // State to hold the list of played songs and their positions
-  const [playedSongs, setPlayedSongs] = useState([]);
+  const [playedSongs, setPlayedSongs] = useState<any[]>([]);
+  // Playlist state for auto-continue functionality
+  const [playlist, setPlaylist] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [lastPosition, setLastPosition] = useState(0);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
   const isMobileWeb = useIsMobileWeb();
@@ -103,7 +114,7 @@ const AudioScreen = () => {
     }
   };
 
-  const shareAudioLink = async (url) => {
+  const shareAudioLink = async (url: string) => {
     try {
       const result = await Share.share({
         message: 'Check out this cool video on YouTube!',
@@ -157,7 +168,7 @@ const AudioScreen = () => {
   };
 
 
-  const shareAudioFile = async (fileUri) => {
+  const shareAudioFile = async (fileUri: string) => {
     console.log('Sharing audio file:', fileUri);
     try {
       const shareOptions = {
@@ -202,23 +213,27 @@ const AudioScreen = () => {
   const seekBackward = async () => {
     if (sound) {
       const playbackStatus = await sound.getStatusAsync();
-      const newPosition = Math.max(playbackStatus.positionMillis - 15000, 0);
-      await sound.setPositionAsync(newPosition);
+      if (playbackStatus.isLoaded) {
+        const newPosition = Math.max(playbackStatus.positionMillis - 15000, 0);
+        await sound.setPositionAsync(newPosition);
+      }
     }
   };
 
   const seekForward = async () => {
     if (sound) {
       const playbackStatus = await sound.getStatusAsync();
-      const newPosition = Math.min(
-        playbackStatus.positionMillis + 30000,
-        playbackStatus.durationMillis
-      );
-      await sound.setPositionAsync(newPosition);
+      if (playbackStatus.isLoaded) {
+        const newPosition = Math.min(
+          playbackStatus.positionMillis + 30000,
+          playbackStatus.durationMillis
+        );
+        await sound.setPositionAsync(newPosition);
+      }
     }
   };
 
-  const getStoredPostion = (file) => {
+  const getStoredPostion = (file: any) => {
     const playedSong = playedSongs.find((playedSong) => playedSong.song.title === file.title);
     return playedSong ? playedSong.position : 0;
   };
@@ -228,6 +243,61 @@ const AudioScreen = () => {
     const songUrl = file.url;
     setUrl(file.url);
   }, []);
+
+  // Initialize playlist from parameters or fetch from category
+  useEffect(() => {
+    const initializePlaylist = async () => {
+      if (file.playlist) {
+        // Use provided playlist
+        const playlistData = JSON.parse(file.playlist);
+        setPlaylist(playlistData);
+        setCurrentIndex(parseInt(file.currentIndex || '0'));
+      } else if (file.category) {
+        // Fetch all files from the same category
+        try {
+          const allFiles = (await getAllFiles('audioFilesList', 'mp3Files')).map((url: string) => {
+            const segments = url.split('/');
+            const filename = segments[segments.length - 1];
+            const title = filename.split('.')[0];
+            return {
+              title: title.replaceAll("_", " "),
+              url: url,
+            };
+          });
+
+          // Filter files by category (same logic as FilesScreen)
+          const categorizedFiles = allFiles.map((fileItem: any) => {
+            const urlParts = fileItem.url.split('/');
+            const folder = urlParts[urlParts.length - 2];
+            return { ...fileItem, category: folder };
+          });
+
+          const categoryFiles = categorizedFiles.filter((fileItem: any) => fileItem.category === file.category);
+          
+          // Sort alphabetically by title for consistent ordering
+          categoryFiles.sort((a: any, b: any) => a.title.localeCompare(b.title));
+          
+          setPlaylist(categoryFiles);
+          
+          // Find current track index
+          const currentIdx = categoryFiles.findIndex((track: any) => track.url === file.url);
+          setCurrentIndex(currentIdx >= 0 ? currentIdx : 0);
+          
+          console.log('Playlist initialized:', {
+            totalTracks: categoryFiles.length,
+            currentIndex: currentIdx >= 0 ? currentIdx : 0,
+            currentTrack: file.title,
+            category: file.category,
+            tracks: categoryFiles.map((t: any) => t.title)
+          });
+        } catch (error) {
+          console.error('Error fetching playlist:', error);
+        }
+      }
+    };
+
+    initializePlaylist();
+  }, [file.playlist, file.currentIndex, file.category, file.url]);
 
 
 
@@ -258,16 +328,34 @@ const AudioScreen = () => {
 
       const { sound: newSound, status } = await Audio.Sound.createAsync(
         { uri: songUrl },
-        { shouldPlay: true, staysActiveInBackground: true, positionMillis: lastPosition }
-
+        { shouldPlay: true, positionMillis: lastPosition }
       );
+
+      // Set up completion handler
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded) {
+          updateState(status);
+          
+          // Additional check for completion using refs for current values
+          if (status.didJustFinish) {
+            console.log('Track completion detected via direct callback');
+            const currentPlaylist = playlistRef.current;
+            const currentIdx = currentIndexRef.current;
+            if (currentPlaylist.length > 0 && currentIdx < currentPlaylist.length - 1) {
+              console.log('Auto-advancing from direct callback');
+              handleTrackCompletion();
+            }
+          }
+        }
+      });
 
       setSound(newSound);
       setIsPlaying(true);
       setPlayState('playing');
-      setDuration(status.durationMillis);
+      if (status.isLoaded) {
+        setDuration(status.durationMillis || 0);
+      }
       setIsLoading(false);
-      updateState
 
 
       setIsSoundLoading(false);
@@ -280,11 +368,15 @@ const AudioScreen = () => {
 
   const soundRef = useRef(sound);
   const fileRef = useRef(file);
+  const playlistRef = useRef(playlist);
+  const currentIndexRef = useRef(currentIndex);
 
   useEffect(() => {
     soundRef.current = sound;
     fileRef.current = file;
-  }, [sound, file]);
+    playlistRef.current = playlist;
+    currentIndexRef.current = currentIndex;
+  }, [sound, file, playlist, currentIndex]);
 
   useFocusEffect(
     useCallback(() => {
@@ -324,16 +416,19 @@ const AudioScreen = () => {
   }, [playedSongs]);
 
   useEffect(() => {
-    if (isFirstLoad) {
-      const position = getStoredPostion(file);
-      if (position) {
-        setPosition(position);
-        if (sound) {
-          sound.setPositionAsync(position);
-          setIsFirstLoad(false);
+    const restorePosition = async () => {
+      if (isFirstLoad) {
+        const position = getStoredPostion(file);
+        if (position) {
+          setPosition(position);
+          if (sound) {
+            await sound.setPositionAsync(position);
+            setIsFirstLoad(false);
+          }
         }
       }
-    }
+    };
+    restorePosition();
   }, [file]);
 
 
@@ -356,8 +451,41 @@ const AudioScreen = () => {
     loadPlayedSongs();
   }, []);
 
-  const updateState = throttle(async (status) => {
+  const updateState = throttle(async (status: any) => {
     setPosition(status.positionMillis);
+    setLastPosition(status.positionMillis);
+    
+    // Log only important events
+    if (status.didJustFinish) {
+      console.log('didJustFinish detected in updateState');
+    }
+    
+    // Check if track just finished
+    if (status.didJustFinish && playlist.length > 0 && currentIndex < playlist.length - 1) {
+      console.log('Track finished, auto-advancing to next track');
+      handleTrackCompletion();
+      return;
+    }
+    
+    // Alternative approach: Check if we're very close to the end
+    if (status.isLoaded && status.durationMillis && status.positionMillis) {
+      const remainingTime = status.durationMillis - status.positionMillis;
+      if (remainingTime <= 1000 && remainingTime > 0 && playlist.length > 0 && currentIndex < playlist.length - 1) {
+        console.log('Track nearly finished (< 1s remaining), auto-advancing to next track');
+        handleTrackCompletion();
+        return;
+      }
+    }
+    
+    // Fallback: Check if position hasn't changed and we're near the end
+    if (status.isLoaded && status.durationMillis && status.positionMillis) {
+      const progressPercent = (status.positionMillis / status.durationMillis) * 100;
+      if (progressPercent > 98 && !isPlaying && playlist.length > 0 && currentIndex < playlist.length - 1) {
+        console.log('Track appears completed (>98% and not playing), auto-advancing');
+        handleTrackCompletion();
+        return;
+      }
+    }
     
     // Compare to the value in our ref instead of state
     const lastUpdate = lastStorageUpdateRef.current;
@@ -392,20 +520,95 @@ const AudioScreen = () => {
   }, 1000);
 
   useEffect(() => {
-    if (sound) {
-      sound.setOnPlaybackStatusUpdate(updateState);
-    }
+    // Set up periodic check for track completion as a fallback
+    const interval = setInterval(async () => {
+      if (sound && playlist.length > 0 && currentIndex < playlist.length - 1) {
+        try {
+          const status = await sound.getStatusAsync();
+          if (status.isLoaded && status.durationMillis && status.positionMillis) {
+            const remainingTime = status.durationMillis - status.positionMillis;
+            const progressPercent = (status.positionMillis / status.durationMillis) * 100;
+            
+            // Check if track is essentially complete
+            if ((remainingTime <= 500 || progressPercent > 99) && status.positionMillis > 0) {
+              console.log('Periodic check detected track completion, auto-advancing');
+              handleTrackCompletion();
+            }
+          }
+        } catch (error) {
+          console.log('Error in periodic completion check:', error);
+        }
+      }
+    }, 2000); // Check every 2 seconds
 
+    // Cleanup function
     return () => {
+      clearInterval(interval);
       if (sound) {
         sound.setOnPlaybackStatusUpdate(null);
       }
       updateState.cancel(); // Cancel any scheduled execution of updateState when the component unmounts
     };
-  }, [sound]);
+  }, [sound, playlist, currentIndex]);
 
 
-  const formatTime = (milliseconds) => {
+  const handleTrackCompletion = async () => {
+    if (playlist.length > 0 && currentIndex < playlist.length - 1) {
+      goToNextTrack();
+    }
+  };
+
+  const goToNextTrack = async () => {
+    if (playlist.length > 0 && currentIndex < playlist.length - 1) {
+      const nextTrack = playlist[currentIndex + 1];
+      console.log('Advancing to:', nextTrack.title);
+      
+      // Unload current sound
+      if (sound) {
+        await sound.unloadAsync();
+        setSound(null);
+      }
+      
+      // Navigate to next track
+      router.replace({
+        pathname: "/AudioScreen",
+        params: {
+          url: nextTrack.url,
+          title: nextTrack.title,
+          playlist: JSON.stringify(playlist),
+          currentIndex: (currentIndex + 1).toString(),
+          category: file.category
+        }
+      });
+    }
+  };
+
+  const goToPreviousTrack = async () => {
+    if (playlist.length > 0 && currentIndex > 0) {
+      const prevTrack = playlist[currentIndex - 1];
+      console.log('Going back to:', prevTrack.title);
+      
+      // Unload current sound
+      if (sound) {
+        await sound.unloadAsync();
+        setSound(null);
+      }
+      
+      // Navigate to previous track
+      router.replace({
+        pathname: "/AudioScreen",
+        params: {
+          url: prevTrack.url,
+          title: prevTrack.title,
+          playlist: JSON.stringify(playlist),
+          currentIndex: (currentIndex - 1).toString(),
+          category: file.category
+        }
+      });
+    }
+  };
+
+  const formatTime = (milliseconds: number) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -415,6 +618,8 @@ const AudioScreen = () => {
 
 
   const togglePlayback = async () => {
+    if (!sound) return;
+    
     if (isPlaying) {
       await sound.pauseAsync();
       setIsPlaying(false);
@@ -496,6 +701,11 @@ const AudioScreen = () => {
                 <Progress.Bar progress={downloadProgress} width={200} />
               )}
               <Text style={styles.title}>{file.title.toUpperCase().replace('_', ' ')}</Text>
+              {playlist.length > 1 && (
+                <Text style={styles.trackIndicator}>
+                  Track {currentIndex + 1} of {playlist.length}
+                </Text>
+              )}
               <Slider
                 style={styles.slider}
                 thumbTintColor="#FFFFFF" // Color of the knob
@@ -521,6 +731,15 @@ const AudioScreen = () => {
                 >
                   <Icon name={isMuted ? "volume-off" : "volume-up"} size={40} color="#FFF" />
                 </TouchableOpacity>
+                {playlist.length > 1 && currentIndex > 0 && (
+                  <TouchableOpacity
+                    style={styles.trackNavButton}
+                    onPress={goToPreviousTrack}
+                    disabled={!sound}
+                  >
+                    <Icon name="skip-previous" size={40} color="#FFF" />
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity
                   style={styles.seekBackwardButton}
                   onPress={seekBackward}
@@ -542,6 +761,15 @@ const AudioScreen = () => {
                 >
                   <ForwardIcon />
                 </TouchableOpacity>
+                {playlist.length > 1 && currentIndex < playlist.length - 1 && (
+                  <TouchableOpacity
+                    style={styles.trackNavButton}
+                    onPress={goToNextTrack}
+                    disabled={!sound}
+                  >
+                    <Icon name="skip-next" size={40} color="#FFF" />
+                  </TouchableOpacity>
+                )}
                 {Platform.OS !== 'android' && (
                   Platform.OS === 'web' ? (
                     <TouchableOpacity
@@ -673,10 +901,15 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginRight: 20,
   },
+  trackIndicator: {
+    fontSize: 14,
+    color: '#CCCCCC',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
   slider: {
     width: screenWidth * 0.9, // Set the width as needed
     height: 40, // Set the height as needed
-    thumbTouchSize: { height: 10, width: 10, backgroundColor: '#000000' },
     marginBottom: 20, // Set the margin as needed
   },
   songTitle: {
@@ -728,6 +961,11 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   seekForwardButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  trackNavButton: {
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
