@@ -58,13 +58,13 @@ function RootLayoutNav() {
   return (
     <>
       <Stack
-        initialRouteName="(drawer)/index"
         screenOptions={{
           header: () =>  null
         }}
       >
         <Stack.Screen name="YoutubePlayer" options={{ animation: 'none', header: () => <CustomHeaderMain title='VIDEOS' /> }} />
         <Stack.Screen name="AudioStartScreen" options={{ header: () => <CustomHeaderMain title='AUDIO' /> }} />
+        <Stack.Screen name="AudioScreen" options={{ header: () => null }} />
         <Stack.Screen name="ChantingScreen" options={{ header: () => <CustomHeaderMain title='CHANTING' /> }} />
         <Stack.Screen name="CustomImageGalleryScreen" options={{ header: () => <CustomHeaderMain title='PHOTOS' /> }} />
         <Stack.Screen name="DayScreen" options={{ header: () => <CustomHeaderMain title='AUDIO' /> }} />
@@ -74,6 +74,7 @@ function RootLayoutNav() {
         <Stack.Screen name="BlogScreen" options={{ header: () => <CustomHeaderMain title='BLOG' /> }} />
         <Stack.Screen name="DonationScreen" options={{ header: () => <CustomHeaderMain title='DONATE' /> }} />
         <Stack.Screen name="EbooksScreen" options={{ header: () => <CustomHeaderMain title='EBOOKS' /> }} />
+        <Stack.Screen name="FilesScreen" options={{ header: () => null }} />
         <Stack.Screen name="FolderScreen" options={{ header: () => <CustomHeaderMain title='AUDIO' /> }} />
         <Stack.Screen name="GalleryScreen" options={{ header: () => <CustomHeaderMain title='GALLERY' /> }} />
         <Stack.Screen name="GurudevaPicsScreen" options={{ header: () => <CustomHeaderMain title='PHOTOS' /> }} />
