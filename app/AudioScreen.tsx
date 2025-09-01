@@ -11,8 +11,7 @@ import {
   Alert,
   Platform
 } from "react-native";
-import { Audio, InterruptionModeIOS } from "expo-av";
-import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { getAllFiles } from './api/apiWrapper';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -21,16 +20,13 @@ import ReplayIcon from "../components/ReplayIcon";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
-import { throttle } from 'lodash';
 import * as FileSystem from 'expo-file-system';
 import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import { isLoaded } from "expo-font";
 import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
 import * as Clipboard from 'expo-clipboard';
-import { isSearchBarAvailableForCurrentPlatform } from "react-native-screens";
+import useTrackPlayer from '../hooks/useTrackPlayer';
 
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 
@@ -54,29 +50,37 @@ const AudioScreen = () => {
     category?: string 
   }>();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [url, setUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const isLoadingNewFile = useRef(false);
-  const [playState, setPlayState] = useState('idle');
-  const [playNext, setPlayNext] = useState(false);
-  const [isSoundLoading, setIsSoundLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [position, setPosition] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isFileDownloaded, setIsFileDownloaded] = useState(false);
   // State to hold the list of played songs and their positions
   const [playedSongs, setPlayedSongs] = useState<any[]>([]);
-  // Playlist state for auto-continue functionality
-  const [playlist, setPlaylist] = useState<any[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [lastPosition, setLastPosition] = useState(0);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
   const isMobileWeb = useIsMobileWeb();
   const lastStorageUpdateRef = useRef(0);
+
+  // Use the new TrackPlayer hook
+  const {
+    isPlaying,
+    isLoading,
+    currentTrack,
+    playlist,
+    currentIndex,
+    position,
+    duration,
+    loadTrack,
+    loadPlaylist,
+    goToNextTrack,
+    goToPreviousTrack,
+    togglePlayback,
+    seekTo,
+    seekForward,
+    seekBackward,
+    cleanup
+  } = useTrackPlayer(() => {
+    console.log('Track loaded successfully');
+  });
 
   const onSetWidth = (width: number) => {
     console.log('QuoteScreen width: ', width);
@@ -198,38 +202,12 @@ const AudioScreen = () => {
 
 
   const muteSound = async () => {
-    if (!sound) {
-      return;
-    }
-
     try {
       setIsMuted(!isMuted);
-      await sound.setVolumeAsync(isMuted ? 1 : 0);
+      // Note: TrackPlayer doesn't have volume control in this implementation
+      // You can add volume control if needed
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  const seekBackward = async () => {
-    if (sound) {
-      const playbackStatus = await sound.getStatusAsync();
-      if (playbackStatus.isLoaded) {
-        const newPosition = Math.max(playbackStatus.positionMillis - 15000, 0);
-        await sound.setPositionAsync(newPosition);
-      }
-    }
-  };
-
-  const seekForward = async () => {
-    if (sound) {
-      const playbackStatus = await sound.getStatusAsync();
-      if (playbackStatus.isLoaded) {
-        const newPosition = Math.min(
-          playbackStatus.positionMillis + 30000,
-          playbackStatus.durationMillis
-        );
-        await sound.setPositionAsync(newPosition);
-      }
     }
   };
 
@@ -241,8 +219,11 @@ const AudioScreen = () => {
 
   useEffect(() => {
     const songUrl = file.url;
-    setUrl(file.url);
-  }, []);
+    // Load the track using TrackPlayer
+    if (songUrl) {
+      loadTrack(songUrl, file.title, true, 0);
+    }
+  }, [file.url, file.title]);
 
   // Initialize playlist from parameters or fetch from category
   useEffect(() => {
@@ -250,8 +231,8 @@ const AudioScreen = () => {
       if (file.playlist) {
         // Use provided playlist
         const playlistData = JSON.parse(file.playlist);
-        setPlaylist(playlistData);
-        setCurrentIndex(parseInt(file.currentIndex || '0'));
+        const startIndex = parseInt(file.currentIndex || '0');
+        await loadPlaylist(playlistData, startIndex);
       } else if (file.category) {
         // Fetch all files from the same category
         try {
@@ -277,15 +258,15 @@ const AudioScreen = () => {
           // Sort alphabetically by title for consistent ordering
           categoryFiles.sort((a: any, b: any) => a.title.localeCompare(b.title));
           
-          setPlaylist(categoryFiles);
-          
           // Find current track index
           const currentIdx = categoryFiles.findIndex((track: any) => track.url === file.url);
-          setCurrentIndex(currentIdx >= 0 ? currentIdx : 0);
+          const startIndex = currentIdx >= 0 ? currentIdx : 0;
+          
+          await loadPlaylist(categoryFiles, startIndex);
           
           console.log('Playlist initialized:', {
             totalTracks: categoryFiles.length,
-            currentIndex: currentIdx >= 0 ? currentIdx : 0,
+            currentIndex: startIndex,
             currentTrack: file.title,
             category: file.category,
             tracks: categoryFiles.map((t: any) => t.title)
@@ -297,86 +278,21 @@ const AudioScreen = () => {
     };
 
     initializePlaylist();
-  }, [file.playlist, file.currentIndex, file.category, file.url]);
+  }, [file.playlist, file.currentIndex, file.category, file.url, loadPlaylist]);
 
 
 
-  // Song changing
-  useEffect(() => {
-    if (!url) {
-      return;
-    }
-    const loadSound = async () => {
+  // Track loading is now handled by the useTrackPlayer hook
 
-      setIsSoundLoading(true);
-
-      const songUrl = url;
-      const lastPosition = 0;
-
-      try {
-        await Audio.setAudioModeAsync({
-          staysActiveInBackground: true,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
-          allowsRecordingIOS: false,
-          interruptionModeIOS: InterruptionModeIOS.DoNotMix,
-          playsInSilentModeIOS: true,
-        });
-      } catch (error) {
-        console.log('Error setting audio mode:', error);
-      }
-
-      const { sound: newSound, status } = await Audio.Sound.createAsync(
-        { uri: songUrl },
-        { shouldPlay: true, positionMillis: lastPosition }
-      );
-
-      // Set up completion handler
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded) {
-          updateState(status);
-          
-          // Additional check for completion using refs for current values
-          if (status.didJustFinish) {
-            console.log('Track completion detected via direct callback');
-            const currentPlaylist = playlistRef.current;
-            const currentIdx = currentIndexRef.current;
-            if (currentPlaylist.length > 0 && currentIdx < currentPlaylist.length - 1) {
-              console.log('Auto-advancing from direct callback');
-              handleTrackCompletion();
-            }
-          }
-        }
-      });
-
-      setSound(newSound);
-      setIsPlaying(true);
-      setPlayState('playing');
-      if (status.isLoaded) {
-        setDuration(status.durationMillis || 0);
-      }
-      setIsLoading(false);
-
-
-      setIsSoundLoading(false);
-      console.log('Sound loaded', isSoundLoading);
-    };
-
-    loadSound();
-
-  }, [url]);
-
-  const soundRef = useRef(sound);
   const fileRef = useRef(file);
   const playlistRef = useRef(playlist);
   const currentIndexRef = useRef(currentIndex);
 
   useEffect(() => {
-    soundRef.current = sound;
     fileRef.current = file;
     playlistRef.current = playlist;
     currentIndexRef.current = currentIndex;
-  }, [sound, file, playlist, currentIndex]);
+  }, [file, playlist, currentIndex]);
 
   useFocusEffect(
     useCallback(() => {

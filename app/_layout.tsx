@@ -5,6 +5,7 @@ import { SplashScreen, Stack, usePathname } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import CustomHeaderMain from '../components/CustomHeaderMain';
+import TrackPlayer from 'react-native-track-player';
 
 
 
@@ -30,6 +31,7 @@ export default function RootLayout() {
     PacificoRegular: require('../assets/fonts/Pacifico-Regular.ttf'),
     ...FontAwesome.font,
   })
+  
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
@@ -41,6 +43,24 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  // Initialize TrackPlayer
+  useEffect(() => {
+    const setupTrackPlayer = async () => {
+      try {
+        await TrackPlayer.setupPlayer();
+        console.log('TrackPlayer setup complete');
+      } catch (error) {
+        console.error('Error setting up TrackPlayer:', error);
+      }
+    };
+
+    setupTrackPlayer();
+
+    return () => {
+      TrackPlayer.destroy();
+    };
+  }, []);
 
   if (!loaded) {
     console.log('not loaded');
