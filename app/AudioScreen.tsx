@@ -438,7 +438,7 @@ const AudioScreen = () => {
   useEffect(() => {
     // Set up periodic check for track completion as a fallback
     const interval = setInterval(async () => {
-      if (playlist.length > 0 && currentIndex < playlist.length - 1) {
+      if (sound && playlist.length > 0 && currentIndex < playlist.length - 1) {
         try {
           const status = await sound.getStatusAsync();
           if (status.isLoaded && status.durationMillis && status.positionMillis) {
@@ -465,7 +465,7 @@ const AudioScreen = () => {
       }
       updateState.cancel(); // Cancel any scheduled execution of updateState when the component unmounts
     };
-  }, [playlist, currentIndex]); // Removed 'sound' from dependency array
+  }, [sound, playlist, currentIndex]);
 
 
   const handleTrackCompletion = async () => {
@@ -474,9 +474,55 @@ const AudioScreen = () => {
     }
   };
 
+  const goToNextTrack = async () => {
+    if (playlist.length > 0 && currentIndex < playlist.length - 1) {
+      const nextTrack = playlist[currentIndex + 1];
+      console.log('Advancing to:', nextTrack.title);
+      
+      // Unload current sound
+      if (sound) {
+        await sound.unloadAsync();
+        setSound(null);
+      }
+      
+      // Navigate to next track
+      router.replace({
+        pathname: "/AudioScreen",
+        params: {
+          url: nextTrack.url,
+          title: nextTrack.title,
+          playlist: JSON.stringify(playlist),
+          currentIndex: (currentIndex + 1).toString(),
+          category: file.category
+        }
+      });
+    }
+  };
 
-
-
+  const goToPreviousTrack = async () => {
+    if (playlist.length > 0 && currentIndex > 0) {
+      const prevTrack = playlist[currentIndex - 1];
+      console.log('Going back to:', prevTrack.title);
+      
+      // Unload current sound
+      if (sound) {
+        await sound.unloadAsync();
+        setSound(null);
+      }
+      
+      // Navigate to previous track
+      router.replace({
+        pathname: "/AudioScreen",
+        params: {
+          url: prevTrack.url,
+          title: prevTrack.title,
+          playlist: JSON.stringify(playlist),
+          currentIndex: (currentIndex - 1).toString(),
+          category: file.category
+        }
+      });
+    }
+  };
 
   const formatTime = (milliseconds: number) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -487,7 +533,17 @@ const AudioScreen = () => {
   };
 
 
-
+  const togglePlayback = async () => {
+    if (!sound) return;
+    
+    if (isPlaying) {
+      await sound.pauseAsync();
+      setIsPlaying(false);
+    } else {
+      await sound.playAsync();
+      setIsPlaying(true);
+    }
+  };
 
   const getImageHeight = () => {
     if (isTablet() || Platform.OS === 'web') {
