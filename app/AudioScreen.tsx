@@ -438,7 +438,7 @@ const AudioScreen = () => {
   useEffect(() => {
     // Set up periodic check for track completion as a fallback
     const interval = setInterval(async () => {
-      if (sound && playlist.length > 0 && currentIndex < playlist.length - 1) {
+      if (playlist.length > 0 && currentIndex < playlist.length - 1) {
         try {
           const status = await sound.getStatusAsync();
           if (status.isLoaded && status.durationMillis && status.positionMillis) {
@@ -465,7 +465,7 @@ const AudioScreen = () => {
       }
       updateState.cancel(); // Cancel any scheduled execution of updateState when the component unmounts
     };
-  }, [sound, playlist, currentIndex]);
+  }, [playlist, currentIndex]); // Removed 'sound' from dependency array
 
 
   const handleTrackCompletion = async () => {
