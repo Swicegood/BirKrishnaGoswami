@@ -20,6 +20,7 @@
       "userInterfaceStyle": "light",
       "requireFullScreen": true,
       "bundleIdentifier": "com.isckon.birkrishnagoswami",
+      "deploymentTarget": "15.1",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio",
@@ -47,16 +48,17 @@
     },
     "plugins": [
       "expo-router",
+      "expo-font",
+      "./plugins/withExifInterface",
       [
         "expo-build-properties",
         {
           "ios": {
-            "useFrameworks": "static"
+            "buildReactNativeFromSource": false,
+            "deploymentTarget": "15.1"
           }
         }
-      ],
-      "expo-font",
-      "./plugins/withExifInterface"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
