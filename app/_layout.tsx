@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, usePathname } from 'expo-router';
 import { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 import TrackPlayer from 'react-native-track-player';
 
@@ -46,21 +46,43 @@ export default function RootLayout() {
 
   // Initialize TrackPlayer
   useEffect(() => {
+    if (!loaded) return; // Wait for fonts to load first
+    
     const setupTrackPlayer = async () => {
       try {
+        // Only setup TrackPlayer on native platforms
+        if (Platform.OS === 'web') {
+          console.log('TrackPlayer not needed on web platform');
+          return;
+        }
+        
+        // Check if TrackPlayer is available
+        if (!TrackPlayer) {
+          console.warn('TrackPlayer is not available - skipping setup');
+          return;
+        }
+        
+        // Setup the player
         await TrackPlayer.setupPlayer();
         console.log('TrackPlayer setup complete');
       } catch (error) {
         console.error('Error setting up TrackPlayer:', error);
+        // Don't throw the error, just log it to prevent app crash
       }
     };
 
     setupTrackPlayer();
 
     return () => {
-      TrackPlayer.destroy();
+      try {
+        if (TrackPlayer && Platform.OS !== 'web') {
+          TrackPlayer.destroy();
+        }
+      } catch (error) {
+        console.error('Error destroying TrackPlayer:', error);
+      }
     };
-  }, []);
+  }, [loaded]); // Add loaded as dependency
 
   if (!loaded) {
     console.log('not loaded');

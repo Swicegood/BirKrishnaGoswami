@@ -100,3 +100,8 @@ export async function getUpdatedFiles() {
 }
 
 export { getAllFiles };
+
+// Add default export for API route
+export default function ApiWrapper() {
+  return null; // This is a utility file, not a React component
+}

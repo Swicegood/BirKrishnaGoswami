@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Dimensions, SafeAreaView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Dimensions, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import GuageView from '../../components/GuageView';
 import { useFocusEffect } from '@react-navigation/native';
 

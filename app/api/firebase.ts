@@ -25,3 +25,8 @@ export const functions = getFunctions(app);
 if (typeof window !== "undefined" && window.location !== undefined && window.location.hostname === "localhost") {
   //connectFunctionsEmulator(functions, "localhost", 5001);
 } 
+
+// Add default export for API route
+export default function Firebase() {
+  return null; // This is a utility file, not a React component
+} 
