@@ -89,3 +89,4 @@ expo-env.d.ts
 # @end expo-cli
 
 build-*
+package-lock.json
