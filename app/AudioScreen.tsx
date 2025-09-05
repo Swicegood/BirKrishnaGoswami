@@ -19,7 +19,7 @@ import ForwardIcon from '../components/ForwardIcon';
 import ReplayIcon from "../components/ReplayIcon";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system';
 import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,6 +27,7 @@ import GuageView from '../components/GuageView';
 import useIsMobileWeb from '../hooks/useIsMobileWeb';
 import * as Clipboard from 'expo-clipboard';
 import useTrackPlayer from '../hooks/useTrackPlayer';
+import throttle from 'lodash.throttle';
 
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 
@@ -294,58 +295,27 @@ const AudioScreen = () => {
     currentIndexRef.current = currentIndex;
   }, [file, playlist, currentIndex]);
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        if (soundRef.current) {
-          console.log('Unloading sound', fileRef.current.title);
-          const unloadSound = async () => {
-            try {
-              const status = await soundRef.current.getStatusAsync();
-              console.log('status:', status);
-              const newSong = { song: fileRef.current, position: status.positionMillis };
 
-              // Retrieve the current playedSongs from AsyncStorage
-              const jsonValue = await AsyncStorage.getItem('@playedSongs');
-              let playedSongs = jsonValue != null ? JSON.parse(jsonValue) : [];
-
-              // Append the new song
-              playedSongs.push(newSong);
-
-              // Store the updated playedSongs back to AsyncStorage
-              await AsyncStorage.setItem('@playedSongs', JSON.stringify(playedSongs));
-
-              console.log('New played songs:', playedSongs);
-            } catch (error) {
-              console.error('Error unloading sound:', error);
-            }
-            await soundRef.current.unloadAsync();
-          };
-          unloadSound();
-        }
-      };
-    }, []) // Empty dependency array
-  );
 
   useEffect(() => {
     console.log('Played songs:', playedSongs);
   }, [playedSongs]);
 
-  useEffect(() => {
-    const restorePosition = async () => {
-      if (isFirstLoad) {
-        const position = getStoredPostion(file);
-        if (position) {
-          setPosition(position);
-          if (sound) {
-            await sound.setPositionAsync(position);
-            setIsFirstLoad(false);
-          }
-        }
-      }
-    };
-    restorePosition();
-  }, [file]);
+  // useEffect(() => {
+  //   const restorePosition = async () => {
+  //     if (isFirstLoad) {
+  //       const position = getStoredPostion(file);
+  //       if (position) {
+  //         setPosition(position);
+  //         if (sound) {
+  //           await sound.setPositionAsync(position);
+  //           setIsFirstLoad(false);
+  //         }
+  //       }
+  //     }
+  //   };
+  //   restorePosition();
+  // }, [file]);
 
 
   useEffect(() => {
@@ -368,8 +338,7 @@ const AudioScreen = () => {
   }, []);
 
   const updateState = throttle(async (status: any) => {
-    setPosition(status.positionMillis);
-    setLastPosition(status.positionMillis);
+    // Position is managed by TrackPlayer's useProgress hook
     
     // Log only important events
     if (status.didJustFinish) {
@@ -412,7 +381,7 @@ const AudioScreen = () => {
         
         // Update or add the current song
         const songIndex = playedSongs.findIndex(
-          (song) => song.song.title === file.title
+          (song: any) => song.song.title === file.title
         );
         
         const newSong = { song: file, position: status.positionMillis };
@@ -435,37 +404,37 @@ const AudioScreen = () => {
     }
   }, 1000);
 
-  useEffect(() => {
-    // Set up periodic check for track completion as a fallback
-    const interval = setInterval(async () => {
-      if (sound && playlist.length > 0 && currentIndex < playlist.length - 1) {
-        try {
-          const status = await sound.getStatusAsync();
-          if (status.isLoaded && status.durationMillis && status.positionMillis) {
-            const remainingTime = status.durationMillis - status.positionMillis;
-            const progressPercent = (status.positionMillis / status.durationMillis) * 100;
+  // useEffect(() => {
+  //   // Set up periodic check for track completion as a fallback
+  //   const interval = setInterval(async () => {
+  //     if (sound && playlist.length > 0 && currentIndex < playlist.length - 1) {
+  //       try {
+  //         const status = await sound.getStatusAsync();
+  //         if (status.isLoaded && status.durationMillis && status.positionMillis) {
+  //           const remainingTime = status.durationMillis - status.positionMillis;
+  //           const progressPercent = (status.positionMillis / status.durationMillis) * 100;
             
-            // Check if track is essentially complete
-            if ((remainingTime <= 500 || progressPercent > 99) && status.positionMillis > 0) {
-              console.log('Periodic check detected track completion, auto-advancing');
-              handleTrackCompletion();
-            }
-          }
-        } catch (error) {
-          console.log('Error in periodic completion check:', error);
-        }
-      }
-    }, 2000); // Check every 2 seconds
+  //           // Check if track is essentially complete
+  //           if ((remainingTime <= 500 || progressPercent > 99) && status.positionMillis > 0) {
+  //             console.log('Periodic check detected track completion, auto-advancing');
+  //             handleTrackCompletion();
+  //           }
+  //         }
+  //       } catch (error) {
+  //         console.log('Error in periodic completion check:', error);
+  //       }
+  //     }
+  //   }, 2000); // Check every 2 seconds
 
     // Cleanup function
-    return () => {
-      clearInterval(interval);
-      if (sound) {
-        sound.setOnPlaybackStatusUpdate(null);
-      }
-      updateState.cancel(); // Cancel any scheduled execution of updateState when the component unmounts
-    };
-  }, [sound, playlist, currentIndex]);
+  //   return () => {
+  //     clearInterval(interval);
+  //     if (sound) {
+  //       sound.setOnPlaybackStatusUpdate(null);
+  //     }
+  //     updateState.cancel(); // Cancel any scheduled execution of updateState when the component unmounts
+  //   };
+  // }, [sound, playlist, currentIndex]);
 
 
   const handleTrackCompletion = async () => {
@@ -474,54 +443,36 @@ const AudioScreen = () => {
     }
   };
 
-  const goToNextTrack = async () => {
-    if (playlist.length > 0 && currentIndex < playlist.length - 1) {
-      const nextTrack = playlist[currentIndex + 1];
-      console.log('Advancing to:', nextTrack.title);
-      
-      // Unload current sound
-      if (sound) {
-        await sound.unloadAsync();
-        setSound(null);
+  const doGoToNextTrack = async () => {
+    await goToNextTrack();
+    const nextIndex = Math.min(currentIndex + 1, playlist.length - 1);
+    const nextTrack = playlist[nextIndex] as any;
+    router.replace({
+      pathname: "/AudioScreen",
+      params: {
+        url: nextTrack.url,
+        title: nextTrack.title,
+        playlist: JSON.stringify(playlist),
+        currentIndex: nextIndex.toString(),
+        category: file.category
       }
-      
-      // Navigate to next track
-      router.replace({
-        pathname: "/AudioScreen",
-        params: {
-          url: nextTrack.url,
-          title: nextTrack.title,
-          playlist: JSON.stringify(playlist),
-          currentIndex: (currentIndex + 1).toString(),
-          category: file.category
-        }
-      });
-    }
+    });
   };
-
-  const goToPreviousTrack = async () => {
-    if (playlist.length > 0 && currentIndex > 0) {
-      const prevTrack = playlist[currentIndex - 1];
-      console.log('Going back to:', prevTrack.title);
-      
-      // Unload current sound
-      if (sound) {
-        await sound.unloadAsync();
-        setSound(null);
+  
+  const doGoToPreviousTrack = async () => {
+    await goToPreviousTrack();
+    const prevIndex = Math.max(currentIndex - 1, 0);
+    const prevTrack = playlist[prevIndex] as any;
+    router.replace({
+      pathname: "/AudioScreen",
+      params: {
+        url: prevTrack.url,
+        title: prevTrack.title,
+        playlist: JSON.stringify(playlist),
+        currentIndex: prevIndex.toString(),
+        category: file.category
       }
-      
-      // Navigate to previous track
-      router.replace({
-        pathname: "/AudioScreen",
-        params: {
-          url: prevTrack.url,
-          title: prevTrack.title,
-          playlist: JSON.stringify(playlist),
-          currentIndex: (currentIndex - 1).toString(),
-          category: file.category
-        }
-      });
-    }
+    });
   };
 
   const formatTime = (milliseconds: number) => {
@@ -533,17 +484,7 @@ const AudioScreen = () => {
   };
 
 
-  const togglePlayback = async () => {
-    if (!sound) return;
-    
-    if (isPlaying) {
-      await sound.pauseAsync();
-      setIsPlaying(false);
-    } else {
-      await sound.playAsync();
-      setIsPlaying(true);
-    }
-  };
+
 
   const getImageHeight = () => {
     if (isTablet() || Platform.OS === 'web') {
@@ -630,9 +571,7 @@ const AudioScreen = () => {
                 value={position}
                 maximumValue={duration}
                 onSlidingComplete={async (value) => {
-                  if (sound) {
-                    await sound.setPositionAsync(value);
-                  }
+                  await seekTo(value);
                 }}
               />
               <View style={styles.timeContainer}>
@@ -643,45 +582,45 @@ const AudioScreen = () => {
                 <TouchableOpacity
                   style={styles.muteButton}
                   onPress={muteSound}
-                  disabled={!sound}
+                  disabled={isLoading}
                 >
                   <Icon name={isMuted ? "volume-off" : "volume-up"} size={40} color="#FFF" />
                 </TouchableOpacity>
                 {playlist.length > 1 && currentIndex > 0 && (
                   <TouchableOpacity
                     style={styles.trackNavButton}
-                    onPress={goToPreviousTrack}
-                    disabled={!sound}
+                    onPress={doGoToPreviousTrack}
+                    disabled={isLoading}
                   >
                     <Icon name="skip-previous" size={40} color="#FFF" />
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity
                   style={styles.seekBackwardButton}
-                  onPress={seekBackward}
-                  disabled={!sound}
+                  onPress={() => seekBackward()}
+                  disabled={isLoading}
                 >
                   <ReplayIcon />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.button}
                   onPress={togglePlayback}
-                  disabled={!sound}
+                  disabled={isLoading}
                 >
                   <Icon name={isPlaying ? "pause" : "play-arrow"} size={40} color="#FFF" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.seekForwardButton}
-                  onPress={seekForward}
-                  disabled={!sound}
+                  onPress={() => seekForward()}
+                  disabled={isLoading}
                 >
                   <ForwardIcon />
                 </TouchableOpacity>
                 {playlist.length > 1 && currentIndex < playlist.length - 1 && (
                   <TouchableOpacity
                     style={styles.trackNavButton}
-                    onPress={goToNextTrack}
-                    disabled={!sound}
+                    onPress={doGoToNextTrack}
+                    disabled={isLoading}
                   >
                     <Icon name="skip-next" size={40} color="#FFF" />
                   </TouchableOpacity>
@@ -698,12 +637,12 @@ const AudioScreen = () => {
                         try {
                           setDownloadProgress(0);
                           // Fetch the file through the proxy
-                          const response = await fetch(PROXY_URL + url);
+                          const response = await fetch(PROXY_URL + file.url);
                           const contentLength = response.headers.get('Content-Length');
-                          const total = parseInt(contentLength, 10);
+                          const total = parseInt(contentLength || '0', 10);
                           let loaded = 0;
 
-                          const reader = response.body.getReader();
+                          const reader = response.body!.getReader();
                           const chunks = [];
 
                           while (true) {
@@ -735,7 +674,7 @@ const AudioScreen = () => {
                           setDownloadProgress(0);
                         }
                       }}
-                      disabled={!sound}
+                      disabled={isLoading}
                     >
                       <Icon name="get-app" size={40} color="#FFF" />
                     </TouchableOpacity>
@@ -752,7 +691,7 @@ const AudioScreen = () => {
                         const fileUri = `${FileSystem.cacheDirectory}${file.title}.mp3`;
 
                         const downloadResumable = FileSystem.createDownloadResumable(
-                          url,
+                          file.url,
                           fileUri,
                           {},
                           (downloadProgress) => {
@@ -771,7 +710,7 @@ const AudioScreen = () => {
                           console.error(e);
                         }
                       }}
-                      disabled={!sound}
+                      disabled={isLoading}
                     >
                       <Icon name="get-app" size={40} color="#FFF" />
                     </TouchableOpacity>
