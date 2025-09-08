@@ -11,6 +11,7 @@ import {
   Modal,
   Platform,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CustomHeaderMain from '../components/CustomHeaderMain';
@@ -97,14 +98,17 @@ const DebugLogsScreen: React.FC = () => {
     );
   };
 
-  const exportLogs = () => {
+  const exportLogs = async () => {
     const logText = logs.map(log => 
       `[${log.timestamp.toISOString()}] ${log.level.toUpperCase()}: ${log.message}${log.source ? ` (${log.source})` : ''}${log.data ? `\nData: ${JSON.stringify(log.data, null, 2)}` : ''}`
     ).join('\n\n');
 
-    // For now, just show an alert with the logs
-    // In a real app, you might want to save to file or share
-    Alert.alert('Logs Export', logText.substring(0, 1000) + (logText.length > 1000 ? '...' : ''));
+    try {
+      await Clipboard.setStringAsync(logText);
+      Alert.alert('Success', 'Logs copied to clipboard!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to copy logs to clipboard');
+    }
   };
 
   const getLevelColor = (level: LogEntry['level']): string => {
@@ -214,8 +218,8 @@ const DebugLogsScreen: React.FC = () => {
         
         <View style={styles.actionsContainer}>
           <TouchableOpacity style={styles.actionButton} onPress={exportLogs}>
-            <Ionicons name="download" size={20} color="#007AFF" />
-            <Text style={styles.actionButtonText}>Export</Text>
+            <Ionicons name="copy" size={20} color="#007AFF" />
+            <Text style={styles.actionButtonText}>Copy to Clipboard</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={clearLogs}>
             <Ionicons name="trash" size={20} color="#FF3B30" />
@@ -365,9 +369,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   levelButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
     borderWidth: 1,
     marginRight: 8,
     backgroundColor: '#f9f9f9',

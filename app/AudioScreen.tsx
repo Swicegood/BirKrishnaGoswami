@@ -28,6 +28,7 @@ import useIsMobileWeb from '../hooks/useIsMobileWeb';
 import * as Clipboard from 'expo-clipboard';
 import useTrackPlayer from '../hooks/useTrackPlayer';
 import throttle from 'lodash.throttle';
+import logger from '../utils/logger';
 
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 
@@ -58,8 +59,26 @@ const AudioScreen = () => {
   const [playedSongs, setPlayedSongs] = useState<any[]>([]);
   const [orientation, setOrientation] = useState(Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT');
   const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
   const isMobileWeb = useIsMobileWeb();
   const lastStorageUpdateRef = useRef(0);
+
+  // Log component initialization
+  useEffect(() => {
+    logger.info('AudioScreen initialized', {
+      file: {
+        url: file.url,
+        title: file.title,
+        playlist: file.playlist ? 'provided' : 'none',
+        currentIndex: file.currentIndex,
+        category: file.category
+      },
+      orientation,
+      platform: Platform.OS,
+      isMobileWeb
+    }, 'AudioScreen');
+  }, []);
+
 
   // Use the new TrackPlayer hook
   const {
@@ -79,16 +98,45 @@ const AudioScreen = () => {
     seekForward,
     seekBackward,
     cleanup
-  } = useTrackPlayer(() => {
-    console.log('Track loaded successfully');
+  } = useTrackPlayer((loaded) => {
+    logger.info('Track loaded callback', { loaded }, 'AudioScreen');
+    setIsFirstLoad(false);
   });
 
+  // Log rendering state changes
+  useEffect(() => {
+    logger.debug('AudioScreen render state changed', {
+      isPlaying,
+      isLoading,
+      position,
+      duration,
+      currentIndex,
+      playlistLength: playlist?.length || 0,
+      orientation,
+      width,
+      height,
+      isMuted,
+      downloadProgress,
+      isFileDownloaded
+    }, 'AudioScreen');
+  }, [isPlaying, isLoading, position, duration, currentIndex, playlist?.length, orientation, width, height, isMuted, downloadProgress, isFileDownloaded]);
+
+  // Log component cleanup
+  useEffect(() => {
+    return () => {
+      logger.info('AudioScreen component unmounting', {
+        title: file.title,
+        finalPosition: position,
+        finalDuration: duration,
+        isPlaying
+      }, 'AudioScreen');
+    };
+  }, []);
+
   const onSetWidth = (width: number) => {
-    console.log('QuoteScreen width: ', width);
+    logger.debug('Width changed', { width, previousWidth: width }, 'AudioScreen');
     setWidth(width);
   };
-
-  const [height, setHeight] = useState(Dimensions.get('window').height);
   const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
 
@@ -102,12 +150,19 @@ const AudioScreen = () => {
     // Only change orientation if the aspect ratio change is significant
     if (Math.abs(aspectRatio - previousAspectRatio) > ORIENTATION_THRESHOLD) {
       const newOrientation = newWidth > newHeight ? 'LANDSCAPE' : 'PORTRAIT';
+      logger.info('Orientation changed', {
+        from: orientation,
+        to: newOrientation,
+        newWidth,
+        newHeight,
+        aspectRatio,
+        previousAspectRatio
+      }, 'AudioScreen');
       setOrientation(newOrientation);
     }
 
     setWidth(newWidth);
     setHeight(newHeight);
-    console.log('HandleOrientation Called :', orientation);
   }
 
 
@@ -120,6 +175,7 @@ const AudioScreen = () => {
   };
 
   const shareAudioLink = async (url: string) => {
+    logger.info('Sharing audio link', { url }, 'AudioScreen');
     try {
       const result = await Share.share({
         message: 'Check out this cool video on YouTube!',
@@ -129,22 +185,23 @@ const AudioScreen = () => {
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
           // Shared with activity type of result.activityType
-          console.log('Shared with', result.activityType);
+          logger.info('Audio link shared with activity type', { activityType: result.activityType }, 'AudioScreen');
         } else {
           // Shared
-          console.log('Shared successfully!');
+          logger.info('Audio link shared successfully', {}, 'AudioScreen');
         }
       } else if (result.action === Share.dismissedAction) {
         // Dismissed
-        console.log('Share dismissed');
+        logger.info('Audio link share dismissed', {}, 'AudioScreen');
       }
     } catch (error) {
-      console.error('Error sharing YouTube video:', error);
+      logger.error('Error sharing audio link', { error: error instanceof Error ? error.message : String(error), url }, 'AudioScreen');
     }
   };
 
 
   const mailAudioLink = async (url: string) => {
+    logger.info('Sharing audio link via mail/web', { url, hasNavigatorShare: !!navigator.share }, 'AudioScreen');
     if (navigator.share) {
       // Web Share API is supported
       try {
@@ -153,20 +210,22 @@ const AudioScreen = () => {
           text: 'I thought you might be interested in this audio file.',
           url: url
         });
+        logger.info('Audio link shared via Web Share API', { url }, 'AudioScreen');
       } catch (error) {
-        console.error('Error sharing:', error);
+        logger.error('Error sharing via Web Share API', { error: error instanceof Error ? error.message : String(error), url }, 'AudioScreen');
       }
     } else {
       // Web Share API is not supported, fallback to clipboard
       try {
         await Clipboard.setStringAsync(url);
+        logger.info('Audio link copied to clipboard', { url }, 'AudioScreen');
         Alert.alert(
           'Link Copied',
           "The audio link has been copied to your clipboard. You can now paste it wherever you'd like to share it.",
           [{ text: 'OK' }]
         );
       } catch (error) {
-        console.error('Failed to copy text: ', error);
+        logger.error('Failed to copy audio link to clipboard', { error: error instanceof Error ? error.message : String(error), url }, 'AudioScreen');
         Alert.alert('Error', 'Failed to copy the link. Please try again.');
       }
     }
@@ -174,7 +233,7 @@ const AudioScreen = () => {
 
 
   const shareAudioFile = async (fileUri: string) => {
-    console.log('Sharing audio file:', fileUri);
+    logger.info('Sharing audio file', { fileUri }, 'AudioScreen');
     try {
       const shareOptions = {
         title: 'Share audio file',
@@ -187,28 +246,29 @@ const AudioScreen = () => {
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
           // Shared with activity type of result.activityType
-          console.log('Shared with', result.activityType);
+          logger.info('Audio file shared with activity type', { activityType: result.activityType, fileUri }, 'AudioScreen');
         } else {
           // Shared
-          console.log('Shared successfully!');
+          logger.info('Audio file shared successfully', { fileUri }, 'AudioScreen');
         }
       } else if (result.action === Share.dismissedAction) {
         // Dismissed
-        console.log('Share dismissed');
+        logger.info('Audio file share dismissed', { fileUri }, 'AudioScreen');
       }
     } catch (error) {
-      console.error('Error sharing audio file:', error);
+      logger.error('Error sharing audio file', { error: error instanceof Error ? error.message : String(error), fileUri }, 'AudioScreen');
     }
   };
 
 
   const muteSound = async () => {
+    logger.info('Mute button pressed', { currentMuteState: isMuted, newMuteState: !isMuted }, 'AudioScreen');
     try {
       setIsMuted(!isMuted);
       // Note: TrackPlayer doesn't have volume control in this implementation
       // You can add volume control if needed
     } catch (error) {
-      console.error(error);
+      logger.error('Error toggling mute', { error: error instanceof Error ? error.message : String(error), isMuted }, 'AudioScreen');
     }
   };
 
@@ -220,23 +280,37 @@ const AudioScreen = () => {
 
   useEffect(() => {
     const songUrl = file.url;
+    logger.info('Loading track', { songUrl, title: file.title }, 'AudioScreen');
     // Load the track using TrackPlayer
     if (songUrl) {
       loadTrack(songUrl, file.title, true, 0);
+    } else {
+      logger.warn('No song URL provided', { file }, 'AudioScreen');
     }
   }, [file.url, file.title]);
 
   // Initialize playlist from parameters or fetch from category
   useEffect(() => {
     const initializePlaylist = async () => {
+      logger.info('Initializing playlist', { 
+        hasPlaylist: !!file.playlist, 
+        hasCategory: !!file.category,
+        currentIndex: file.currentIndex 
+      }, 'AudioScreen');
+      
       if (file.playlist) {
         // Use provided playlist
         const playlistData = JSON.parse(file.playlist);
         const startIndex = parseInt(file.currentIndex || '0');
+        logger.info('Loading provided playlist', { 
+          trackCount: playlistData.length, 
+          startIndex 
+        }, 'AudioScreen');
         await loadPlaylist(playlistData, startIndex);
       } else if (file.category) {
         // Fetch all files from the same category
         try {
+          logger.info('Fetching files for category', { category: file.category }, 'AudioScreen');
           const allFiles = (await getAllFiles('audioFilesList', 'mp3Files')).map((url: string) => {
             const segments = url.split('/');
             const filename = segments[segments.length - 1];
@@ -265,15 +339,18 @@ const AudioScreen = () => {
           
           await loadPlaylist(categoryFiles, startIndex);
           
-          console.log('Playlist initialized:', {
+          logger.info('Playlist initialized from category', {
             totalTracks: categoryFiles.length,
             currentIndex: startIndex,
             currentTrack: file.title,
             category: file.category,
             tracks: categoryFiles.map((t: any) => t.title)
-          });
+          }, 'AudioScreen');
         } catch (error) {
-          console.error('Error fetching playlist:', error);
+          logger.error('Error fetching playlist from category', { 
+            error: error instanceof Error ? error.message : String(error), 
+            category: file.category 
+          }, 'AudioScreen');
         }
       }
     };
@@ -320,17 +397,25 @@ const AudioScreen = () => {
 
   useEffect(() => {
     const loadPlayedSongs = async () => {
+      logger.info('Loading played songs from storage', {}, 'AudioScreen');
       try {
         const jsonValue = await AsyncStorage.getItem('@playedSongs');
         if (jsonValue !== null) {
           const newPlayedSongs = JSON.parse(jsonValue);
           if (JSON.stringify(newPlayedSongs) !== JSON.stringify(playedSongs)) {
+            logger.info('Played songs loaded from storage', { 
+              songCount: newPlayedSongs.length,
+              songs: newPlayedSongs.map((s: any) => s.song.title)
+            }, 'AudioScreen');
             setPlayedSongs(newPlayedSongs);
           }
+        } else {
+          logger.info('No played songs found in storage', {}, 'AudioScreen');
         }
       } catch (e) {
-        // error reading value
-        console.log(e);
+        logger.error('Error loading played songs from storage', { 
+          error: e instanceof Error ? e.message : String(e) 
+        }, 'AudioScreen');
       }
     };
 
@@ -342,12 +427,18 @@ const AudioScreen = () => {
     
     // Log only important events
     if (status.didJustFinish) {
-      console.log('didJustFinish detected in updateState');
+      logger.info('Track finished detected in updateState', { 
+        position: status.positionMillis, 
+        duration: status.durationMillis 
+      }, 'AudioScreen');
     }
     
     // Check if track just finished
-    if (status.didJustFinish && playlist.length > 0 && currentIndex < playlist.length - 1) {
-      console.log('Track finished, auto-advancing to next track');
+    if (status.didJustFinish && playlist?.length > 0 && currentIndex < playlist.length - 1) {
+      logger.info('Track finished, auto-advancing to next track', { 
+        currentIndex, 
+        playlistLength: playlist?.length || 0
+      }, 'AudioScreen');
       handleTrackCompletion();
       return;
     }
@@ -355,8 +446,12 @@ const AudioScreen = () => {
     // Alternative approach: Check if we're very close to the end
     if (status.isLoaded && status.durationMillis && status.positionMillis) {
       const remainingTime = status.durationMillis - status.positionMillis;
-      if (remainingTime <= 1000 && remainingTime > 0 && playlist.length > 0 && currentIndex < playlist.length - 1) {
-        console.log('Track nearly finished (< 1s remaining), auto-advancing to next track');
+      if (remainingTime <= 1000 && remainingTime > 0 && playlist?.length > 0 && currentIndex < playlist.length - 1) {
+        logger.info('Track nearly finished (< 1s remaining), auto-advancing to next track', { 
+          remainingTime, 
+          currentIndex, 
+          playlistLength: playlist?.length || 0
+        }, 'AudioScreen');
         handleTrackCompletion();
         return;
       }
@@ -365,8 +460,13 @@ const AudioScreen = () => {
     // Fallback: Check if position hasn't changed and we're near the end
     if (status.isLoaded && status.durationMillis && status.positionMillis) {
       const progressPercent = (status.positionMillis / status.durationMillis) * 100;
-      if (progressPercent > 98 && !isPlaying && playlist.length > 0 && currentIndex < playlist.length - 1) {
-        console.log('Track appears completed (>98% and not playing), auto-advancing');
+      if (progressPercent > 98 && !isPlaying && playlist?.length > 0 && currentIndex < playlist.length - 1) {
+        logger.info('Track appears completed (>98% and not playing), auto-advancing', { 
+          progressPercent, 
+          isPlaying, 
+          currentIndex, 
+          playlistLength: playlist?.length || 0
+        }, 'AudioScreen');
         handleTrackCompletion();
         return;
       }
@@ -388,8 +488,17 @@ const AudioScreen = () => {
         
         if (songIndex !== -1) {
           playedSongs[songIndex] = newSong;
+          logger.debug('Updated song position in storage', { 
+            title: file.title, 
+            position: status.positionMillis,
+            songIndex 
+          }, 'AudioScreen');
         } else {
           playedSongs.push(newSong);
+          logger.debug('Added new song position to storage', { 
+            title: file.title, 
+            position: status.positionMillis 
+          }, 'AudioScreen');
         }
         
         await AsyncStorage.setItem('@playedSongs', JSON.stringify(playedSongs));
@@ -397,9 +506,16 @@ const AudioScreen = () => {
         // 3. Update the ref immediately
         lastStorageUpdateRef.current = status.positionMillis;
 
-        console.log('Position saved to storage:', status.positionMillis);
+        logger.debug('Position saved to storage', { 
+          position: status.positionMillis, 
+          title: file.title 
+        }, 'AudioScreen');
       } catch (error) {
-        console.error('Error saving position to storage:', error);
+        logger.error('Error saving position to storage', { 
+          error: error instanceof Error ? error.message : String(error),
+          position: status.positionMillis,
+          title: file.title
+        }, 'AudioScreen');
       }
     }
   }, 1000);
@@ -438,15 +554,33 @@ const AudioScreen = () => {
 
 
   const handleTrackCompletion = async () => {
-    if (playlist.length > 0 && currentIndex < playlist.length - 1) {
+    if (playlist?.length > 0 && currentIndex < playlist.length - 1) {
+      logger.info('Handling track completion - auto-advancing', { 
+        currentIndex, 
+        playlistLength: playlist?.length || 0
+      }, 'AudioScreen');
       goToNextTrack();
+    } else {
+      logger.info('Track completed but no next track available', { 
+        currentIndex, 
+        playlistLength: playlist?.length || 0
+      }, 'AudioScreen');
     }
   };
 
   const doGoToNextTrack = async () => {
+    logger.info('User requested next track', { 
+      currentIndex, 
+      playlistLength: playlist?.length || 0
+    }, 'AudioScreen');
     await goToNextTrack();
-    const nextIndex = Math.min(currentIndex + 1, playlist.length - 1);
-    const nextTrack = playlist[nextIndex] as any;
+    const nextIndex = Math.min(currentIndex + 1, (playlist?.length || 1) - 1);
+    const nextTrack = playlist?.[nextIndex] as any;
+    logger.info('Navigating to next track', { 
+      fromIndex: currentIndex, 
+      toIndex: nextIndex, 
+      nextTrack: nextTrack.title 
+    }, 'AudioScreen');
     router.replace({
       pathname: "/AudioScreen",
       params: {
@@ -460,9 +594,18 @@ const AudioScreen = () => {
   };
   
   const doGoToPreviousTrack = async () => {
+    logger.info('User requested previous track', { 
+      currentIndex, 
+      playlistLength: playlist?.length || 0
+    }, 'AudioScreen');
     await goToPreviousTrack();
     const prevIndex = Math.max(currentIndex - 1, 0);
-    const prevTrack = playlist[prevIndex] as any;
+    const prevTrack = playlist?.[prevIndex] as any;
+    logger.info('Navigating to previous track', { 
+      fromIndex: currentIndex, 
+      toIndex: prevIndex, 
+      prevTrack: prevTrack.title 
+    }, 'AudioScreen');
     router.replace({
       pathname: "/AudioScreen",
       params: {
@@ -487,32 +630,73 @@ const AudioScreen = () => {
 
 
   const getImageHeight = () => {
-    if (isTablet() || Platform.OS === 'web') {
+    const isTabletDevice = isTablet();
+    let height;
+    
+    if (isTabletDevice || Platform.OS === 'web') {
       if (orientation === 'LANDSCAPE') {
         if (isMobileWeb) {
-          return width * 0.1;
+          height = width * 0.1;
+        } else {
+          height = width * 0.3;
         }
-        return width * 0.3;
+      } else {
+        height = width * 0.4;
       }
-      return width * 0.4;
+    } else {
+      height = orientation === 'LANDSCAPE' ? 160 : 260;
     }
-    return orientation === 'LANDSCAPE' ? 160 : 260;
+    
+    logger.debug('Calculated image height', {
+      height,
+      width,
+      orientation,
+      isTablet: isTabletDevice,
+      platform: Platform.OS,
+      isMobileWeb
+    }, 'AudioScreen');
+    
+    return height;
   }
 
   const getImageWidth = () => {
-    if (isTablet() || Platform.OS === 'web') {
-      return getImageHeight() * 4 / 3;
-    }
-    return width;
+    const imageWidth = (isTablet() || Platform.OS === 'web') ? getImageHeight() * 4 / 3 : width;
+    
+    logger.debug('Calculated image width', {
+      width: imageWidth,
+      height: getImageHeight(),
+      isTablet: isTablet(),
+      platform: Platform.OS
+    }, 'AudioScreen');
+    
+    return imageWidth;
   }
 
   if (isLoading) {
+    logger.debug('AudioScreen rendering loading state', { 
+      isLoading, 
+      title: file.title 
+    }, 'AudioScreen');
     return (
       <View style={styles.musicContainer}>
         <ActivityIndicator size="large" color="#ED4D4E" />
       </View>
     );
   }
+
+  logger.debug('AudioScreen rendering main UI', {
+    orientation,
+    width,
+    height,
+    isPlaying,
+    position,
+    duration,
+    currentIndex,
+    playlistLength: playlist?.length || 0,
+    title: file.title,
+    hasDownloadProgress: downloadProgress > 0,
+    isFileDownloaded
+  }, 'AudioScreen');
 
   return (
     <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
@@ -558,9 +742,9 @@ const AudioScreen = () => {
                 <Progress.Bar progress={downloadProgress} width={200} />
               )}
               <Text style={styles.title}>{file.title.toUpperCase().replace('_', ' ')}</Text>
-              {playlist.length > 1 && (
+              {playlist?.length > 1 && (
                 <Text style={styles.trackIndicator}>
-                  Track {currentIndex + 1} of {playlist.length}
+                  Track {currentIndex + 1} of {playlist?.length || 0}
                 </Text>
               )}
               <Slider
@@ -571,6 +755,11 @@ const AudioScreen = () => {
                 value={position}
                 maximumValue={duration}
                 onSlidingComplete={async (value) => {
+                  logger.info('User seeking to position', { 
+                    from: position, 
+                    to: value, 
+                    title: file.title 
+                  }, 'AudioScreen');
                   await seekTo(value);
                 }}
               />
@@ -586,7 +775,7 @@ const AudioScreen = () => {
                 >
                   <Icon name={isMuted ? "volume-off" : "volume-up"} size={40} color="#FFF" />
                 </TouchableOpacity>
-                {playlist.length > 1 && currentIndex > 0 && (
+                {playlist?.length > 1 && currentIndex > 0 && (
                   <TouchableOpacity
                     style={styles.trackNavButton}
                     onPress={doGoToPreviousTrack}
@@ -616,7 +805,7 @@ const AudioScreen = () => {
                 >
                   <ForwardIcon />
                 </TouchableOpacity>
-                {playlist.length > 1 && currentIndex < playlist.length - 1 && (
+                {playlist?.length > 1 && currentIndex < (playlist?.length || 1) - 1 && (
                   <TouchableOpacity
                     style={styles.trackNavButton}
                     onPress={doGoToNextTrack}
@@ -631,9 +820,11 @@ const AudioScreen = () => {
                       style={styles.downloadButton}
                       onPress={async () => {
                         if (isFileDownloaded) {
+                          logger.info('Download attempted but file already downloaded', { title: file.title }, 'AudioScreen');
                           Alert.alert('Downloaded', 'This file is already downloaded');
                           return;
                         }
+                        logger.info('Starting web download', { url: file.url, title: file.title }, 'AudioScreen');
                         try {
                           setDownloadProgress(0);
                           // Fetch the file through the proxy
@@ -641,6 +832,11 @@ const AudioScreen = () => {
                           const contentLength = response.headers.get('Content-Length');
                           const total = parseInt(contentLength || '0', 10);
                           let loaded = 0;
+
+                          logger.info('Web download started', { 
+                            totalSize: total, 
+                            url: file.url 
+                          }, 'AudioScreen');
 
                           const reader = response.body!.getReader();
                           const chunks = [];
@@ -666,10 +862,18 @@ const AudioScreen = () => {
 
                           window.URL.revokeObjectURL(blobUrl);
 
+                          logger.info('Web download completed successfully', { 
+                            title: file.title, 
+                            totalSize: total 
+                          }, 'AudioScreen');
                           setIsFileDownloaded(true);
                           setDownloadProgress(1);
                         } catch (error) {
-                          console.error('Download failed:', error);
+                          logger.error('Web download failed', { 
+                            error: error instanceof Error ? error.message : String(error), 
+                            url: file.url, 
+                            title: file.title 
+                          }, 'AudioScreen');
                           Alert.alert('Download Failed', 'There was an error downloading the file.');
                           setDownloadProgress(0);
                         }
@@ -683,10 +887,12 @@ const AudioScreen = () => {
                       style={styles.downloadButton}
                       onPress={async () => {
                         if (isFileDownloaded) {
+                          logger.info('Download attempted but file already downloaded', { title: file.title }, 'AudioScreen');
                           Alert.alert('Downloaded', 'This file is already downloaded');
                           shareAudioFile(`${FileSystem.cacheDirectory}${file.title}.mp3`);
                           return;
                         }
+                        logger.info('Starting native download', { url: file.url, title: file.title }, 'AudioScreen');
                         // Check if external storage is available and accessible
                         const fileUri = `${FileSystem.cacheDirectory}${file.title}.mp3`;
 
@@ -696,18 +902,29 @@ const AudioScreen = () => {
                           {},
                           (downloadProgress) => {
                             const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
-                            console.log(`Download progress: ${progress * 100}%`);
+                            logger.debug('Native download progress', { 
+                              progress: progress * 100, 
+                              bytesWritten: downloadProgress.totalBytesWritten,
+                              totalBytes: downloadProgress.totalBytesExpectedToWrite
+                            }, 'AudioScreen');
                             setDownloadProgress(progress);
                           }
                         );
 
                         try {
                           const { uri } = await downloadResumable.downloadAsync();
-                          console.log('Finished downloading to ', uri);
+                          logger.info('Native download completed successfully', { 
+                            uri, 
+                            title: file.title 
+                          }, 'AudioScreen');
                           Alert.alert('Download Complete', `Finished downloading to ${uri}`);
                           setIsFileDownloaded(true);
                         } catch (e) {
-                          console.error(e);
+                          logger.error('Native download failed', { 
+                            error: e instanceof Error ? e.message : String(e), 
+                            url: file.url, 
+                            title: file.title 
+                          }, 'AudioScreen');
                         }
                       }}
                       disabled={isLoading}

@@ -23,7 +23,8 @@
       "distribution": "internal",
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm",
-        "RELEASE_CHANNEL": "debug-preview"
+        "RELEASE_CHANNEL": "debug-preview",
+        "DEBUG_ENABLED": "true"
       }
     },
     "production": {

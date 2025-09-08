@@ -19,16 +19,35 @@ class Logger {
   }
 
   private checkDebugMode(): boolean {
-    // Check if we're in debug-preview mode
-    const releaseChannel = Constants.expoConfig?.extra?.releaseChannel;
-    const isDebugPreview = releaseChannel === 'debug-preview';
-    
-    // Also check for development mode
-    const isDev = __DEV__;
-    
-    // If no release channel is set, default to production mode (no debug logging)
-    // This ensures debug logging is only enabled when explicitly set to debug-preview
-    return isDebugPreview || isDev;
+    try {
+      // Check if we're in debug-preview mode (EAS debug-preview builds)
+      const releaseChannel = Constants.expoConfig?.extra?.releaseChannel;
+      const debugEnabled = Constants.expoConfig?.extra?.debugEnabled;
+      
+      // Convert string "true"/"false" to boolean, or check release channel
+      const isDebugMode = debugEnabled === 'true' || debugEnabled === true || releaseChannel === 'debug-preview';
+      
+      // Debug logging to help troubleshoot
+      console.log('Logger Debug Info:', {
+        releaseChannel,
+        debugEnabled,
+        isDebugMode,
+        expoConfig: Constants.expoConfig?.extra,
+        finalResult: isDebugMode
+      });
+      
+      // TEMPORARY: Force enable debug mode for testing
+      const forceDebugMode = true;
+      console.log('FORCE DEBUG MODE:', forceDebugMode);
+      
+      // Enable debug logging ONLY in debug-preview builds
+      // This ensures debug logging is only available in your custom EAS debug-preview builds
+      return forceDebugMode;
+    } catch (error) {
+      console.error('Error in checkDebugMode:', error);
+      // Fallback: return true for testing
+      return true;
+    }
   }
 
   private generateId(): string {

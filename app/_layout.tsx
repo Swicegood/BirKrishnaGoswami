@@ -103,6 +103,15 @@ function RootLayoutNav() {
     logger.info('Navigation changed', { pathname }, 'Navigation');
   }, [pathname]);
 
+  // Test debug logging
+  useEffect(() => {
+    logger.info('App started', { 
+      isDebugEnabled: logger.isDebugEnabled(),
+      platform: Platform.OS,
+      timestamp: new Date().toISOString()
+    }, 'AppStart');
+  }, []);
+
 
   return (
     <>

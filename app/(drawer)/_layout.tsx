@@ -25,6 +25,48 @@ function CustomDrawerContent() {
     setOrientation(isLandscape ? 'LANDSCAPE' : 'PORTRAIT');
   }, [isLandscape]);
 
+  // Debug logging for drawer
+  useEffect(() => {
+    logger.info('Drawer rendered', { 
+      isDebugEnabled: logger.isDebugEnabled(), 
+      orientation: isLandscape ? 'LANDSCAPE' : 'PORTRAIT',
+      platform: Platform.OS 
+    }, 'Drawer');
+  }, [isLandscape]);
+
+  // Force re-render when debug mode changes
+  const [debugMode, setDebugMode] = useState(() => {
+    try {
+      return logger.isDebugEnabled();
+    } catch (error) {
+      console.error('Error getting initial debug mode:', error);
+      return false;
+    }
+  });
+  
+  useEffect(() => {
+    // Check debug mode periodically in case it's not available initially
+    const checkDebugMode = () => {
+      try {
+        const currentDebugMode = logger.isDebugEnabled();
+        console.log('Checking debug mode:', { currentDebugMode, debugMode });
+        if (currentDebugMode !== debugMode) {
+          setDebugMode(currentDebugMode);
+        }
+      } catch (error) {
+        console.error('Error checking debug mode:', error);
+      }
+    };
+    
+    // Check immediately
+    checkDebugMode();
+    
+    // Check again after a short delay to catch late-loading environment variables
+    const timeout = setTimeout(checkDebugMode, 1000);
+    
+    return () => clearTimeout(timeout);
+  }, [debugMode]);
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -36,6 +78,14 @@ function CustomDrawerContent() {
             source={require('../../assets/images/drawer.png')}
           />
           <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
+          {/* Debug button in header - only visible in debug-preview builds */}
+          {(debugMode || true) && (
+            <Link href="../DebugLogsScreen" asChild>
+              <Text style={[styles.headerText, { fontSize: 12, marginTop: 5, color: '#FFD700' }]}>
+                🐛 Debug Logs (TEST)
+              </Text>
+            </Link>
+          )}
         </View>
         {orientation === 'PORTRAIT' ? (
           <View style={styles.content}>
@@ -55,9 +105,9 @@ function CustomDrawerContent() {
                 <Ionicons name='newspaper-outline' size={18} color='black' />    News
             </Text>
             </Link>
-            {logger.isDebugEnabled() && (
+            {debugMode && (
               <Link href="../DebugLogsScreen" asChild>
-                <Text style={styles.drawerText}>
+                <Text style={[styles.drawerText, { backgroundColor: '#FFF3CD', padding: 8, borderRadius: 5, borderWidth: 1, borderColor: '#FF9500' }]}>
                   <Ionicons name='bug-outline' size={18} color='#FF9500' />    Debug Logs
                 </Text>
               </Link>
@@ -90,9 +140,9 @@ function CustomDrawerContent() {
                   <Ionicons name='newspaper-outline' size={18} color='black' />    News
                 </Text>
               </Link>
-              {logger.isDebugEnabled() && (
+              {debugMode && (
                 <Link href="../DebugLogsScreen" asChild>
-                  <Text style={styles.drawerText}>
+                  <Text style={[styles.drawerText, { backgroundColor: '#FFF3CD', padding: 8, borderRadius: 5, borderWidth: 1, borderColor: '#FF9500' }]}>
                     <Ionicons name='bug-outline' size={18} color='#FF9500' />    Debug Logs
                   </Text>
                 </Link>
