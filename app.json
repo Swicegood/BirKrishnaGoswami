@@ -20,7 +20,6 @@
       "userInterfaceStyle": "light",
       "requireFullScreen": true,
       "bundleIdentifier": "com.isckon.birkrishnagoswami",
-      "deploymentTarget": "15.1",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio",
@@ -55,10 +54,24 @@
         {
           "ios": {
             "buildReactNativeFromSource": false,
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "15.1",
+            "newArchEnabled": false,
+            "useModularHeaders": true,
+            "useFrameworks": "static",
+            "podfileProperties": {
+              "use_modular_headers!": true,
+              "FirebaseCoreInternal": { "modular_headers": true },
+              "GoogleUtilities": { "modular_headers": true },
+              "FirebaseCore": { "modular_headers": true },
+              "FirebaseCoreExtension": { "modular_headers": true },
+              "FirebaseInstallations": { "modular_headers": true },
+              "FirebaseMessaging": { "modular_headers": true },
+              "GoogleDataTransport": { "modular_headers": true }
+            }
           }
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
