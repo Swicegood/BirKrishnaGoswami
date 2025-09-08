@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import CustomHeaderMain from '../components/CustomHeaderMain';
 import TrackPlayer from 'react-native-track-player';
+import logger from '../utils/logger';
 
 
 
@@ -39,7 +40,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      console.log('loaded');
+      logger.info('Fonts loaded successfully', { fontCount: Object.keys(FontAwesome.font).length + 4 }, 'AppLayout');
       SplashScreen.hideAsync();
     }
   }, [loaded]);
@@ -52,21 +53,21 @@ export default function RootLayout() {
       try {
         // Only setup TrackPlayer on native platforms
         if (Platform.OS === 'web') {
-          console.log('TrackPlayer not needed on web platform');
+          logger.info('TrackPlayer not needed on web platform', { platform: Platform.OS }, 'TrackPlayer');
           return;
         }
         
         // Check if TrackPlayer is available
         if (!TrackPlayer) {
-          console.warn('TrackPlayer is not available - skipping setup');
+          logger.warn('TrackPlayer is not available - skipping setup', null, 'TrackPlayer');
           return;
         }
         
         // Setup the player
         await TrackPlayer.setupPlayer();
-        console.log('TrackPlayer setup complete');
+        logger.info('TrackPlayer setup complete', { platform: Platform.OS }, 'TrackPlayer');
       } catch (error) {
-        console.error('Error setting up TrackPlayer:', error);
+        logger.error('Error setting up TrackPlayer', { error: error instanceof Error ? error.message : String(error), platform: Platform.OS }, 'TrackPlayer');
         // Don't throw the error, just log it to prevent app crash
       }
     };
@@ -76,16 +77,17 @@ export default function RootLayout() {
     return () => {
       try {
         if (TrackPlayer && Platform.OS !== 'web') {
-          TrackPlayer.destroy();
+          // TrackPlayer doesn't have a destroy method, so we'll just log the cleanup
+          logger.info('TrackPlayer cleanup', { platform: Platform.OS }, 'TrackPlayer');
         }
       } catch (error) {
-        console.error('Error destroying TrackPlayer:', error);
+        logger.error('Error during TrackPlayer cleanup', { error: error instanceof Error ? error.message : String(error), platform: Platform.OS }, 'TrackPlayer');
       }
     };
   }, [loaded]); // Add loaded as dependency
 
   if (!loaded) {
-    console.log('not loaded');
+    logger.debug('App not loaded yet, waiting for fonts', null, 'AppLayout');
     return null;
   }
 
@@ -95,6 +97,11 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const pathname = usePathname();
+  
+  // Log navigation changes
+  useEffect(() => {
+    logger.info('Navigation changed', { pathname }, 'Navigation');
+  }, [pathname]);
 
 
   return (
@@ -133,6 +140,7 @@ function RootLayoutNav() {
         <Stack.Screen name="SearchYouTubeScreen" options={{ header: () => <CustomHeaderMain title='VIDEOS' /> }} />
         <Stack.Screen name="TemplesScreen" options={{ header: () => <CustomHeaderMain title='TEMPLES' /> }} />
         <Stack.Screen name="YearScreen" options={{ header: () => <CustomHeaderMain title='AUDIO' /> }} />
+        <Stack.Screen name="DebugLogsScreen" options={{ header: () => <CustomHeaderMain title='DEBUG LOGS' /> }} />
         <Stack.Screen name="(tabs2)" options={{ header: () => <CustomHeaderMain title='MEMORIES' /> }} />
         <Stack.Screen name="(tabs3)" options={{ header: () => <CustomHeaderMain title='VYASA PUJA' /> }} />
         <Stack.Screen name="[...missing]" options={{ header: () => <CustomHeaderMain title='Oops!' /> }} />
@@ -144,6 +152,5 @@ function RootLayoutNav() {
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: '#993D39', // Use the same color as your header
-    fontColor: 'white',
   },
 });

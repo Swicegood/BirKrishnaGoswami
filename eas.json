@@ -19,6 +19,13 @@
         "EXPO_PACKAGE_MANAGER": "npm"
       }
     },
+    "debug-preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PACKAGE_MANAGER": "npm",
+        "RELEASE_CHANNEL": "debug-preview"
+      }
+    },
     "production": {
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm"

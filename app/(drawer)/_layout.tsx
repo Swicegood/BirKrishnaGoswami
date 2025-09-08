@@ -9,6 +9,7 @@ import { View, Text, Dimensions, StyleSheet, Image, Platform } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import logger from '../../utils/logger';
 
 
 const windowHeight = Dimensions.get('window').height;
@@ -54,6 +55,13 @@ function CustomDrawerContent() {
                 <Ionicons name='newspaper-outline' size={18} color='black' />    News
             </Text>
             </Link>
+            {logger.isDebugEnabled() && (
+              <Link href="../DebugLogsScreen" asChild>
+                <Text style={styles.drawerText}>
+                  <Ionicons name='bug-outline' size={18} color='#FF9500' />    Debug Logs
+                </Text>
+              </Link>
+            )}
             {isApple ?
                   <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
                     <Text style={styles.drawerText}>
@@ -82,6 +90,13 @@ function CustomDrawerContent() {
                   <Ionicons name='newspaper-outline' size={18} color='black' />    News
                 </Text>
               </Link>
+              {logger.isDebugEnabled() && (
+                <Link href="../DebugLogsScreen" asChild>
+                  <Text style={styles.drawerText}>
+                    <Ionicons name='bug-outline' size={18} color='#FF9500' />    Debug Logs
+                  </Text>
+                </Link>
+              )}
                 {isApple ?
                    <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
                    <Text style={{ ...styles.drawerText, paddingLeft: 40 }}>
@@ -118,7 +133,7 @@ export default function DrawerLayout() {
     <Drawer
       drawerContent={(props) => {
 
-        return <CustomDrawerContent drawerPosition={undefined} {...props} />
+        return <CustomDrawerContent {...props} />
       }}
       screenOptions={{
         drawerType: "front",

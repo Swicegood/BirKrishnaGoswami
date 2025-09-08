@@ -91,7 +91,8 @@
         "messagingSenderId": "790459013032",
         "appId": "1:790459013032:web:d33b61fc48a0178cf82f9d",
         "measurementId": "G-7GVXDMLLSY"
-      }
+      },
+      "releaseChannel": "$RELEASE_CHANNEL"
     }
   }
 }
