@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { AppState } from 'react-native';
 import TrackPlayer, { State, Event, useTrackPlayerEvents, useProgress } from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,9 @@ const useTrackPlayer = (onTrackLoaded) => {
   const isLoadingNewFile = useRef(false);
   const watchdogIntervalRef = useRef(null);
   const isTransitioning = useRef(false);
+  const lastTrackStartTime = useRef(0);
+  const trackLoadMutex = useRef(false);
+  const progressIntervalRef = useRef(null);
   
   const { position, duration } = useProgress();
 
@@ -50,9 +53,26 @@ const useTrackPlayer = (onTrackLoaded) => {
 
   const startPlaybackWatchdog = () => {
     logger.info('Starting playback watchdog', {}, 'useTrackPlayer');
+    
+    // Clear any existing progress interval
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    
     return setInterval(async () => {
       try {
         const playerState = await TrackPlayer.getState();
+        
+        // Check for stopped state which indicates track completion
+        if (playerState === State.Stopped) {
+          logger.info('Watchdog detected track stopped, attempting to advance', {
+            state: playerState,
+            appState: appState.current
+          }, 'useTrackPlayer');
+          await goToNextTrack();
+          return;
+        }
+        
         if (playerState === State.Playing) {
           const currentTrackIndex = await TrackPlayer.getCurrentTrack();
           if (currentTrackIndex !== null) {
@@ -61,12 +81,18 @@ const useTrackPlayer = (onTrackLoaded) => {
               const position = await TrackPlayer.getPosition();
               const duration = await TrackPlayer.getDuration();
               
-              // Check if track has ended
-              if (duration > 0 && position >= duration - 1000) {
-                logger.info('Watchdog detected track ended, advancing to next', {
+              // Check if track has ended (more lenient threshold)
+              // Only advance if we're actually near the end AND have played for at least 10 seconds
+              // AND at least 30 seconds have passed since the track started
+              const remainingTime = duration - position;
+              const timeSinceStart = Date.now() - lastTrackStartTime.current;
+              if (duration > 0 && remainingTime <= 2 && position > 10 && timeSinceStart > 30000) {
+                logger.info('Watchdog detected track near end, advancing to next', {
                   track: track.title,
                   position,
-                  duration
+                  duration,
+                  remaining: remainingTime,
+                  timeSinceStart
                 }, 'useTrackPlayer');
                 await goToNextTrack();
               }
@@ -78,7 +104,7 @@ const useTrackPlayer = (onTrackLoaded) => {
           error: error instanceof Error ? error.message : String(error) 
         }, 'useTrackPlayer');
       }
-    }, 2000);
+    }, 3000); // Increased interval to 3 seconds
   };
 
   useEffect(() => {
@@ -115,6 +141,9 @@ const useTrackPlayer = (onTrackLoaded) => {
           clearInterval(watchdogIntervalRef.current);
         }
         watchdogIntervalRef.current = startPlaybackWatchdog();
+      } else if (appState.current === 'active' && nextAppState.match(/inactive|background/)) {
+        // App is going to background - keep watchdog running for auto-advance
+        logger.info('App moved to background, keeping watchdog running for auto-advance', {}, 'useTrackPlayer');
       }
       appState.current = nextAppState;
       setAppStateVisible(nextAppState);
@@ -167,8 +196,27 @@ const useTrackPlayer = (onTrackLoaded) => {
   });
 
   const loadTrack = async (trackUrl, trackTitle, shouldPlay = true, startPosition = 0) => {
+    // Preload Mutex Pattern - prevent multiple simultaneous track loads
+    if (trackLoadMutex.current) {
+      logger.warn('Track load mutex locked, skipping load request', { 
+        trackTitle, 
+        trackUrl,
+        currentMutex: trackLoadMutex.current
+      }, 'useTrackPlayer');
+      return;
+    }
+
     if (isLoadingNewFile.current) {
       logger.warn('Already loading a file, skipping load request', { 
+        trackTitle, 
+        trackUrl 
+      }, 'useTrackPlayer');
+      return;
+    }
+
+    // Check if we're already loading the same track
+    if (currentTrack && currentTrack.url === trackUrl && isLoading) {
+      logger.warn('Same track already loading, skipping duplicate request', { 
         trackTitle, 
         trackUrl 
       }, 'useTrackPlayer');
@@ -179,9 +227,13 @@ const useTrackPlayer = (onTrackLoaded) => {
       trackTitle, 
       trackUrl, 
       shouldPlay, 
-      startPosition 
+      startPosition,
+      currentPlaylistIndex: currentIndex,
+      playlistLength: playlist.length
     }, 'useTrackPlayer');
 
+    // Acquire mutex
+    trackLoadMutex.current = true;
     isLoadingNewFile.current = true;
     setIsLoading(true);
 
@@ -191,11 +243,16 @@ const useTrackPlayer = (onTrackLoaded) => {
         id: '1',
         url: trackUrl,
         title: trackTitle,
+        artist: 'BKG Audio',
+        album: 'Spiritual Discourses',
+        genre: 'Spiritual',
+        duration: 0, // Will be updated when track loads
       });
 
       if (shouldPlay) {
         await TrackPlayer.play();
         setIsPlaying(true);
+        lastTrackStartTime.current = Date.now();
         logger.info('Track loaded and started playing', { trackTitle }, 'useTrackPlayer');
       } else {
         logger.info('Track loaded but not playing', { trackTitle }, 'useTrackPlayer');
@@ -219,16 +276,40 @@ const useTrackPlayer = (onTrackLoaded) => {
       }, 'useTrackPlayer');
       setIsLoading(false);
     } finally {
+      // Release mutex
+      trackLoadMutex.current = false;
       isLoadingNewFile.current = false;
     }
   };
 
-  const loadPlaylist = async (playlistData, startIndex = 0) => {
+  const loadPlaylist = useCallback(async (playlistData, startIndex = 0) => {
+    // Check if we're already loading the same playlist
+    const playlistKey = JSON.stringify(playlistData) + startIndex;
+    if (isLoadingNewFile.current) {
+      logger.warn('Already loading playlist, skipping duplicate request', { 
+        trackCount: playlistData.length, 
+        startIndex 
+      }, 'useTrackPlayer');
+      return;
+    }
+
     logger.info('Loading playlist', { 
       trackCount: playlistData.length, 
       startIndex,
-      startTrack: playlistData[startIndex]?.title
+      startTrack: playlistData[startIndex]?.title,
+      startTrackUrl: playlistData[startIndex]?.url
     }, 'useTrackPlayer');
+    
+    // Clear any existing stored state to prevent interference
+    try {
+      await AsyncStorage.removeItem('currentPlaylist');
+      await AsyncStorage.removeItem('currentIndex');
+      logger.debug('Cleared existing stored playlist state', {}, 'useTrackPlayer');
+    } catch (error) {
+      logger.error('Error clearing stored playlist state', { 
+        error: error instanceof Error ? error.message : String(error) 
+      }, 'useTrackPlayer');
+    }
     
     setPlaylist(playlistData);
     setCurrentIndex(startIndex);
@@ -256,20 +337,64 @@ const useTrackPlayer = (onTrackLoaded) => {
         playlistLength: playlistData.length 
       }, 'useTrackPlayer');
     }
-  };
+  }, []);
 
   const goToNextTrack = async () => {
-    if (playlist.length > 0 && currentIndex < playlist.length - 1) {
-      const nextIndex = currentIndex + 1;
-      const nextTrack = playlist[nextIndex];
+    // Track Transition Protection - prevent multiple simultaneous transitions
+    if (isTransitioning.current) {
+      logger.warn('Track transition already in progress, skipping duplicate request', {
+        currentTransition: isTransitioning.current
+      }, 'useTrackPlayer');
+      return;
+    }
+
+    // Try to get playlist from AsyncStorage if local state is empty (background scenario)
+    let currentPlaylist = playlist;
+    let currentIdx = currentIndex;
+    
+    if (currentPlaylist.length === 0) {
+      try {
+        const storedPlaylist = await AsyncStorage.getItem('currentPlaylist');
+        const storedIndex = await AsyncStorage.getItem('currentIndex');
+        
+        if (storedPlaylist && storedIndex) {
+          currentPlaylist = JSON.parse(storedPlaylist);
+          currentIdx = parseInt(storedIndex, 10);
+          logger.info('Retrieved playlist from storage for auto-advance', {
+            playlistLength: currentPlaylist.length,
+            currentIndex: currentIdx
+          }, 'useTrackPlayer');
+        }
+      } catch (error) {
+        logger.error('Error retrieving playlist from storage', {
+          error: error instanceof Error ? error.message : String(error)
+        }, 'useTrackPlayer');
+      }
+    }
+    
+    if (currentPlaylist.length > 0 && currentIdx < currentPlaylist.length - 1) {
+      const nextIndex = currentIdx + 1;
+      const nextTrack = currentPlaylist[nextIndex];
+      
+      // Enhanced getNextFile Robustness - validate next track
+      if (!nextTrack || !nextTrack.url || !nextTrack.title) {
+        logger.error('Invalid next track found, cannot advance', {
+          nextIndex,
+          nextTrack,
+          playlistLength: currentPlaylist.length
+        }, 'useTrackPlayer');
+        return;
+      }
       
       logger.info('Advancing to next track', { 
-        from: currentIndex, 
+        from: currentIdx, 
         to: nextIndex, 
-        nextTrack: nextTrack.title 
+        nextTrack: nextTrack.title,
+        playlistLength: currentPlaylist.length
       }, 'useTrackPlayer');
       
-      // Set manual navigation flag to prevent interference
+      // Set transition flag and manual navigation flag to prevent interference
+      isTransitioning.current = true;
       global.setManualNavigation?.(true);
       
       try {
@@ -287,15 +412,17 @@ const useTrackPlayer = (onTrackLoaded) => {
           nextTrack: nextTrack.title
         }, 'useTrackPlayer');
       } finally {
-        // Clear manual navigation flag after delay
+        // Clear transition flag and manual navigation flag after delay
+        isTransitioning.current = false;
         setTimeout(() => {
           global.setManualNavigation?.(false);
         }, 3000);
       }
     } else {
       logger.info('Cannot advance to next track', { 
-        currentIndex, 
-        playlistLength: playlist.length 
+        currentIndex: currentIdx, 
+        playlistLength: currentPlaylist.length,
+        hasStoredPlaylist: currentPlaylist.length > 0
       }, 'useTrackPlayer');
     }
   };
@@ -329,7 +456,8 @@ const useTrackPlayer = (onTrackLoaded) => {
           prevTrack: prevTrack.title
         }, 'useTrackPlayer');
       } finally {
-        // Clear manual navigation flag after delay
+        // Clear transition flag and manual navigation flag after delay
+        isTransitioning.current = false;
         setTimeout(() => {
           global.setManualNavigation?.(false);
         }, 3000);
@@ -432,9 +560,19 @@ const useTrackPlayer = (onTrackLoaded) => {
   const cleanup = async () => {
     logger.info('Cleaning up TrackPlayer', {}, 'useTrackPlayer');
     try {
+      // Clear all intervals
       if (watchdogIntervalRef.current) {
         clearInterval(watchdogIntervalRef.current);
       }
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+      
+      // Reset all flags
+      trackLoadMutex.current = false;
+      isTransitioning.current = false;
+      isLoadingNewFile.current = false;
+      
       await TrackPlayer.destroy();
       logger.info('TrackPlayer cleanup completed', {}, 'useTrackPlayer');
     } catch (error) {

@@ -5,8 +5,9 @@ import { SplashScreen, Stack, usePathname } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import CustomHeaderMain from '../components/CustomHeaderMain';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { Capability } from 'react-native-track-player';
 import logger from '../utils/logger';
+import { registerBackgroundFetch, unregisterBackgroundFetch } from '../backgroundFetch';
 
 
 
@@ -45,7 +46,7 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  // Initialize TrackPlayer
+  // Initialize TrackPlayer and Background Fetch
   useEffect(() => {
     if (!loaded) return; // Wait for fonts to load first
     
@@ -63,9 +64,38 @@ export default function RootLayout() {
           return;
         }
         
-        // Setup the player
-        await TrackPlayer.setupPlayer();
-        logger.info('TrackPlayer setup complete', { platform: Platform.OS }, 'TrackPlayer');
+        // Setup the player with background capabilities
+        await TrackPlayer.setupPlayer({
+          waitForBuffer: true,
+          autoHandleInterruptions: true,
+        });
+        
+        // Configure capabilities for background playback
+        await TrackPlayer.updateOptions({
+          capabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+            Capability.Stop,
+          ],
+          compactCapabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+          ],
+          notificationCapabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+          ],
+        });
+        
+        logger.info('TrackPlayer setup complete with background capabilities', { platform: Platform.OS }, 'TrackPlayer');
+        
+        // Register background fetch for auto-advancing tracks
+        await registerBackgroundFetch();
       } catch (error) {
         logger.error('Error setting up TrackPlayer', { error: error instanceof Error ? error.message : String(error), platform: Platform.OS }, 'TrackPlayer');
         // Don't throw the error, just log it to prevent app crash
@@ -80,6 +110,8 @@ export default function RootLayout() {
           // TrackPlayer doesn't have a destroy method, so we'll just log the cleanup
           logger.info('TrackPlayer cleanup', { platform: Platform.OS }, 'TrackPlayer');
         }
+        // Unregister background fetch on cleanup
+        unregisterBackgroundFetch();
       } catch (error) {
         logger.error('Error during TrackPlayer cleanup', { error: error instanceof Error ? error.message : String(error), platform: Platform.OS }, 'TrackPlayer');
       }

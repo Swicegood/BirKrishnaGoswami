@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -44,13 +44,28 @@ const isTablet = () => {
 
 const AudioScreen = () => {
   const navigation = useNavigation();
-  const file = useLocalSearchParams<{ 
+  const rawFile = useLocalSearchParams<{ 
     url: string, 
     title: string, 
     playlist?: string, 
     currentIndex?: string,
     category?: string 
   }>();
+  
+  // Memoize the file object to prevent unnecessary re-renders and effect triggers
+  const file = useMemo(() => ({
+    url: rawFile.url,
+    title: rawFile.title,
+    playlist: rawFile.playlist,
+    currentIndex: rawFile.currentIndex,
+    category: rawFile.category
+  }), [
+    rawFile.url, 
+    rawFile.title, 
+    rawFile.playlist, 
+    rawFile.currentIndex, 
+    rawFile.category
+  ]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -98,7 +113,7 @@ const AudioScreen = () => {
     seekForward,
     seekBackward,
     cleanup
-  } = useTrackPlayer((loaded) => {
+  } = useTrackPlayer((loaded: boolean) => {
     logger.info('Track loaded callback', { loaded }, 'AudioScreen');
     setIsFirstLoad(false);
   });
@@ -278,16 +293,6 @@ const AudioScreen = () => {
   };
 
 
-  useEffect(() => {
-    const songUrl = file.url;
-    logger.info('Loading track', { songUrl, title: file.title }, 'AudioScreen');
-    // Load the track using TrackPlayer
-    if (songUrl) {
-      loadTrack(songUrl, file.title, true, 0);
-    } else {
-      logger.warn('No song URL provided', { file }, 'AudioScreen');
-    }
-  }, [file.url, file.title]);
 
   // Initialize playlist from parameters or fetch from category
   useEffect(() => {
@@ -337,6 +342,15 @@ const AudioScreen = () => {
           const currentIdx = categoryFiles.findIndex((track: any) => track.url === file.url);
           const startIndex = currentIdx >= 0 ? currentIdx : 0;
           
+          logger.info('Track index calculation', {
+            selectedUrl: file.url,
+            selectedTitle: file.title,
+            foundIndex: currentIdx,
+            startIndex: startIndex,
+            totalTracks: categoryFiles.length,
+            allTracks: categoryFiles.map((t: any, idx: number) => ({ index: idx, title: t.title, url: t.url }))
+          }, 'AudioScreen');
+          
           await loadPlaylist(categoryFiles, startIndex);
           
           logger.info('Playlist initialized from category', {
@@ -356,7 +370,7 @@ const AudioScreen = () => {
     };
 
     initializePlaylist();
-  }, [file.playlist, file.currentIndex, file.category, file.url, loadPlaylist]);
+  }, [file.url, file.title, file.playlist, file.currentIndex, file.category, loadPlaylist]);
 
 
 
