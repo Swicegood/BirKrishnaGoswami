@@ -284,7 +284,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     }
   };
 
-  const loadPlaylist = useCallback(async (playlistData, startIndex = 0) => {
+  const loadPlaylist = useCallback(async (playlistData, startIndex = 0, savedPosition = 0) => {
     // Check if we're already loading the same playlist
     const playlistKey = JSON.stringify(playlistData) + startIndex;
     if (isLoadingNewFile.current) {
@@ -299,7 +299,8 @@ const useTrackPlayer = (onTrackLoaded) => {
       trackCount: playlistData.length, 
       startIndex,
       startTrack: playlistData[startIndex]?.title,
-      startTrackUrl: playlistData[startIndex]?.url
+      startTrackUrl: playlistData[startIndex]?.url,
+      savedPosition
     }, 'useTrackPlayer');
     
     // Clear any existing stored state to prevent interference
@@ -332,7 +333,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     
     if (playlistData[startIndex]) {
       const track = playlistData[startIndex];
-      await loadTrack(track.url, track.title, true, 0);
+      await loadTrack(track.url, track.title, true, savedPosition);
     } else {
       logger.warn('No track found at start index', { 
         startIndex, 

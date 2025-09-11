@@ -282,9 +282,35 @@ const AudioScreen = () => {
     }
   };
 
-  const getStoredPostion = (file: any) => {
-    const playedSong = playedSongs.find((playedSong) => playedSong.song.title === file.title);
-    return playedSong ? playedSong.position : 0;
+  const getStoredPosition = (url: string) => {
+    logger.info('Looking for saved position', { 
+      url, 
+      playedSongsCount: playedSongs.length,
+      playedSongs: playedSongs.map((s: any) => ({ 
+        url: s.song?.url, 
+        position: s.position,
+        title: s.song?.title 
+      }))
+    }, 'AudioScreen');
+    
+    const playedSong = playedSongs.find((playedSong) => playedSong.song.url === url);
+    if (playedSong && playedSong.position > 0) {
+      // Convert from milliseconds to seconds for TrackPlayer
+      const positionInSeconds = playedSong.position / 1000;
+      logger.info('Found saved position for track', { 
+        url, 
+        positionMs: playedSong.position, 
+        positionSeconds: positionInSeconds 
+      }, 'AudioScreen');
+      return positionInSeconds;
+    }
+    
+    logger.info('No saved position found for track', { 
+      url, 
+      foundSong: !!playedSong,
+      songPosition: playedSong?.position || 0
+    }, 'AudioScreen');
+    return 0;
   };
 
 
@@ -292,10 +318,17 @@ const AudioScreen = () => {
   // Initialize playlist from parameters or fetch from category
   useEffect(() => {
     const initializePlaylist = async () => {
+      // Wait for played songs to be loaded first
+      if (playedSongs.length === 0) {
+        logger.info('Waiting for played songs to load before initializing playlist', {}, 'AudioScreen');
+        return;
+      }
+      
       logger.info('Initializing playlist', { 
         hasPlaylist: !!file.playlist, 
         hasCategory: !!file.category,
-        currentIndex: file.currentIndex 
+        currentIndex: file.currentIndex,
+        playedSongsLoaded: playedSongs.length
       }, 'AudioScreen');
       
       if (file.playlist) {
@@ -306,7 +339,8 @@ const AudioScreen = () => {
           trackCount: playlistData.length, 
           startIndex 
         }, 'AudioScreen');
-        await loadPlaylist(playlistData, startIndex);
+        const savedPosition = getStoredPosition(file.url);
+        await loadPlaylist(playlistData, startIndex, savedPosition);
       } else if (file.category) {
         // Fetch all files from the same category
         try {
@@ -346,7 +380,8 @@ const AudioScreen = () => {
             allTracks: categoryFiles.map((t: any, idx: number) => ({ index: idx, title: t.title, url: t.url }))
           }, 'AudioScreen');
           
-          await loadPlaylist(categoryFiles, startIndex);
+          const savedPosition = getStoredPosition(file.url);
+          await loadPlaylist(categoryFiles, startIndex, savedPosition);
           
           logger.info('Playlist initialized from category', {
             totalTracks: categoryFiles.length,
@@ -365,7 +400,7 @@ const AudioScreen = () => {
     };
 
     initializePlaylist();
-  }, [file.url, file.title, file.playlist, file.currentIndex, file.category, loadPlaylist]);
+  }, [file.url, file.title, file.playlist, file.currentIndex, file.category, loadPlaylist, playedSongs]);
 
 
 
@@ -435,12 +470,13 @@ const AudioScreen = () => {
     loadPlayedSongs();
   }, []);
 
-  const updateState = throttle(async (currentPosition: number) => {
+  const updateState = throttle(async (currentPosition: number, forceSave = false) => {
     logger.info('updateState called', { 
       currentPosition, 
       hasCurrentTrack: !!currentTrack,
       currentTrackTitle: (currentTrack as any)?.title,
-      currentTrackUrl: (currentTrack as any)?.url
+      currentTrackUrl: (currentTrack as any)?.url,
+      forceSave
     }, 'AudioScreen');
     
     // Only save if we have a current track and position > 0
@@ -459,14 +495,18 @@ const AudioScreen = () => {
     const lastUpdate = lastStorageUpdateRef.current;
     const timeSinceLastUpdate = Math.abs(positionMillis - lastUpdate);
     
+    // Save immediately if forced, or if it's the first save (position > 0 but lastUpdate is 0), or every 10 seconds
+    const shouldSave = forceSave || (lastUpdate === 0 && positionMillis > 0) || timeSinceLastUpdate >= 10000;
+    
     logger.info('Checking if should save position', { 
       positionMillis, 
       lastUpdate, 
       timeSinceLastUpdate,
-      shouldSave: timeSinceLastUpdate >= 30000
+      shouldSave,
+      isFirstSave: lastUpdate === 0 && positionMillis > 0
     }, 'AudioScreen');
     
-    if (timeSinceLastUpdate >= 30000) { // Save every 30 seconds
+    if (shouldSave) { // Save immediately on first play, then every 10 seconds
       try {
         const jsonValue = await AsyncStorage.getItem('@playedSongs');
         let playedSongs = jsonValue ? JSON.parse(jsonValue) : [];
@@ -538,12 +578,19 @@ const AudioScreen = () => {
     logger.info('Position change effect triggered', { 
       position, 
       hasCurrentTrack: !!currentTrack,
-      currentTrackTitle: (currentTrack as any)?.title
+      currentTrackTitle: (currentTrack as any)?.title,
+      currentTrackUrl: (currentTrack as any)?.url
     }, 'AudioScreen');
     
     if (position > 0 && currentTrack) {
       logger.info('Calling updateState from position change effect', { position }, 'AudioScreen');
       updateState(position);
+    } else {
+      logger.info('Not calling updateState', { 
+        position, 
+        hasCurrentTrack: !!currentTrack,
+        reason: !currentTrack ? 'no current track' : 'position <= 0'
+      }, 'AudioScreen');
     }
   }, [position, currentTrack, updateState]);
 
@@ -576,11 +623,48 @@ const AudioScreen = () => {
         logger.info('Saving final position on unmount', { position }, 'AudioScreen');
         // Save immediately on unmount
         updateState.cancel(); // Cancel any pending throttled calls
-        updateState(position);
+        updateState(position, true); // Force save on unmount
       }
     };
   }, [position, currentTrack, updateState]);
 
+  // Handle navigation away (back button) - stop playback and save position
+  // Using a different approach - detect when the back button is pressed
+  useEffect(() => {
+    const handleBackPress = () => {
+      logger.info('Back button pressed - stopping playback and saving position', {
+        position,
+        hasCurrentTrack: !!currentTrack,
+        currentTrackTitle: (currentTrack as any)?.title
+      }, 'AudioScreen');
+      
+      if (position > 0 && currentTrack) {
+        // Force save position immediately
+        updateState.cancel(); // Cancel any pending throttled calls
+        updateState(position, true);
+      }
+      
+      // Stop playback when navigating away
+      if (isPlaying) {
+        logger.info('Stopping playback due to back button press', {}, 'AudioScreen');
+        togglePlayback(); // This will pause the track
+      }
+    };
+
+    // Add back button listener
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      // Prevent default behavior of leaving the screen
+      e.preventDefault();
+      
+      // Handle the back press
+      handleBackPress();
+      
+      // Allow navigation to continue
+      navigation.dispatch(e.data.action);
+    });
+
+    return unsubscribe;
+  }, [navigation, position, currentTrack, isPlaying, updateState, togglePlayback]);
 
   const handleTrackCompletion = async () => {
     if (playlist?.length > 0 && currentIndex < playlist.length - 1) {
