@@ -183,11 +183,13 @@ const useTrackPlayer = (onTrackLoaded) => {
       const nowPlaying = event.state === State.Playing;
       setIsPlaying(nowPlaying);
       
-      logger.info('Playback state changed', { 
-        from: wasPlaying ? 'playing' : 'paused',
-        to: nowPlaying ? 'playing' : 'paused',
-        state: event.state
-      }, 'useTrackPlayer');
+      // Only log significant state changes
+      if (wasPlaying !== nowPlaying) {
+        logger.info('Playback state changed', { 
+          from: wasPlaying ? 'playing' : 'paused',
+          to: nowPlaying ? 'playing' : 'paused'
+        }, 'useTrackPlayer');
+      }
       
       if (event.state === State.Stopped) {
         logger.info('Track stopped', {}, 'useTrackPlayer');

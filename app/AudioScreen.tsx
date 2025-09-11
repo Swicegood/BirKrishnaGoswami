@@ -118,23 +118,18 @@ const AudioScreen = () => {
     setIsFirstLoad(false);
   });
 
-  // Log rendering state changes
+  // Log rendering state changes (reduced verbosity)
   useEffect(() => {
-    logger.debug('AudioScreen render state changed', {
-      isPlaying,
-      isLoading,
-      position,
-      duration,
-      currentIndex,
-      playlistLength: playlist?.length || 0,
-      orientation,
-      width,
-      height,
-      isMuted,
-      downloadProgress,
-      isFileDownloaded
-    }, 'AudioScreen');
-  }, [isPlaying, isLoading, position, duration, currentIndex, playlist?.length, orientation, width, height, isMuted, downloadProgress, isFileDownloaded]);
+    // Only log significant state changes, not every render
+    if (isLoading !== undefined) {
+      logger.debug('AudioScreen state changed', {
+        isPlaying,
+        isLoading,
+        currentIndex,
+        playlistLength: playlist?.length || 0
+      }, 'AudioScreen');
+    }
+  }, [isPlaying, isLoading, currentIndex, playlist?.length]);
 
   // Log component cleanup
   useEffect(() => {
@@ -419,7 +414,11 @@ const AudioScreen = () => {
           if (JSON.stringify(newPlayedSongs) !== JSON.stringify(playedSongs)) {
             logger.info('Played songs loaded from storage', { 
               songCount: newPlayedSongs.length,
-              songs: newPlayedSongs.map((s: any) => s.song.title)
+              songs: newPlayedSongs.map((s: any) => ({ 
+                title: s.song?.title, 
+                url: s.song?.url, 
+                position: s.position 
+              }))
             }, 'AudioScreen');
             setPlayedSongs(newPlayedSongs);
           }
@@ -436,135 +435,151 @@ const AudioScreen = () => {
     loadPlayedSongs();
   }, []);
 
-  const updateState = throttle(async (status: any) => {
-    // Position is managed by TrackPlayer's useProgress hook
+  const updateState = throttle(async (currentPosition: number) => {
+    logger.info('updateState called', { 
+      currentPosition, 
+      hasCurrentTrack: !!currentTrack,
+      currentTrackTitle: (currentTrack as any)?.title,
+      currentTrackUrl: (currentTrack as any)?.url
+    }, 'AudioScreen');
     
-    // Log only important events
-    if (status.didJustFinish) {
-      logger.info('Track finished detected in updateState', { 
-        position: status.positionMillis, 
-        duration: status.durationMillis 
+    // Only save if we have a current track and position > 0
+    if (!currentTrack || currentPosition <= 0) {
+      logger.info('Skipping save - no current track or position <= 0', { 
+        hasCurrentTrack: !!currentTrack,
+        currentPosition 
       }, 'AudioScreen');
-    }
-    
-    // Check if track just finished
-    if (status.didJustFinish && playlist?.length > 0 && currentIndex < playlist.length - 1) {
-      logger.info('Track finished, auto-advancing to next track', { 
-        currentIndex, 
-        playlistLength: playlist?.length || 0
-      }, 'AudioScreen');
-      handleTrackCompletion();
       return;
     }
-    
-    // Alternative approach: Check if we're very close to the end
-    if (status.isLoaded && status.durationMillis && status.positionMillis) {
-      const remainingTime = status.durationMillis - status.positionMillis;
-      if (remainingTime <= 1000 && remainingTime > 0 && playlist?.length > 0 && currentIndex < playlist.length - 1) {
-        logger.info('Track nearly finished (< 1s remaining), auto-advancing to next track', { 
-          remainingTime, 
-          currentIndex, 
-          playlistLength: playlist?.length || 0
-        }, 'AudioScreen');
-        handleTrackCompletion();
-        return;
-      }
-    }
-    
-    // Fallback: Check if position hasn't changed and we're near the end
-    if (status.isLoaded && status.durationMillis && status.positionMillis) {
-      const progressPercent = (status.positionMillis / status.durationMillis) * 100;
-      if (progressPercent > 98 && !isPlaying && playlist?.length > 0 && currentIndex < playlist.length - 1) {
-        logger.info('Track appears completed (>98% and not playing), auto-advancing', { 
-          progressPercent, 
-          isPlaying, 
-          currentIndex, 
-          playlistLength: playlist?.length || 0
-        }, 'AudioScreen');
-        handleTrackCompletion();
-        return;
-      }
-    }
+
+    // Convert position from seconds to milliseconds for compatibility with old data format
+    const positionMillis = Math.floor(currentPosition * 1000);
     
     // Compare to the value in our ref instead of state
     const lastUpdate = lastStorageUpdateRef.current;
-    if (Math.abs(status.positionMillis - lastUpdate) >= 30000) {
+    const timeSinceLastUpdate = Math.abs(positionMillis - lastUpdate);
+    
+    logger.info('Checking if should save position', { 
+      positionMillis, 
+      lastUpdate, 
+      timeSinceLastUpdate,
+      shouldSave: timeSinceLastUpdate >= 30000
+    }, 'AudioScreen');
+    
+    if (timeSinceLastUpdate >= 30000) { // Save every 30 seconds
       try {
         const jsonValue = await AsyncStorage.getItem('@playedSongs');
         let playedSongs = jsonValue ? JSON.parse(jsonValue) : [];
         
+        logger.info('Retrieved played songs from storage', { 
+          existingCount: playedSongs.length,
+          existingSongs: playedSongs.map((s: any) => ({ title: s.song?.title, url: s.song?.url }))
+        }, 'AudioScreen');
+        
+        // Create song object in the same format as the old implementation
+        const songData = {
+          title: (currentTrack as any)?.title || file.title,
+          url: (currentTrack as any)?.url || file.url
+        };
+        
+        logger.info('Song data to save', songData, 'AudioScreen');
+        
         // Update or add the current song
         const songIndex = playedSongs.findIndex(
-          (song: any) => song.song.title === file.title
+          (song: any) => song.song.url === songData.url
         );
         
-        const newSong = { song: file, position: status.positionMillis };
+        const newSong = { song: songData, position: positionMillis };
         
         if (songIndex !== -1) {
           playedSongs[songIndex] = newSong;
-          logger.debug('Updated song position in storage', { 
-            title: file.title, 
-            position: status.positionMillis,
-            songIndex 
+          logger.info('Updated song position in storage', { 
+            title: songData.title, 
+            position: positionMillis,
+            songIndex,
+            oldPosition: playedSongs[songIndex]?.position
           }, 'AudioScreen');
         } else {
           playedSongs.push(newSong);
-          logger.debug('Added new song position to storage', { 
-            title: file.title, 
-            position: status.positionMillis 
+          logger.info('Added new song position to storage', { 
+            title: songData.title, 
+            position: positionMillis,
+            newTotalCount: playedSongs.length
           }, 'AudioScreen');
         }
         
         await AsyncStorage.setItem('@playedSongs', JSON.stringify(playedSongs));
 
-        // 3. Update the ref immediately
-        lastStorageUpdateRef.current = status.positionMillis;
+        // Update the ref immediately
+        lastStorageUpdateRef.current = positionMillis;
 
-        logger.debug('Position saved to storage', { 
-          position: status.positionMillis, 
-          title: file.title 
+        logger.info('Position successfully saved to storage', { 
+          position: positionMillis, 
+          title: songData.title,
+          totalSongsInStorage: playedSongs.length
         }, 'AudioScreen');
       } catch (error) {
         logger.error('Error saving position to storage', { 
           error: error instanceof Error ? error.message : String(error),
-          position: status.positionMillis,
-          title: file.title
+          position: positionMillis,
+          title: (currentTrack as any)?.title || file.title
         }, 'AudioScreen');
       }
+    } else {
+      logger.info('Skipping save - not enough time elapsed', { 
+        timeSinceLastUpdate,
+        required: 30000
+      }, 'AudioScreen');
     }
   }, 1000);
 
-  // useEffect(() => {
-  //   // Set up periodic check for track completion as a fallback
-  //   const interval = setInterval(async () => {
-  //     if (sound && playlist.length > 0 && currentIndex < playlist.length - 1) {
-  //       try {
-  //         const status = await sound.getStatusAsync();
-  //         if (status.isLoaded && status.durationMillis && status.positionMillis) {
-  //           const remainingTime = status.durationMillis - status.positionMillis;
-  //           const progressPercent = (status.positionMillis / status.durationMillis) * 100;
-            
-  //           // Check if track is essentially complete
-  //           if ((remainingTime <= 500 || progressPercent > 99) && status.positionMillis > 0) {
-  //             console.log('Periodic check detected track completion, auto-advancing');
-  //             handleTrackCompletion();
-  //           }
-  //         }
-  //       } catch (error) {
-  //         console.log('Error in periodic completion check:', error);
-  //       }
-  //     }
-  //   }, 2000); // Check every 2 seconds
+  // Save track position data when position changes
+  useEffect(() => {
+    logger.info('Position change effect triggered', { 
+      position, 
+      hasCurrentTrack: !!currentTrack,
+      currentTrackTitle: (currentTrack as any)?.title
+    }, 'AudioScreen');
+    
+    if (position > 0 && currentTrack) {
+      logger.info('Calling updateState from position change effect', { position }, 'AudioScreen');
+      updateState(position);
+    }
+  }, [position, currentTrack, updateState]);
 
-    // Cleanup function
-  //   return () => {
-  //     clearInterval(interval);
-  //     if (sound) {
-  //       sound.setOnPlaybackStatusUpdate(null);
-  //     }
-  //     updateState.cancel(); // Cancel any scheduled execution of updateState when the component unmounts
-  //   };
-  // }, [sound, playlist, currentIndex]);
+  // Save position when track changes
+  useEffect(() => {
+    logger.info('Track change effect triggered', { 
+      hasCurrentTrack: !!currentTrack,
+      currentTrackTitle: (currentTrack as any)?.title,
+      currentTrackUrl: (currentTrack as any)?.url,
+      position
+    }, 'AudioScreen');
+    
+    // Save position when currentTrack changes (track switch)
+    if (position > 0 && currentTrack) {
+      logger.info('Calling updateState from track change effect', { position }, 'AudioScreen');
+      updateState(position);
+    }
+  }, [currentTrack]); // Only depend on currentTrack, not position
+
+  // Save final position when component unmounts
+  useEffect(() => {
+    return () => {
+      logger.info('Component unmount effect triggered', { 
+        position, 
+        hasCurrentTrack: !!currentTrack,
+        currentTrackTitle: (currentTrack as any)?.title
+      }, 'AudioScreen');
+      
+      if (position > 0 && currentTrack) {
+        logger.info('Saving final position on unmount', { position }, 'AudioScreen');
+        // Save immediately on unmount
+        updateState.cancel(); // Cancel any pending throttled calls
+        updateState(position);
+      }
+    };
+  }, [position, currentTrack, updateState]);
 
 
   const handleTrackCompletion = async () => {
@@ -657,30 +672,12 @@ const AudioScreen = () => {
   }
 
   if (isLoading) {
-    logger.debug('AudioScreen rendering loading state', { 
-      isLoading, 
-      title: file.title 
-    }, 'AudioScreen');
     return (
       <View style={styles.musicContainer}>
         <ActivityIndicator size="large" color="#ED4D4E" />
       </View>
     );
   }
-
-  logger.debug('AudioScreen rendering main UI', {
-    orientation,
-    width,
-    height,
-    isPlaying,
-    position,
-    duration,
-    currentIndex,
-    playlistLength: playlist?.length || 0,
-    title: file.title,
-    hasDownloadProgress: downloadProgress > 0,
-    isFileDownloaded
-  }, 'AudioScreen');
 
   return (
     <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
@@ -754,6 +751,11 @@ const AudioScreen = () => {
                     title: (currentTrack as any)?.title || file.title || 'Unknown' 
                   }, 'AudioScreen');
                   await seekTo(value);
+                  // Save position after seeking
+                  if (value > 0 && currentTrack) {
+                    logger.info('Saving position after slider seek', { value }, 'AudioScreen');
+                    updateState(value);
+                  }
                 }}
               />
               <View style={styles.timeContainer}>
@@ -779,7 +781,14 @@ const AudioScreen = () => {
                 )}
                 <TouchableOpacity
                   style={styles.seekBackwardButton}
-                  onPress={() => seekBackward()}
+                  onPress={async () => {
+                    await seekBackward();
+                    // Save position after seeking backward
+                    if (position > 0 && currentTrack) {
+                      logger.info('Saving position after seek backward', { position }, 'AudioScreen');
+                      updateState(position);
+                    }
+                  }}
                   disabled={isLoading}
                 >
                   <ReplayIcon />
@@ -793,7 +802,14 @@ const AudioScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.seekForwardButton}
-                  onPress={() => seekForward()}
+                  onPress={async () => {
+                    await seekForward();
+                    // Save position after seeking forward
+                    if (position > 0 && currentTrack) {
+                      logger.info('Saving position after seek forward', { position }, 'AudioScreen');
+                      updateState(position);
+                    }
+                  }}
                   disabled={isLoading}
                 >
                   <ForwardIcon />
