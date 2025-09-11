@@ -510,7 +510,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     logger.info('Seeking forward', { seconds }, 'useTrackPlayer');
     try {
       const currentPosition = await TrackPlayer.getPosition();
-      const newPosition = Math.min(currentPosition + (seconds * 1000), duration);
+      const newPosition = Math.min(currentPosition + seconds, duration);
       await TrackPlayer.seekTo(newPosition);
       logger.info('Seek forward completed', { 
         from: currentPosition, 
@@ -529,7 +529,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     logger.info('Seeking backward', { seconds }, 'useTrackPlayer');
     try {
       const currentPosition = await TrackPlayer.getPosition();
-      const newPosition = Math.max(currentPosition - (seconds * 1000), 0);
+      const newPosition = Math.max(currentPosition - seconds, 0);
       await TrackPlayer.seekTo(newPosition);
       logger.info('Seek backward completed', { 
         from: currentPosition, 

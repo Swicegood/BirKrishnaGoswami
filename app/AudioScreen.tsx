@@ -602,12 +602,12 @@ const AudioScreen = () => {
     // and the UI will update automatically through state changes
   };
 
-  const formatTime = (milliseconds: number) => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
+  const formatTime = (seconds: number) => {
+    const totalSeconds = Math.floor(seconds);
     const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
+    const remainingSeconds = totalSeconds % 60;
 
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
 
@@ -974,7 +974,7 @@ const styles = StyleSheet.create({
   },
   trackIndicator: {
     fontSize: 14,
-    color: '#CCCCCC',
+    color: 'brown',
     marginBottom: 20,
     textAlign: 'center',
   },
