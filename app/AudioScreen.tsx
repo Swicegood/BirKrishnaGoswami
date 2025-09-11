@@ -588,23 +588,8 @@ const AudioScreen = () => {
       playlistLength: playlist?.length || 0
     }, 'AudioScreen');
     await goToNextTrack();
-    const nextIndex = Math.min(currentIndex + 1, (playlist?.length || 1) - 1);
-    const nextTrack = playlist?.[nextIndex] as any;
-    logger.info('Navigating to next track', { 
-      fromIndex: currentIndex, 
-      toIndex: nextIndex, 
-      nextTrack: nextTrack.title 
-    }, 'AudioScreen');
-    router.replace({
-      pathname: "/AudioScreen",
-      params: {
-        url: nextTrack.url,
-        title: nextTrack.title,
-        playlist: JSON.stringify(playlist),
-        currentIndex: nextIndex.toString(),
-        category: file.category
-      }
-    });
+    // No need to navigate - the useTrackPlayer hook handles track changes
+    // and the UI will update automatically through state changes
   };
   
   const doGoToPreviousTrack = async () => {
@@ -613,23 +598,8 @@ const AudioScreen = () => {
       playlistLength: playlist?.length || 0
     }, 'AudioScreen');
     await goToPreviousTrack();
-    const prevIndex = Math.max(currentIndex - 1, 0);
-    const prevTrack = playlist?.[prevIndex] as any;
-    logger.info('Navigating to previous track', { 
-      fromIndex: currentIndex, 
-      toIndex: prevIndex, 
-      prevTrack: prevTrack.title 
-    }, 'AudioScreen');
-    router.replace({
-      pathname: "/AudioScreen",
-      params: {
-        url: prevTrack.url,
-        title: prevTrack.title,
-        playlist: JSON.stringify(playlist),
-        currentIndex: prevIndex.toString(),
-        category: file.category
-      }
-    });
+    // No need to navigate - the useTrackPlayer hook handles track changes
+    // and the UI will update automatically through state changes
   };
 
   const formatTime = (milliseconds: number) => {
@@ -733,16 +703,25 @@ const AudioScreen = () => {
               <View style={styles.rightItem}>
                 <View style={styles.circle}>
                   {isMobileWeb ? (
-                    <TouchableOpacity onPress={() => file.url && mailAudioLink(file.url)}>
+                    <TouchableOpacity onPress={() => {
+                      const url = (currentTrack as any)?.url || file.url;
+                      if (url) mailAudioLink(url);
+                    }}>
                       <Entypo name="share" size={26} color="orange" fontWeight='bold' />
                     </TouchableOpacity>
                   ) : (
                     Platform.OS === 'web' ? (
-                      <TouchableOpacity onPress={() => file.url && mailAudioLink(file.url)}>
+                      <TouchableOpacity onPress={() => {
+                        const url = (currentTrack as any)?.url || file.url;
+                        if (url) mailAudioLink(url);
+                      }}>
                         <Entypo name="share" size={26} color="orange" fontWeight='bold' />
                       </TouchableOpacity>
                     ) : (
-                      <TouchableOpacity onPress={() => file.url && shareAudioLink(file.url)}>
+                      <TouchableOpacity onPress={() => {
+                        const url = (currentTrack as any)?.url || file.url;
+                        if (url) shareAudioLink(url);
+                      }}>
                         <Entypo name="share" size={26} color="orange" fontWeight='bold' />
                       </TouchableOpacity>
                     )
@@ -755,7 +734,7 @@ const AudioScreen = () => {
               {downloadProgress > 0 && downloadProgress < 1 && (
                 <Progress.Bar progress={downloadProgress} width={200} />
               )}
-              <Text style={styles.title}>{file.title.toUpperCase().replace('_', ' ')}</Text>
+              <Text style={styles.title}>{((currentTrack as any)?.title || file.title || '').toUpperCase().replace('_', ' ')}</Text>
               {playlist?.length > 1 && (
                 <Text style={styles.trackIndicator}>
                   Track {currentIndex + 1} of {playlist?.length || 0}
@@ -772,7 +751,7 @@ const AudioScreen = () => {
                   logger.info('User seeking to position', { 
                     from: position, 
                     to: value, 
-                    title: file.title 
+                    title: (currentTrack as any)?.title || file.title || 'Unknown' 
                   }, 'AudioScreen');
                   await seekTo(value);
                 }}
@@ -833,23 +812,25 @@ const AudioScreen = () => {
                     <TouchableOpacity
                       style={styles.downloadButton}
                       onPress={async () => {
+                        const currentTitle = (currentTrack as any)?.title || file.title || 'Unknown';
+                        const currentUrl = (currentTrack as any)?.url || file.url || '';
                         if (isFileDownloaded) {
-                          logger.info('Download attempted but file already downloaded', { title: file.title }, 'AudioScreen');
+                          logger.info('Download attempted but file already downloaded', { title: currentTitle }, 'AudioScreen');
                           Alert.alert('Downloaded', 'This file is already downloaded');
                           return;
                         }
-                        logger.info('Starting web download', { url: file.url, title: file.title }, 'AudioScreen');
+                        logger.info('Starting web download', { url: currentUrl, title: currentTitle }, 'AudioScreen');
                         try {
                           setDownloadProgress(0);
                           // Fetch the file through the proxy
-                          const response = await fetch(PROXY_URL + file.url);
+                          const response = await fetch(PROXY_URL + currentUrl);
                           const contentLength = response.headers.get('Content-Length');
                           const total = parseInt(contentLength || '0', 10);
                           let loaded = 0;
 
                           logger.info('Web download started', { 
                             totalSize: total, 
-                            url: file.url 
+                            url: currentUrl 
                           }, 'AudioScreen');
 
                           const reader = response.body!.getReader();
@@ -868,7 +849,7 @@ const AudioScreen = () => {
 
                           const link = document.createElement('a');
                           link.href = blobUrl;
-                          link.download = `${file.title}.mp3`;
+                          link.download = `${currentTitle}.mp3`;
 
                           document.body.appendChild(link);
                           link.click();
@@ -877,7 +858,7 @@ const AudioScreen = () => {
                           window.URL.revokeObjectURL(blobUrl);
 
                           logger.info('Web download completed successfully', { 
-                            title: file.title, 
+                            title: currentTitle, 
                             totalSize: total 
                           }, 'AudioScreen');
                           setIsFileDownloaded(true);
@@ -885,8 +866,8 @@ const AudioScreen = () => {
                         } catch (error) {
                           logger.error('Web download failed', { 
                             error: error instanceof Error ? error.message : String(error), 
-                            url: file.url, 
-                            title: file.title 
+                            url: currentUrl, 
+                            title: currentTitle 
                           }, 'AudioScreen');
                           Alert.alert('Download Failed', 'There was an error downloading the file.');
                           setDownloadProgress(0);
@@ -900,18 +881,20 @@ const AudioScreen = () => {
                     <TouchableOpacity
                       style={styles.downloadButton}
                       onPress={async () => {
+                        const currentTitle = (currentTrack as any)?.title || file.title || 'Unknown';
+                        const currentUrl = (currentTrack as any)?.url || file.url || '';
                         if (isFileDownloaded) {
-                          logger.info('Download attempted but file already downloaded', { title: file.title }, 'AudioScreen');
+                          logger.info('Download attempted but file already downloaded', { title: currentTitle }, 'AudioScreen');
                           Alert.alert('Downloaded', 'This file is already downloaded');
-                          shareAudioFile(`${FileSystem.cacheDirectory}${file.title}.mp3`);
+                          shareAudioFile(`${FileSystem.cacheDirectory}${currentTitle}.mp3`);
                           return;
                         }
-                        logger.info('Starting native download', { url: file.url, title: file.title }, 'AudioScreen');
+                        logger.info('Starting native download', { url: currentUrl, title: currentTitle }, 'AudioScreen');
                         // Check if external storage is available and accessible
-                        const fileUri = `${FileSystem.cacheDirectory}${file.title}.mp3`;
+                        const fileUri = `${FileSystem.cacheDirectory}${currentTitle}.mp3`;
 
                         const downloadResumable = FileSystem.createDownloadResumable(
-                          file.url,
+                          currentUrl,
                           fileUri,
                           {},
                           (downloadProgress) => {
@@ -926,18 +909,20 @@ const AudioScreen = () => {
                         );
 
                         try {
-                          const { uri } = await downloadResumable.downloadAsync();
-                          logger.info('Native download completed successfully', { 
-                            uri, 
-                            title: file.title 
-                          }, 'AudioScreen');
-                          Alert.alert('Download Complete', `Finished downloading to ${uri}`);
-                          setIsFileDownloaded(true);
+                          const result = await downloadResumable.downloadAsync();
+                          if (result?.uri) {
+                            logger.info('Native download completed successfully', { 
+                              uri: result.uri, 
+                              title: currentTitle 
+                            }, 'AudioScreen');
+                            Alert.alert('Download Complete', `Finished downloading to ${result.uri}`);
+                            setIsFileDownloaded(true);
+                          }
                         } catch (e) {
                           logger.error('Native download failed', { 
                             error: e instanceof Error ? e.message : String(e), 
-                            url: file.url, 
-                            title: file.title 
+                            url: currentUrl, 
+                            title: currentTitle 
                           }, 'AudioScreen');
                         }
                       }}
