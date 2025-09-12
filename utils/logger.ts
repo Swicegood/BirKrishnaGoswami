@@ -42,17 +42,17 @@ class Logger {
         finalResult: isDebugMode
       });
       
-      // TEMPORARY: Force enable debug mode for testing
-      const forceDebugMode = true;
+      // Disable debug mode for production builds
+      const forceDebugMode = false;
       console.log('FORCE DEBUG MODE:', forceDebugMode);
       
-      // Enable debug logging ONLY in debug-preview builds
-      // This ensures debug logging is only available in your custom EAS debug-preview builds
+      // Disable debug logging for production builds
+      // This prevents storage issues and improves performance
       return forceDebugMode;
     } catch (error) {
       console.error('Error in checkDebugMode:', error);
-      // Fallback: return true for testing
-      return true;
+      // Fallback: return false for production
+      return false;
     }
   }
 
