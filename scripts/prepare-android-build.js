@@ -32,7 +32,9 @@ delete packageJson.dependencies['react-native-worklets'];
 if (!packageJson.devDependencies) {
   packageJson.devDependencies = {};
 }
-packageJson.devDependencies['@babel/plugin-proposal-optional-chaining'] = '^7.18.6';
+// Remove deprecated plugin if it exists to avoid conflicts
+delete packageJson.devDependencies['@babel/plugin-proposal-optional-chaining'];
+packageJson.devDependencies['@babel/plugin-transform-optional-chaining'] = '^7.24.0';
 packageJson.devDependencies['@babel/plugin-proposal-nullish-coalescing-operator'] = '^7.18.6';
 packageJson.devDependencies['@babel/plugin-transform-template-literals'] = '^7.24.0';
 
@@ -40,7 +42,7 @@ packageJson.devDependencies['@babel/plugin-transform-template-literals'] = '^7.2
 let updatedBabelConfig = babelConfigContent.replace(
   /plugins: \[([\s\S]*?)\]/,
   `plugins: [
-      '@babel/plugin-proposal-optional-chaining',
+      '@babel/plugin-transform-optional-chaining',
       '@babel/plugin-proposal-nullish-coalescing-operator',
       '@babel/plugin-transform-template-literals',
       $1
@@ -60,7 +62,7 @@ fs.writeFileSync(gradlePropertiesPath, updatedGradleProperties);
 console.log('✅ Android build preparation complete:');
 console.log('  - react-native-reanimated: ~3.16.1');
 console.log('  - react-native-worklets: REMOVED (incompatible with RN 0.79.5)');
-console.log('  - @babel/plugin-proposal-optional-chaining: ADDED');
+console.log('  - @babel/plugin-transform-optional-chaining: ADDED');
 console.log('  - @babel/plugin-proposal-nullish-coalescing-operator: ADDED');
 console.log('  - @babel/plugin-transform-template-literals: ADDED');
 console.log('  - babel.config.js: updated with required plugins');
