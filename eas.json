@@ -7,7 +7,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "medium"
       },
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm"
@@ -15,6 +15,9 @@
     },
     "preview": {
       "distribution": "internal",
+      "android": {
+        "resourceClass": "medium"
+      },
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm"
       }
@@ -28,6 +31,9 @@
       }
     },
     "production": {
+      "android": {
+        "resourceClass": "medium"
+      },
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm"
       }
@@ -35,7 +41,8 @@
     "release": {
       "android": {
         "buildType": "app-bundle",
-        "gradleCommand": ":app:assembleRelease"
+        "gradleCommand": ":app:assembleRelease",
+        "resourceClass": "medium"
       },
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm"

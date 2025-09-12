@@ -68,6 +68,9 @@
               "FirebaseMessaging": { "modular_headers": true },
               "GoogleDataTransport": { "modular_headers": true }
             }
+          },
+          "android": {
+            "newArchEnabled": false
           }
         }
       ],
