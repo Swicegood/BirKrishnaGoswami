@@ -7,6 +7,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
+        "resourceClass": "m-medium"
+      },
+      "android": {
         "resourceClass": "medium"
       },
       "env": {
@@ -24,6 +27,9 @@
     },
     "debug-preview": {
       "distribution": "internal",
+      "android": {
+        "resourceClass": "medium"
+      },
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm",
         "RELEASE_CHANNEL": "debug-preview",
