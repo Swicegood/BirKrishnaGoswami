@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import TrackPlayer, { State, Event, useTrackPlayerEvents, useProgress } from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
@@ -231,13 +231,34 @@ const useTrackPlayer = (onTrackLoaded) => {
       shouldPlay, 
       startPosition,
       currentPlaylistIndex: currentIndex,
-      playlistLength: playlist.length
+      playlistLength: playlist.length,
+      platform: Platform.OS
     }, 'useTrackPlayer');
 
     // Acquire mutex
     trackLoadMutex.current = true;
     isLoadingNewFile.current = true;
     setIsLoading(true);
+
+    // Set up loading timeout for Android
+    const loadingTimeout = setTimeout(() => {
+      if (isLoadingNewFile.current) {
+        logger.error('Track loading timeout - forcing completion', { 
+          trackTitle, 
+          trackUrl,
+          timeout: '15 seconds'
+        }, 'useTrackPlayer');
+        
+        // Force completion to prevent infinite loading
+        setIsLoading(false);
+        isLoadingNewFile.current = false;
+        trackLoadMutex.current = false;
+        
+        // Set current track even if loading failed
+        setCurrentTrack({ url: trackUrl, title: trackTitle });
+        onTrackLoaded?.(true);
+      }
+    }, 15000); // 15 second timeout
 
     try {
       await TrackPlayer.reset();
@@ -270,13 +291,26 @@ const useTrackPlayer = (onTrackLoaded) => {
 
       setCurrentTrack({ url: trackUrl, title: trackTitle });
       setIsLoading(false);
+      
+      // Clear timeout since loading completed successfully
+      clearTimeout(loadingTimeout);
+      
     } catch (error) {
       logger.error('Error loading track', { 
         error: error instanceof Error ? error.message : String(error),
         trackTitle,
-        trackUrl
+        trackUrl,
+        platform: Platform.OS
       }, 'useTrackPlayer');
+      
+      // Clear timeout and force completion on error
+      clearTimeout(loadingTimeout);
       setIsLoading(false);
+      
+      // Set current track even on error to prevent infinite loading
+      setCurrentTrack({ url: trackUrl, title: trackTitle });
+      onTrackLoaded?.(true);
+      
     } finally {
       // Release mutex
       trackLoadMutex.current = false;

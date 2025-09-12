@@ -33,10 +33,17 @@ const DebugLogsScreen: React.FC = () => {
     { key: 'debug', label: 'Debug', color: '#34C759' },
   ];
 
-  const loadLogs = useCallback(() => {
-    const currentLogs = logger.getLogs();
-    setLogs(currentLogs);
-    filterLogs(currentLogs, searchText, selectedLevel);
+  const loadLogs = useCallback(async () => {
+    try {
+      const currentLogs = await logger.getAllLogs();
+      setLogs(currentLogs);
+      filterLogs(currentLogs, searchText, selectedLevel);
+    } catch (error) {
+      console.error('Error loading logs:', error);
+      const currentLogs = logger.getLogs();
+      setLogs(currentLogs);
+      filterLogs(currentLogs, searchText, selectedLevel);
+    }
   }, [searchText, selectedLevel]);
 
   const filterLogs = useCallback((logList: LogEntry[], search: string, level: string) => {
@@ -83,14 +90,15 @@ const DebugLogsScreen: React.FC = () => {
   const clearLogs = () => {
     Alert.alert(
       'Clear Logs',
-      'Are you sure you want to clear all logs?',
+      'Are you sure you want to clear all logs? This will also clear persistent logs.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Clear',
+          text: 'Clear All',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             logger.clearLogs();
+            await logger.clearPersistentLogs();
             loadLogs();
           },
         },

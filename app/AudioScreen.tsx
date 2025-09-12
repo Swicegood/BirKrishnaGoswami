@@ -328,7 +328,8 @@ const AudioScreen = () => {
         hasPlaylist: !!file.playlist, 
         hasCategory: !!file.category,
         currentIndex: file.currentIndex,
-        playedSongsLoaded: playedSongs.length
+        playedSongsLoaded: playedSongs.length,
+        platform: Platform.OS
       }, 'AudioScreen');
       
       if (file.playlist) {
@@ -755,10 +756,35 @@ const AudioScreen = () => {
     return imageWidth;
   }
 
+  // Android-specific loading timeout fallback
+  useEffect(() => {
+    if (Platform.OS === 'android' && isLoading) {
+      const androidLoadingTimeout = setTimeout(() => {
+        if (isLoading) {
+          logger.error('Android loading timeout - forcing UI to show', {
+            title: file.title,
+            url: file.url,
+            platform: Platform.OS
+          }, 'AudioScreen');
+          
+          // Force the loading to complete after 20 seconds on Android
+          setIsFirstLoad(false);
+        }
+      }, 20000); // 20 second timeout for Android
+      
+      return () => clearTimeout(androidLoadingTimeout);
+    }
+  }, [isLoading, file.title, file.url]);
+
   if (isLoading) {
     return (
       <View style={styles.musicContainer}>
         <ActivityIndicator size="large" color="#ED4D4E" />
+        {Platform.OS === 'android' && (
+          <Text style={styles.loadingText}>
+            Loading audio... If this takes too long, try restarting the app.
+          </Text>
+        )}
       </View>
     );
   }
@@ -1171,6 +1197,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white', // Or whatever color you want
     justifyContent: 'center', // Center the child items vertically
     alignItems: 'center', // Center the child items horizontally
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 20,
+    paddingHorizontal: 20,
   },
 });
 

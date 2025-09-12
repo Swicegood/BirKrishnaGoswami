@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface LogEntry {
   id: string;
@@ -13,9 +14,14 @@ class Logger {
   private logs: LogEntry[] = [];
   private maxLogs: number = 1000;
   private isDebugMode: boolean = false;
+  private persistentLogs: LogEntry[] = [];
+  private maxPersistentLogs: number = 500;
+  private storageKey = '@debug_logs';
+  private isInitialized = false;
 
   constructor() {
     this.isDebugMode = this.checkDebugMode();
+    this.initializePersistentLogs();
   }
 
   private checkDebugMode(): boolean {
@@ -50,6 +56,31 @@ class Logger {
     }
   }
 
+  private async initializePersistentLogs(): Promise<void> {
+    try {
+      const storedLogs = await AsyncStorage.getItem(this.storageKey);
+      if (storedLogs) {
+        this.persistentLogs = JSON.parse(storedLogs).map((log: any) => ({
+          ...log,
+          timestamp: new Date(log.timestamp)
+        }));
+        console.log(`Loaded ${this.persistentLogs.length} persistent logs from storage`);
+      }
+      this.isInitialized = true;
+    } catch (error) {
+      console.error('Error loading persistent logs:', error);
+      this.isInitialized = true;
+    }
+  }
+
+  private async savePersistentLogs(): Promise<void> {
+    try {
+      await AsyncStorage.setItem(this.storageKey, JSON.stringify(this.persistentLogs));
+    } catch (error) {
+      console.error('Error saving persistent logs:', error);
+    }
+  }
+
   private generateId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
@@ -75,6 +106,19 @@ class Logger {
       this.logs = this.logs.slice(0, this.maxLogs);
     }
 
+    // Add to persistent logs for important events (errors, warnings, and critical info)
+    if (level === 'error' || level === 'warn' || (level === 'info' && this.isCriticalLog(message, source))) {
+      this.persistentLogs.unshift(logEntry);
+      
+      // Keep only the most recent persistent logs
+      if (this.persistentLogs.length > this.maxPersistentLogs) {
+        this.persistentLogs = this.persistentLogs.slice(0, this.maxPersistentLogs);
+      }
+      
+      // Save to storage asynchronously
+      this.savePersistentLogs();
+    }
+
     // Also log to console for development
     if (__DEV__) {
       const logMessage = `[${logEntry.timestamp.toISOString()}] ${level.toUpperCase()}: ${message}`;
@@ -92,6 +136,21 @@ class Logger {
           console.log(logMessage, data);
       }
     }
+  }
+
+  private isCriticalLog(message: string, source?: string): boolean {
+    const criticalKeywords = [
+      'loading', 'error', 'failed', 'timeout', 'crash', 'hang', 'stuck',
+      'initialization', 'trackplayer', 'audioscreen', 'playlist'
+    ];
+    
+    const criticalSources = ['useTrackPlayer', 'AudioScreen'];
+    
+    const messageLower = message.toLowerCase();
+    const sourceLower = source?.toLowerCase() || '';
+    
+    return criticalKeywords.some(keyword => messageLower.includes(keyword)) ||
+           criticalSources.some(criticalSource => sourceLower.includes(criticalSource));
   }
 
   info(message: string, data?: any, source?: string): void {
@@ -132,6 +191,33 @@ class Logger {
 
   getLogsBySource(source: string): LogEntry[] {
     return this.logs.filter(log => log.source === source);
+  }
+
+  getPersistentLogs(): LogEntry[] {
+    return this.persistentLogs;
+  }
+
+  async clearPersistentLogs(): Promise<void> {
+    this.persistentLogs = [];
+    await AsyncStorage.removeItem(this.storageKey);
+  }
+
+  async getAllLogs(): Promise<LogEntry[]> {
+    // Wait for initialization if not ready
+    while (!this.isInitialized) {
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+    
+    // Combine in-memory and persistent logs, removing duplicates
+    const allLogs = [...this.logs];
+    this.persistentLogs.forEach(persistentLog => {
+      if (!allLogs.find(log => log.id === persistentLog.id)) {
+        allLogs.push(persistentLog);
+      }
+    });
+    
+    // Sort by timestamp (newest first)
+    return allLogs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 }
 
