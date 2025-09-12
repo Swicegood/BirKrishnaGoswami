@@ -39,13 +39,13 @@ packageJson.devDependencies['@babel/plugin-proposal-nullish-coalescing-operator'
 packageJson.devDependencies['@babel/plugin-transform-template-literals'] = '^7.24.0';
 
 // Update babel.config.js to add required plugins for React Native Reanimated 3.16.1
+// Clean up any existing plugin entries and rebuild the plugins array
 let updatedBabelConfig = babelConfigContent.replace(
-  /plugins: \[([\s\S]*?)\]/,
+  /plugins: \[[\s\S]*?\]/,
   `plugins: [
       '@babel/plugin-transform-optional-chaining',
       '@babel/plugin-proposal-nullish-coalescing-operator',
-      '@babel/plugin-transform-template-literals',
-      $1
+      '@babel/plugin-transform-template-literals'
     ]`
 );
 
