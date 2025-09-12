@@ -789,6 +789,60 @@ const AudioScreen = () => {
     );
   }
 
+  // Fallback UI for when track fails to load completely
+  if (!currentTrack && !isLoading && file.url) {
+    return (
+      <View style={styles.musicContainer}>
+        {/* Back Button */}
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => {
+            logger.info('Back button pressed from fallback UI', {}, 'AudioScreen');
+            router.back();
+          }}
+        >
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.title}>{file.title}</Text>
+        <Text style={styles.loadingText}>
+          Audio failed to load. Tap to retry.
+        </Text>
+        
+        <View style={styles.fallbackControls}>
+          <TouchableOpacity 
+            style={styles.retryButton}
+            onPress={() => {
+              logger.info('Retrying track load from fallback UI', {
+                title: file.title,
+                url: file.url
+              }, 'AudioScreen');
+              loadTrack(file.url, file.title, true, 0);
+            }}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+
+          {/* Next Track Button */}
+          {playlist && playlist.length > 0 && currentIndex < playlist.length - 1 && (
+            <TouchableOpacity 
+              style={styles.nextButton}
+              onPress={() => {
+                logger.info('Next track button pressed from fallback UI', {
+                  currentIndex: currentIndex,
+                  nextIndex: currentIndex + 1
+                }, 'AudioScreen');
+                goToNextTrack();
+              }}
+            >
+              <Text style={styles.nextButtonText}>Next Track →</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  }
+
   return (
     <GuageView onSetOrientation={onSetOrientation} onSetWidth={onSetWidth}>
       <ImageBackground
@@ -1204,6 +1258,52 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     paddingHorizontal: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 20,
+    zIndex: 1000,
+  },
+  backButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  fallbackControls: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    gap: 15,
+  },
+  retryButton: {
+    backgroundColor: '#ED4D4E',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 25,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  nextButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+  },
+  nextButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

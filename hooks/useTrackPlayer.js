@@ -155,7 +155,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     };
   }, []);
 
-  useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackState, Event.PlaybackError], async (event) => {
+  useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackState, Event.PlaybackError, Event.PlaybackQueueEnded], async (event) => {
     logger.debug('TrackPlayer event received', { 
       type: event.type, 
       state: event.state,
@@ -177,6 +177,21 @@ const useTrackPlayer = (onTrackLoaded) => {
         }, 'useTrackPlayer');
         setCurrentTrack(track);
         onTrackLoaded?.(true);
+      }
+    } else if (event.type === Event.PlaybackQueueEnded) {
+      logger.info('Playback queue ended, attempting to continue to next track', {
+        currentIndex: currentIndex,
+        playlistLength: playlist.length
+      }, 'useTrackPlayer');
+      
+      // Auto-continue to next track when current track ends
+      if (playlist.length > 0 && currentIndex < playlist.length - 1) {
+        await goToNextTrack();
+      } else {
+        logger.info('No more tracks in playlist, playback ended', {
+          currentIndex: currentIndex,
+          playlistLength: playlist.length
+        }, 'useTrackPlayer');
       }
     } else if (event.type === Event.PlaybackState) {
       const wasPlaying = isPlaying;
