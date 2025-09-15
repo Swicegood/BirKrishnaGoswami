@@ -42,8 +42,8 @@ class Logger {
         finalResult: isDebugMode
       });
       
-      // Enable debug mode for debug-preview builds
-      const forceDebugMode = isDebugMode;
+      // Temporarily force debug mode to true for testing
+      const forceDebugMode = true; // isDebugMode;
       console.log('FORCE DEBUG MODE:', forceDebugMode);
       
       // Enable debug logging for debug-preview builds
