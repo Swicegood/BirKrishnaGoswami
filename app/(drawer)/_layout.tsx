@@ -78,11 +78,11 @@ function CustomDrawerContent() {
             source={require('../../assets/images/drawer.png')}
           />
           <Text style={styles.headerText}>H. H. Bir Krishna Goswami Maharaja</Text>
-          {/* Debug button in header - disabled for production builds */}
-          {false && (debugMode || true) && (
+          {/* Debug button in header - enabled for debug builds */}
+          {debugMode || true && (
             <Link href="../DebugLogsScreen" asChild>
               <Text style={[styles.headerText, { fontSize: 12, marginTop: 5, color: '#FFD700' }]}>
-                🐛 Debug Logs (TEST)
+                🐛 Debug Logs
               </Text>
             </Link>
           )}
@@ -183,9 +183,8 @@ export default function DrawerLayout() {
 
   return (
     <Drawer
-      drawerContent={(props) => {
-
-        return <CustomDrawerContent {...props} />
+      drawerContent={() => {
+        return <CustomDrawerContent />
       }}
       screenOptions={{
         drawerType: "front",

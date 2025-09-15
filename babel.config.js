@@ -10,20 +10,7 @@ module.exports = function (api) {
     plugins: [
       '@babel/plugin-transform-optional-chaining',
       '@babel/plugin-proposal-nullish-coalescing-operator',
-      '@babel/plugin-transform-template-literals',
-      
-      '@babel/plugin-proposal-optional-chaining',
-      '@babel/plugin-proposal-nullish-coalescing-operator',
-      '@babel/plugin-transform-template-literals',
-      
-      '@babel/plugin-proposal-optional-chaining',
-      '@babel/plugin-proposal-nullish-coalescing-operator',
-      '@babel/plugin-transform-template-literals',
-      
-      // Required for expo-router
-      
-    
-    
+      '@babel/plugin-transform-template-literals'
     ],
   };
 };

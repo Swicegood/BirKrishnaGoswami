@@ -90,7 +90,8 @@ const AudioScreen = () => {
       },
       orientation,
       platform: Platform.OS,
-      isMobileWeb
+      isMobileWeb,
+      debugMode: logger.isDebugEnabled()
     }, 'AudioScreen');
   }, []);
 
@@ -293,6 +294,12 @@ const AudioScreen = () => {
       }))
     }, 'AudioScreen');
     
+    // If playedSongs is not loaded yet, return 0 (start from beginning)
+    if (playedSongs.length === 0) {
+      logger.info('PlayedSongs not loaded yet, starting from beginning', { url }, 'AudioScreen');
+      return 0;
+    }
+    
     const playedSong = playedSongs.find((playedSong) => playedSong.song.url === url);
     if (playedSong && playedSong.position > 0) {
       // Convert from milliseconds to seconds for TrackPlayer
@@ -318,18 +325,14 @@ const AudioScreen = () => {
   // Initialize playlist from parameters or fetch from category
   useEffect(() => {
     const initializePlaylist = async () => {
-      // Wait for played songs to be loaded first
-      if (playedSongs.length === 0) {
-        logger.info('Waiting for played songs to load before initializing playlist', {}, 'AudioScreen');
-        return;
-      }
-      
       logger.info('Initializing playlist', { 
         hasPlaylist: !!file.playlist, 
         hasCategory: !!file.category,
         currentIndex: file.currentIndex,
         playedSongsLoaded: playedSongs.length,
-        platform: Platform.OS
+        platform: Platform.OS,
+        hasUrl: !!file.url,
+        hasTitle: !!file.title
       }, 'AudioScreen');
       
       if (file.playlist) {
@@ -397,11 +400,40 @@ const AudioScreen = () => {
             category: file.category 
           }, 'AudioScreen');
         }
+      } else if (file.url && file.title) {
+        // Single track mode - no playlist, no category (e.g., from DayScreen)
+        logger.info('Loading single track (no playlist/category)', { 
+          url: file.url, 
+          title: file.title 
+        }, 'AudioScreen');
+        
+        try {
+          const savedPosition = getStoredPosition(file.url);
+          await loadTrack(file.url, file.title, true, savedPosition);
+          logger.info('Single track loaded successfully', { 
+            title: file.title, 
+            savedPosition 
+          }, 'AudioScreen');
+        } catch (error) {
+          logger.error('Error loading single track', { 
+            error: error instanceof Error ? error.message : String(error),
+            url: file.url,
+            title: file.title
+          }, 'AudioScreen');
+        }
+      } else {
+        logger.warn('No valid parameters provided for track loading', {
+          hasUrl: !!file.url,
+          hasTitle: !!file.title,
+          hasPlaylist: !!file.playlist,
+          hasCategory: !!file.category
+        }, 'AudioScreen');
       }
     };
 
+    // Don't wait for playedSongs to load - initialize immediately
     initializePlaylist();
-  }, [file.url, file.title, file.playlist, file.currentIndex, file.category, loadPlaylist, playedSongs]);
+  }, [file.url, file.title, file.playlist, file.currentIndex, file.category, loadPlaylist, loadTrack]);
 
 
 
@@ -756,23 +788,24 @@ const AudioScreen = () => {
     return imageWidth;
   }
 
-  // Android-specific loading timeout fallback
+  // Loading timeout fallback for all platforms
   useEffect(() => {
-    if (Platform.OS === 'android' && isLoading) {
-      const androidLoadingTimeout = setTimeout(() => {
+    if (isLoading) {
+      const loadingTimeout = setTimeout(() => {
         if (isLoading) {
-          logger.error('Android loading timeout - forcing UI to show', {
+          logger.error('Loading timeout - forcing UI to show', {
             title: file.title,
             url: file.url,
-            platform: Platform.OS
+            platform: Platform.OS,
+            timeout: Platform.OS === 'android' ? '20 seconds' : '15 seconds'
           }, 'AudioScreen');
           
-          // Force the loading to complete after 20 seconds on Android
+          // Force the loading to complete after timeout
           setIsFirstLoad(false);
         }
-      }, 20000); // 20 second timeout for Android
+      }, Platform.OS === 'android' ? 20000 : 15000); // 20 seconds for Android, 15 for others
       
-      return () => clearTimeout(androidLoadingTimeout);
+      return () => clearTimeout(loadingTimeout);
     }
   }, [isLoading, file.title, file.url]);
 
@@ -780,11 +813,9 @@ const AudioScreen = () => {
     return (
       <View style={styles.musicContainer}>
         <ActivityIndicator size="large" color="#ED4D4E" />
-        {Platform.OS === 'android' && (
-          <Text style={styles.loadingText}>
-            Loading audio... If this takes too long, try restarting the app.
-          </Text>
-        )}
+        <Text style={styles.loadingText}>
+          Loading audio... {Platform.OS === 'android' ? 'If this takes too long, try restarting the app.' : 'Please wait...'}
+        </Text>
       </View>
     );
   }

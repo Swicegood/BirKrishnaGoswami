@@ -42,12 +42,12 @@ class Logger {
         finalResult: isDebugMode
       });
       
-      // Disable debug mode for production builds
-      const forceDebugMode = false;
+      // Enable debug mode for debug-preview builds
+      const forceDebugMode = true;
       console.log('FORCE DEBUG MODE:', forceDebugMode);
       
-      // Disable debug logging for production builds
-      // This prevents storage issues and improves performance
+      // Enable debug logging for debug-preview builds
+      // This allows in-app logging and debugging features
       return forceDebugMode;
     } catch (error) {
       console.error('Error in checkDebugMode:', error);
