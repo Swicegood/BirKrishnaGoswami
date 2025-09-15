@@ -1,37 +1,37 @@
-[2025-09-15T19:17:30.689Z] INFO: Navigation changed (Navigation)
+[2025-09-15T19:29:19.403Z] INFO: Navigation changed (Navigation)
 Data: {
   "pathname": "/"
 }
 
-[2025-09-15T19:17:28.810Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:18.278Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 11199,
+  "position": 13120,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:28.809Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:18.277Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 11199,
+  "position": 13120,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:28.806Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:18.273Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 11199,
+  "position": 13120,
   "songIndex": 25,
-  "oldPosition": 11199
+  "oldPosition": 13120
 }
 
-[2025-09-15T19:17:28.806Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:18.273Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:28.806Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:18.273Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -150,21 +150,24 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:28.802Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:18.268Z] INFO: Playback paused (useTrackPlayer)
+Data: {}
+
+[2025-09-15T19:29:18.268Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 11199,
+  "position": 13120,
   "songIndex": 25,
-  "oldPosition": 11199
+  "oldPosition": 13120
 }
 
-[2025-09-15T19:17:28.802Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:18.268Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:28.802Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:18.268Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -283,42 +286,42 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:28.797Z] INFO: Navigation changed (Navigation)
+[2025-09-15T19:29:18.262Z] INFO: Navigation changed (Navigation)
 Data: {
   "pathname": "/ChantingScreen"
 }
 
-[2025-09-15T19:17:28.786Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:18.253Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 11199,
-  "lastUpdate": 11135,
-  "timeSinceLastUpdate": 64,
+  "positionMillis": 13120,
+  "lastUpdate": 12103,
+  "timeSinceLastUpdate": 1017,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:28.786Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:18.253Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 11.199688198,
+  "currentPosition": 13.120336191,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:28.786Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:18.253Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 11.199688198
+  "position": 13.120336191
 }
 
-[2025-09-15T19:17:28.786Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:18.253Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 11.199688198,
+  "position": 13.120336191,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:28.785Z] INFO: AudioScreen component unmounting (AudioScreen)
+[2025-09-15T19:29:18.252Z] INFO: AudioScreen component unmounting (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "finalPosition": 0,
@@ -326,309 +329,67 @@ Data: {
   "isPlaying": false
 }
 
-[2025-09-15T19:17:28.785Z] INFO: Removing app state listener (useTrackPlayer)
+[2025-09-15T19:29:18.252Z] INFO: Removing app state listener (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:28.784Z] INFO: Cleaning up useTrackPlayer watchdog (useTrackPlayer)
+[2025-09-15T19:29:18.252Z] INFO: Cleaning up useTrackPlayer watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:28.773Z] INFO: Checking if should save position (AudioScreen)
-Data: {
-  "positionMillis": 11199,
-  "lastUpdate": 11135,
-  "timeSinceLastUpdate": 64,
-  "shouldSave": true,
-  "isFirstSave": false
-}
-
-[2025-09-15T19:17:28.773Z] INFO: updateState called (AudioScreen)
-Data: {
-  "currentPosition": 11.199688198,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "forceSave": true
-}
-
-[2025-09-15T19:17:28.773Z] INFO: Back button pressed - stopping playback and saving position (AudioScreen)
-Data: {
-  "position": 11.199688198,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa"
-}
-
-[2025-09-15T19:17:25.692Z] INFO: Starting playback watchdog (useTrackPlayer)
-Data: {}
-
-[2025-09-15T19:17:25.692Z] INFO: App moved to foreground, restarting watchdog (useTrackPlayer)
-Data: {}
-
-[2025-09-15T19:17:25.692Z] INFO: App state changed (useTrackPlayer)
-Data: {
-  "from": "inactive",
-  "to": "active"
-}
-
-[2025-09-15T19:17:23.807Z] INFO: Position successfully saved to storage (AudioScreen)
-Data: {
-  "position": 11135,
-  "title": "Chanting Japa",
-  "totalSongsInStorage": 28
-}
-
-[2025-09-15T19:17:23.798Z] INFO: Updated song position in storage (AudioScreen)
-Data: {
-  "title": "Chanting Japa",
-  "position": 11135,
-  "songIndex": 25,
-  "oldPosition": 11135
-}
-
-[2025-09-15T19:17:23.798Z] INFO: Song data to save (AudioScreen)
-Data: {
-  "title": "Chanting Japa",
-  "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-}
-
-[2025-09-15T19:17:23.798Z] INFO: Retrieved played songs from storage (AudioScreen)
-Data: {
-  "existingCount": 28,
-  "existingSongs": [
-    {
-      "title": "BKG - Camatkara Candrika-01 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-01_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "BKG - Camatkara Candrika-02 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-02_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Yamuna 01-04",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Yamuna_01-04.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Nandisvara 01-06",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Nandisvara_01-06.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Govardhan 01-05",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Govardhan_01-05.mp3"
-    },
-    {
-      "title": "02 - BKG Ananda Vrindavan Campu - Krishnas Appearance 02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/02_-_BKG_Ananda_Vrindavan_Campu_-_Krishnas_Appearance_02.mp3"
-    },
-    {
-      "title": "03 - BKG Ananda Vrindavan Campu - Putana 03",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/03_-_BKG_Ananda_Vrindavan_Campu_-_Putana_03.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Vrindavan 01-02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Vrindavan_01-02.mp3"
-    },
-    {
-      "title": "BKG - Camatkara Candrika-03 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-03_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "BKG BG 03 - 2012-01-01 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03_-_2012-01-01_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 12 - Overview - 2022-08-08 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-12/BKG_BG_12_-_Overview_-_2022-08-08_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Overview-8th Chapter of the Bhagavad Gita - 2022-07-25 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Overview-8th_Chapter_of_the_Bhagavad_Gita_-_2022-07-25_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Basic Summary - 2016-12-11 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-11_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Introduction to Bhagavad Gita - 2011-12-04 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Introduction_to_Bhagavad_Gita_-_2011-12-04_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Basic Summary - 2016-12-09 North Carolina",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-09_North_Carolina.mp3"
-    },
-    {
-      "title": "BKG BG 02-41 - Determination - 2021-09-26 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-02/BKG_BG_02-41_-_Determination_-_2021-09-26_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-01-Prologue",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-01-Prologue.mp3"
-    },
-    {
-      "title": "BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Seasons 01-03",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Seasons_01-03.mp3"
-    },
-    {
-      "title": "BKG BG 03-31 - Gita faith - 2011-07-04 Croatia",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03-31_-_Gita_faith_-_2011-07-04_Croatia.mp3"
-    },
-    {
-      "title": "BKG BG 09-34 - How to always think of Krishna - 2011-07-06 Bosnia",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09-34_-_How_to_always_think_of_Krishna_-_2011-07-06_Bosnia.mp3"
-    },
-    {
-      "title": "BKG BG 09 - 2014-01-26 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_2014-01-26_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 09 - Introduction to the Ninth Chapter of Gita - 2013-12-01 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Introduction_to_the_Ninth_Chapter_of_Gita_-_2013-12-01_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 09 - Overview - 2022-11-28 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Overview_-_2022-11-28_New_Goloka.mp3"
-    },
-    {
-      "title": "Chanting Japa",
-      "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-02-Interlude.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-03-Part-02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-03-Part-02.mp3"
-    }
-  ]
-}
-
-[2025-09-15T19:17:23.797Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
-Data: {
-  "timeSinceLastUpdate": 1091,
-  "required": 30000
-}
-
-[2025-09-15T19:17:23.797Z] INFO: Checking if should save position (AudioScreen)
-Data: {
-  "positionMillis": 11199,
-  "lastUpdate": 10108,
-  "timeSinceLastUpdate": 1091,
-  "shouldSave": false,
-  "isFirstSave": false
-}
-
-[2025-09-15T19:17:23.797Z] INFO: updateState called (AudioScreen)
-Data: {
-  "currentPosition": 11.199688198,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "forceSave": false
-}
-
-[2025-09-15T19:17:23.797Z] INFO: Calling updateState from position change effect (AudioScreen)
-Data: {
-  "position": 11.199688198
-}
-
-[2025-09-15T19:17:23.797Z] INFO: Position change effect triggered (AudioScreen)
-Data: {
-  "position": 11.199688198,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-}
-
-[2025-09-15T19:17:23.796Z] INFO: Checking if should save position (AudioScreen)
-Data: {
-  "positionMillis": 11135,
-  "lastUpdate": 10108,
-  "timeSinceLastUpdate": 1027,
-  "shouldSave": true,
-  "isFirstSave": false
-}
-
-[2025-09-15T19:17:23.796Z] INFO: updateState called (AudioScreen)
-Data: {
-  "currentPosition": 11.135407464,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "forceSave": true
-}
-
-[2025-09-15T19:17:23.796Z] INFO: Saving final position on unmount (AudioScreen)
-Data: {
-  "position": 11.135407464
-}
-
-[2025-09-15T19:17:23.796Z] INFO: Component unmount effect triggered (AudioScreen)
-Data: {
-  "position": 11.135407464,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa"
-}
-
-[2025-09-15T19:17:23.781Z] INFO: App moved to background, keeping watchdog running for auto-advance (useTrackPlayer)
-Data: {}
-
-[2025-09-15T19:17:23.780Z] INFO: App state changed (useTrackPlayer)
-Data: {
-  "from": "active",
-  "to": "inactive"
-}
-
-[2025-09-15T19:17:22.835Z] DEBUG: AudioScreen state changed (AudioScreen)
-Data: {
-  "isPlaying": false,
-  "isLoading": false,
-  "currentIndex": 0,
-  "playlistLength": 0
-}
-
-[2025-09-15T19:17:22.835Z] DEBUG: TrackPlayer event received (useTrackPlayer)
-Data: {
-  "type": "playback-state",
-  "state": "paused"
-}
-
-[2025-09-15T19:17:22.835Z] INFO: Playback paused (useTrackPlayer)
-Data: {}
-
-[2025-09-15T19:17:22.823Z] INFO: Toggling playback (useTrackPlayer)
+[2025-09-15T19:29:18.233Z] INFO: Toggling playback (useTrackPlayer)
 Data: {
   "currentState": "playing"
 }
 
-[2025-09-15T19:17:22.790Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:18.233Z] INFO: Stopping playback due to back button press (AudioScreen)
+Data: {}
+
+[2025-09-15T19:29:18.233Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "position": 10108,
+  "positionMillis": 13120,
+  "lastUpdate": 12103,
+  "timeSinceLastUpdate": 1017,
+  "shouldSave": true,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:18.233Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 13.120336191,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": true
+}
+
+[2025-09-15T19:29:18.233Z] INFO: Back button pressed - stopping playback and saving position (AudioScreen)
+Data: {
+  "position": 13.120336191,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa"
+}
+
+[2025-09-15T19:29:17.897Z] INFO: Position successfully saved to storage (AudioScreen)
+Data: {
+  "position": 12103,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:22.776Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:17.882Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 10108,
+  "position": 12103,
   "songIndex": 25,
-  "oldPosition": 10108
+  "oldPosition": 12103
 }
 
-[2025-09-15T19:17:22.776Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:17.882Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:22.776Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:17.881Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -747,107 +508,728 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:22.775Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:17.881Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
-  "timeSinceLastUpdate": 2050,
+  "timeSinceLastUpdate": 2034,
   "required": 30000
 }
 
-[2025-09-15T19:17:22.775Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:17.881Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 11135,
-  "lastUpdate": 9085,
-  "timeSinceLastUpdate": 2050,
+  "positionMillis": 13120,
+  "lastUpdate": 11086,
+  "timeSinceLastUpdate": 2034,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:22.775Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:17.881Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 11.135407464,
+  "currentPosition": 13.120336191,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:22.775Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:17.880Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 11.135407464
+  "position": 13.120336191
 }
 
-[2025-09-15T19:17:22.774Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:17.880Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 11.135407464,
+  "position": 13.120336191,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:22.774Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:17.880Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 10108,
-  "lastUpdate": 9085,
-  "timeSinceLastUpdate": 1023,
+  "positionMillis": 12103,
+  "lastUpdate": 11086,
+  "timeSinceLastUpdate": 1017,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:22.774Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:17.879Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 10.108035503,
+  "currentPosition": 12.103271211,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:22.774Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:17.879Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 10.108035503
+  "position": 12.103271211
 }
 
-[2025-09-15T19:17:22.774Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:17.879Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 10.108035503,
+  "position": 12.103271211,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:22.252Z] INFO: Starting playback watchdog (useTrackPlayer)
+[2025-09-15T19:29:16.882Z] INFO: Position successfully saved to storage (AudioScreen)
+Data: {
+  "position": 11086,
+  "title": "Chanting Japa",
+  "totalSongsInStorage": 28
+}
+
+[2025-09-15T19:29:16.866Z] INFO: Updated song position in storage (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "position": 11086,
+  "songIndex": 25,
+  "oldPosition": 11086
+}
+
+[2025-09-15T19:29:16.866Z] INFO: Song data to save (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:16.866Z] INFO: Retrieved played songs from storage (AudioScreen)
+Data: {
+  "existingCount": 28,
+  "existingSongs": [
+    {
+      "title": "BKG - Camatkara Candrika-01 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-01_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-02 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-02_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Yamuna 01-04",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Yamuna_01-04.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Nandisvara 01-06",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Nandisvara_01-06.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Govardhan 01-05",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Govardhan_01-05.mp3"
+    },
+    {
+      "title": "02 - BKG Ananda Vrindavan Campu - Krishnas Appearance 02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/02_-_BKG_Ananda_Vrindavan_Campu_-_Krishnas_Appearance_02.mp3"
+    },
+    {
+      "title": "03 - BKG Ananda Vrindavan Campu - Putana 03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/03_-_BKG_Ananda_Vrindavan_Campu_-_Putana_03.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Vrindavan 01-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Vrindavan_01-02.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-03 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-03_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG BG 03 - 2012-01-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03_-_2012-01-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 12 - Overview - 2022-08-08 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-12/BKG_BG_12_-_Overview_-_2022-08-08_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Overview-8th Chapter of the Bhagavad Gita - 2022-07-25 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Overview-8th_Chapter_of_the_Bhagavad_Gita_-_2022-07-25_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-11 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-11_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Introduction to Bhagavad Gita - 2011-12-04 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Introduction_to_Bhagavad_Gita_-_2011-12-04_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-09 North Carolina",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-09_North_Carolina.mp3"
+    },
+    {
+      "title": "BKG BG 02-41 - Determination - 2021-09-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-02/BKG_BG_02-41_-_Determination_-_2021-09-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-01-Prologue",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-01-Prologue.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Seasons 01-03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Seasons_01-03.mp3"
+    },
+    {
+      "title": "BKG BG 03-31 - Gita faith - 2011-07-04 Croatia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03-31_-_Gita_faith_-_2011-07-04_Croatia.mp3"
+    },
+    {
+      "title": "BKG BG 09-34 - How to always think of Krishna - 2011-07-06 Bosnia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09-34_-_How_to_always_think_of_Krishna_-_2011-07-06_Bosnia.mp3"
+    },
+    {
+      "title": "BKG BG 09 - 2014-01-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_2014-01-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Introduction to the Ninth Chapter of Gita - 2013-12-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Introduction_to_the_Ninth_Chapter_of_Gita_-_2013-12-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Overview - 2022-11-28 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Overview_-_2022-11-28_New_Goloka.mp3"
+    },
+    {
+      "title": "Chanting Japa",
+      "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-02-Interlude.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-03-Part-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-03-Part-02.mp3"
+    }
+  ]
+}
+
+[2025-09-15T19:29:16.866Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+Data: {
+  "timeSinceLastUpdate": 2034,
+  "required": 30000
+}
+
+[2025-09-15T19:29:16.866Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 12103,
+  "lastUpdate": 10069,
+  "timeSinceLastUpdate": 2034,
+  "shouldSave": false,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:16.866Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 12.103271211,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": false
+}
+
+[2025-09-15T19:29:16.865Z] INFO: Calling updateState from position change effect (AudioScreen)
+Data: {
+  "position": 12.103271211
+}
+
+[2025-09-15T19:29:16.864Z] INFO: Position change effect triggered (AudioScreen)
+Data: {
+  "position": 12.103271211,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:16.864Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 11086,
+  "lastUpdate": 10069,
+  "timeSinceLastUpdate": 1017,
+  "shouldSave": true,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:16.864Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 11.086047552,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": true
+}
+
+[2025-09-15T19:29:16.864Z] INFO: Saving final position on unmount (AudioScreen)
+Data: {
+  "position": 11.086047552
+}
+
+[2025-09-15T19:29:16.864Z] INFO: Component unmount effect triggered (AudioScreen)
+Data: {
+  "position": 11.086047552,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa"
+}
+
+[2025-09-15T19:29:15.851Z] INFO: Position successfully saved to storage (AudioScreen)
+Data: {
+  "position": 10069,
+  "title": "Chanting Japa",
+  "totalSongsInStorage": 28
+}
+
+[2025-09-15T19:29:15.838Z] INFO: Updated song position in storage (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "position": 10069,
+  "songIndex": 25,
+  "oldPosition": 10069
+}
+
+[2025-09-15T19:29:15.838Z] INFO: Song data to save (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:15.838Z] INFO: Retrieved played songs from storage (AudioScreen)
+Data: {
+  "existingCount": 28,
+  "existingSongs": [
+    {
+      "title": "BKG - Camatkara Candrika-01 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-01_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-02 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-02_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Yamuna 01-04",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Yamuna_01-04.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Nandisvara 01-06",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Nandisvara_01-06.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Govardhan 01-05",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Govardhan_01-05.mp3"
+    },
+    {
+      "title": "02 - BKG Ananda Vrindavan Campu - Krishnas Appearance 02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/02_-_BKG_Ananda_Vrindavan_Campu_-_Krishnas_Appearance_02.mp3"
+    },
+    {
+      "title": "03 - BKG Ananda Vrindavan Campu - Putana 03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/03_-_BKG_Ananda_Vrindavan_Campu_-_Putana_03.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Vrindavan 01-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Vrindavan_01-02.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-03 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-03_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG BG 03 - 2012-01-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03_-_2012-01-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 12 - Overview - 2022-08-08 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-12/BKG_BG_12_-_Overview_-_2022-08-08_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Overview-8th Chapter of the Bhagavad Gita - 2022-07-25 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Overview-8th_Chapter_of_the_Bhagavad_Gita_-_2022-07-25_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-11 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-11_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Introduction to Bhagavad Gita - 2011-12-04 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Introduction_to_Bhagavad_Gita_-_2011-12-04_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-09 North Carolina",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-09_North_Carolina.mp3"
+    },
+    {
+      "title": "BKG BG 02-41 - Determination - 2021-09-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-02/BKG_BG_02-41_-_Determination_-_2021-09-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-01-Prologue",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-01-Prologue.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Seasons 01-03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Seasons_01-03.mp3"
+    },
+    {
+      "title": "BKG BG 03-31 - Gita faith - 2011-07-04 Croatia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03-31_-_Gita_faith_-_2011-07-04_Croatia.mp3"
+    },
+    {
+      "title": "BKG BG 09-34 - How to always think of Krishna - 2011-07-06 Bosnia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09-34_-_How_to_always_think_of_Krishna_-_2011-07-06_Bosnia.mp3"
+    },
+    {
+      "title": "BKG BG 09 - 2014-01-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_2014-01-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Introduction to the Ninth Chapter of Gita - 2013-12-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Introduction_to_the_Ninth_Chapter_of_Gita_-_2013-12-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Overview - 2022-11-28 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Overview_-_2022-11-28_New_Goloka.mp3"
+    },
+    {
+      "title": "Chanting Japa",
+      "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-02-Interlude.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-03-Part-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-03-Part-02.mp3"
+    }
+  ]
+}
+
+[2025-09-15T19:29:15.838Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+Data: {
+  "timeSinceLastUpdate": 2042,
+  "required": 30000
+}
+
+[2025-09-15T19:29:15.838Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 11086,
+  "lastUpdate": 9044,
+  "timeSinceLastUpdate": 2042,
+  "shouldSave": false,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:15.838Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 11.086047552,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": false
+}
+
+[2025-09-15T19:29:15.838Z] INFO: Calling updateState from position change effect (AudioScreen)
+Data: {
+  "position": 11.086047552
+}
+
+[2025-09-15T19:29:15.837Z] INFO: Position change effect triggered (AudioScreen)
+Data: {
+  "position": 11.086047552,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:15.837Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 10069,
+  "lastUpdate": 9044,
+  "timeSinceLastUpdate": 1025,
+  "shouldSave": true,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:15.837Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 10.069394147,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": true
+}
+
+[2025-09-15T19:29:15.837Z] INFO: Saving final position on unmount (AudioScreen)
+Data: {
+  "position": 10.069394147
+}
+
+[2025-09-15T19:29:15.837Z] INFO: Component unmount effect triggered (AudioScreen)
+Data: {
+  "position": 10.069394147,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa"
+}
+
+[2025-09-15T19:29:14.841Z] INFO: Position successfully saved to storage (AudioScreen)
+Data: {
+  "position": 9044,
+  "title": "Chanting Japa",
+  "totalSongsInStorage": 28
+}
+
+[2025-09-15T19:29:14.826Z] INFO: Updated song position in storage (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "position": 9044,
+  "songIndex": 25,
+  "oldPosition": 9044
+}
+
+[2025-09-15T19:29:14.826Z] INFO: Song data to save (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:14.826Z] INFO: Retrieved played songs from storage (AudioScreen)
+Data: {
+  "existingCount": 28,
+  "existingSongs": [
+    {
+      "title": "BKG - Camatkara Candrika-01 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-01_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-02 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-02_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Yamuna 01-04",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Yamuna_01-04.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Nandisvara 01-06",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Nandisvara_01-06.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Govardhan 01-05",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Govardhan_01-05.mp3"
+    },
+    {
+      "title": "02 - BKG Ananda Vrindavan Campu - Krishnas Appearance 02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/02_-_BKG_Ananda_Vrindavan_Campu_-_Krishnas_Appearance_02.mp3"
+    },
+    {
+      "title": "03 - BKG Ananda Vrindavan Campu - Putana 03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/03_-_BKG_Ananda_Vrindavan_Campu_-_Putana_03.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Vrindavan 01-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Vrindavan_01-02.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-03 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-03_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG BG 03 - 2012-01-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03_-_2012-01-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 12 - Overview - 2022-08-08 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-12/BKG_BG_12_-_Overview_-_2022-08-08_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Overview-8th Chapter of the Bhagavad Gita - 2022-07-25 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Overview-8th_Chapter_of_the_Bhagavad_Gita_-_2022-07-25_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-11 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-11_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Introduction to Bhagavad Gita - 2011-12-04 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Introduction_to_Bhagavad_Gita_-_2011-12-04_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-09 North Carolina",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-09_North_Carolina.mp3"
+    },
+    {
+      "title": "BKG BG 02-41 - Determination - 2021-09-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-02/BKG_BG_02-41_-_Determination_-_2021-09-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-01-Prologue",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-01-Prologue.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Seasons 01-03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Seasons_01-03.mp3"
+    },
+    {
+      "title": "BKG BG 03-31 - Gita faith - 2011-07-04 Croatia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03-31_-_Gita_faith_-_2011-07-04_Croatia.mp3"
+    },
+    {
+      "title": "BKG BG 09-34 - How to always think of Krishna - 2011-07-06 Bosnia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09-34_-_How_to_always_think_of_Krishna_-_2011-07-06_Bosnia.mp3"
+    },
+    {
+      "title": "BKG BG 09 - 2014-01-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_2014-01-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Introduction to the Ninth Chapter of Gita - 2013-12-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Introduction_to_the_Ninth_Chapter_of_Gita_-_2013-12-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Overview - 2022-11-28 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Overview_-_2022-11-28_New_Goloka.mp3"
+    },
+    {
+      "title": "Chanting Japa",
+      "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-02-Interlude.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-03-Part-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-03-Part-02.mp3"
+    }
+  ]
+}
+
+[2025-09-15T19:29:14.825Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+Data: {
+  "timeSinceLastUpdate": 2037,
+  "required": 30000
+}
+
+[2025-09-15T19:29:14.825Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 10069,
+  "lastUpdate": 8032,
+  "timeSinceLastUpdate": 2037,
+  "shouldSave": false,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:14.825Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 10.069394147,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": false
+}
+
+[2025-09-15T19:29:14.825Z] INFO: Calling updateState from position change effect (AudioScreen)
+Data: {
+  "position": 10.069394147
+}
+
+[2025-09-15T19:29:14.824Z] INFO: Position change effect triggered (AudioScreen)
+Data: {
+  "position": 10.069394147,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:14.824Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 9044,
+  "lastUpdate": 8032,
+  "timeSinceLastUpdate": 1012,
+  "shouldSave": true,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:14.824Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 9.044026514,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": true
+}
+
+[2025-09-15T19:29:14.824Z] INFO: Saving final position on unmount (AudioScreen)
+Data: {
+  "position": 9.044026514
+}
+
+[2025-09-15T19:29:14.824Z] INFO: Component unmount effect triggered (AudioScreen)
+Data: {
+  "position": 9.044026514,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa"
+}
+
+[2025-09-15T19:29:14.213Z] INFO: Starting playback watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:22.252Z] INFO: App moved to foreground, restarting watchdog (useTrackPlayer)
+[2025-09-15T19:29:14.213Z] INFO: App moved to foreground, restarting watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:22.251Z] INFO: App state changed (useTrackPlayer)
+[2025-09-15T19:29:14.213Z] INFO: App state changed (useTrackPlayer)
 Data: {
   "from": "background",
   "to": "active"
 }
 
-[2025-09-15T19:17:21.751Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:13.812Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 9085,
+  "position": 8032,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:21.744Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:13.800Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 9085,
+  "position": 8032,
   "songIndex": 25,
-  "oldPosition": 9085
+  "oldPosition": 8032
 }
 
-[2025-09-15T19:17:21.744Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:13.799Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:21.744Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:13.799Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -966,95 +1348,95 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:21.743Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:13.799Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
-  "timeSinceLastUpdate": 2034,
+  "timeSinceLastUpdate": 2041,
   "required": 30000
 }
 
-[2025-09-15T19:17:21.743Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:13.799Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 10108,
-  "lastUpdate": 8074,
-  "timeSinceLastUpdate": 2034,
+  "positionMillis": 9044,
+  "lastUpdate": 7003,
+  "timeSinceLastUpdate": 2041,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:21.743Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:13.799Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 10.108035503,
+  "currentPosition": 9.044026514,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:21.743Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:13.799Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 10.108035503
+  "position": 9.044026514
 }
 
-[2025-09-15T19:17:21.743Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:13.798Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 10.108035503,
+  "position": 9.044026514,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:21.742Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:13.798Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 9085,
-  "lastUpdate": 8074,
-  "timeSinceLastUpdate": 1011,
+  "positionMillis": 8032,
+  "lastUpdate": 7003,
+  "timeSinceLastUpdate": 1029,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:21.742Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:13.798Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 9.085948683,
+  "currentPosition": 8.032089878,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:21.742Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:13.798Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 9.085948683
+  "position": 8.032089878
 }
 
-[2025-09-15T19:17:21.742Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:13.798Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 9.085948683,
+  "position": 8.032089878,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:20.747Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:12.792Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 8074,
+  "position": 7003,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:20.730Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:12.783Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 8074,
+  "position": 7003,
   "songIndex": 25,
-  "oldPosition": 8074
+  "oldPosition": 7003
 }
 
-[2025-09-15T19:17:20.730Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:12.783Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:20.730Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:12.783Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -1173,95 +1555,95 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:20.729Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
-  "timeSinceLastUpdate": 2022,
+  "timeSinceLastUpdate": 2043,
   "required": 30000
 }
 
-[2025-09-15T19:17:20.729Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 9085,
-  "lastUpdate": 7063,
-  "timeSinceLastUpdate": 2022,
+  "positionMillis": 8032,
+  "lastUpdate": 5989,
+  "timeSinceLastUpdate": 2043,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:20.729Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 9.085948683,
+  "currentPosition": 8.032089878,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:20.729Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 9.085948683
+  "position": 8.032089878
 }
 
-[2025-09-15T19:17:20.728Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 9.085948683,
+  "position": 8.032089878,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:20.728Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 8074,
-  "lastUpdate": 7063,
-  "timeSinceLastUpdate": 1011,
+  "positionMillis": 7003,
+  "lastUpdate": 5989,
+  "timeSinceLastUpdate": 1014,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:20.728Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 8.074512011,
+  "currentPosition": 7.00386023,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:20.728Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 8.074512011
+  "position": 7.00386023
 }
 
-[2025-09-15T19:17:20.728Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:12.782Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 8.074512011,
+  "position": 7.00386023,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:19.731Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:11.769Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 7063,
+  "position": 5989,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:19.713Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:11.756Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 7063,
+  "position": 5989,
   "songIndex": 25,
-  "oldPosition": 7063
+  "oldPosition": 5989
 }
 
-[2025-09-15T19:17:19.713Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:11.756Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:19.713Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:11.756Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -1380,302 +1762,95 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:19.713Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
-Data: {
-  "timeSinceLastUpdate": 2021,
-  "required": 30000
-}
-
-[2025-09-15T19:17:19.713Z] INFO: Checking if should save position (AudioScreen)
-Data: {
-  "positionMillis": 8074,
-  "lastUpdate": 6053,
-  "timeSinceLastUpdate": 2021,
-  "shouldSave": false,
-  "isFirstSave": false
-}
-
-[2025-09-15T19:17:19.713Z] INFO: updateState called (AudioScreen)
-Data: {
-  "currentPosition": 8.074512011,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "forceSave": false
-}
-
-[2025-09-15T19:17:19.712Z] INFO: Calling updateState from position change effect (AudioScreen)
-Data: {
-  "position": 8.074512011
-}
-
-[2025-09-15T19:17:19.712Z] INFO: Position change effect triggered (AudioScreen)
-Data: {
-  "position": 8.074512011,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-}
-
-[2025-09-15T19:17:19.712Z] INFO: Checking if should save position (AudioScreen)
-Data: {
-  "positionMillis": 7063,
-  "lastUpdate": 6053,
-  "timeSinceLastUpdate": 1010,
-  "shouldSave": true,
-  "isFirstSave": false
-}
-
-[2025-09-15T19:17:19.712Z] INFO: updateState called (AudioScreen)
-Data: {
-  "currentPosition": 7.063825085,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "forceSave": true
-}
-
-[2025-09-15T19:17:19.712Z] INFO: Saving final position on unmount (AudioScreen)
-Data: {
-  "position": 7.063825085
-}
-
-[2025-09-15T19:17:19.711Z] INFO: Component unmount effect triggered (AudioScreen)
-Data: {
-  "position": 7.063825085,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa"
-}
-
-[2025-09-15T19:17:18.715Z] INFO: Position successfully saved to storage (AudioScreen)
-Data: {
-  "position": 6053,
-  "title": "Chanting Japa",
-  "totalSongsInStorage": 28
-}
-
-[2025-09-15T19:17:18.701Z] INFO: Updated song position in storage (AudioScreen)
-Data: {
-  "title": "Chanting Japa",
-  "position": 6053,
-  "songIndex": 25,
-  "oldPosition": 6053
-}
-
-[2025-09-15T19:17:18.701Z] INFO: Song data to save (AudioScreen)
-Data: {
-  "title": "Chanting Japa",
-  "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-}
-
-[2025-09-15T19:17:18.701Z] INFO: Retrieved played songs from storage (AudioScreen)
-Data: {
-  "existingCount": 28,
-  "existingSongs": [
-    {
-      "title": "BKG - Camatkara Candrika-01 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-01_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "BKG - Camatkara Candrika-02 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-02_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Yamuna 01-04",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Yamuna_01-04.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Nandisvara 01-06",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Nandisvara_01-06.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Govardhan 01-05",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Govardhan_01-05.mp3"
-    },
-    {
-      "title": "02 - BKG Ananda Vrindavan Campu - Krishnas Appearance 02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/02_-_BKG_Ananda_Vrindavan_Campu_-_Krishnas_Appearance_02.mp3"
-    },
-    {
-      "title": "03 - BKG Ananda Vrindavan Campu - Putana 03",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/03_-_BKG_Ananda_Vrindavan_Campu_-_Putana_03.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Vrindavan 01-02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Vrindavan_01-02.mp3"
-    },
-    {
-      "title": "BKG - Camatkara Candrika-03 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-03_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "BKG BG 03 - 2012-01-01 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03_-_2012-01-01_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 12 - Overview - 2022-08-08 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-12/BKG_BG_12_-_Overview_-_2022-08-08_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Overview-8th Chapter of the Bhagavad Gita - 2022-07-25 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Overview-8th_Chapter_of_the_Bhagavad_Gita_-_2022-07-25_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Basic Summary - 2016-12-11 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-11_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Introduction to Bhagavad Gita - 2011-12-04 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Introduction_to_Bhagavad_Gita_-_2011-12-04_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Basic Summary - 2016-12-09 North Carolina",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-09_North_Carolina.mp3"
-    },
-    {
-      "title": "BKG BG 02-41 - Determination - 2021-09-26 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-02/BKG_BG_02-41_-_Determination_-_2021-09-26_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-01-Prologue",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-01-Prologue.mp3"
-    },
-    {
-      "title": "BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Seasons 01-03",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Seasons_01-03.mp3"
-    },
-    {
-      "title": "BKG BG 03-31 - Gita faith - 2011-07-04 Croatia",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03-31_-_Gita_faith_-_2011-07-04_Croatia.mp3"
-    },
-    {
-      "title": "BKG BG 09-34 - How to always think of Krishna - 2011-07-06 Bosnia",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09-34_-_How_to_always_think_of_Krishna_-_2011-07-06_Bosnia.mp3"
-    },
-    {
-      "title": "BKG BG 09 - 2014-01-26 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_2014-01-26_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 09 - Introduction to the Ninth Chapter of Gita - 2013-12-01 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Introduction_to_the_Ninth_Chapter_of_Gita_-_2013-12-01_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 09 - Overview - 2022-11-28 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Overview_-_2022-11-28_New_Goloka.mp3"
-    },
-    {
-      "title": "Chanting Japa",
-      "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-02-Interlude.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-03-Part-02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-03-Part-02.mp3"
-    }
-  ]
-}
-
-[2025-09-15T19:17:18.700Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:11.756Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
   "timeSinceLastUpdate": 2023,
   "required": 30000
 }
 
-[2025-09-15T19:17:18.700Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:11.756Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 7063,
-  "lastUpdate": 5040,
+  "positionMillis": 7003,
+  "lastUpdate": 4980,
   "timeSinceLastUpdate": 2023,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:18.700Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:11.756Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 7.063825085,
+  "currentPosition": 7.00386023,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:18.699Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:11.756Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 7.063825085
+  "position": 7.00386023
 }
 
-[2025-09-15T19:17:18.699Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:11.755Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 7.063825085,
+  "position": 7.00386023,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:18.699Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:11.755Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 6053,
-  "lastUpdate": 5040,
-  "timeSinceLastUpdate": 1013,
+  "positionMillis": 5989,
+  "lastUpdate": 4980,
+  "timeSinceLastUpdate": 1009,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:18.699Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:11.755Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 6.053731276,
+  "currentPosition": 5.989424104,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:18.699Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:11.755Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 6.053731276
+  "position": 5.989424104
 }
 
-[2025-09-15T19:17:18.699Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:11.755Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 6.053731276,
+  "position": 5.989424104,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:17.698Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:10.760Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 5040,
+  "position": 4980,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:17.690Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:10.745Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 5040,
+  "position": 4980,
   "songIndex": 25,
-  "oldPosition": 5040
+  "oldPosition": 4980
 }
 
-[2025-09-15T19:17:17.690Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:10.745Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:17.690Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:10.745Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -1794,95 +1969,95 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:17.690Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:10.744Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
-  "timeSinceLastUpdate": 2021,
+  "timeSinceLastUpdate": 2018,
   "required": 30000
 }
 
-[2025-09-15T19:17:17.690Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:10.744Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 6053,
-  "lastUpdate": 4032,
-  "timeSinceLastUpdate": 2021,
+  "positionMillis": 5989,
+  "lastUpdate": 3971,
+  "timeSinceLastUpdate": 2018,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:17.690Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:10.744Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 6.053731276,
+  "currentPosition": 5.989424104,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:17.690Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:10.743Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 6.053731276
+  "position": 5.989424104
 }
 
-[2025-09-15T19:17:17.689Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:10.743Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 6.053731276,
+  "position": 5.989424104,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:17.689Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:10.743Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 5040,
-  "lastUpdate": 4032,
-  "timeSinceLastUpdate": 1008,
+  "positionMillis": 4980,
+  "lastUpdate": 3971,
+  "timeSinceLastUpdate": 1009,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:17.689Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:10.743Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 5.040888826,
+  "currentPosition": 4.980678726,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:17.689Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:10.742Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 5.040888826
+  "position": 4.980678726
 }
 
-[2025-09-15T19:17:17.689Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:10.742Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 5.040888826,
+  "position": 4.980678726,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:16.692Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:09.776Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 4032,
+  "position": 3971,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:16.681Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:09.774Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 4032,
+  "position": 3971,
   "songIndex": 25,
-  "oldPosition": 4032
+  "oldPosition": 3971
 }
 
-[2025-09-15T19:17:16.681Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:09.774Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:16.681Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:09.774Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -2001,329 +2176,122 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:16.680Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:09.736Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
-  "timeSinceLastUpdate": 2018,
+  "timeSinceLastUpdate": 2016,
   "required": 30000
 }
 
-[2025-09-15T19:17:16.680Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:09.736Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 5040,
-  "lastUpdate": 3022,
-  "timeSinceLastUpdate": 2018,
+  "positionMillis": 4980,
+  "lastUpdate": 2964,
+  "timeSinceLastUpdate": 2016,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:16.680Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:09.736Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 5.040888826,
+  "currentPosition": 4.980678726,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:16.680Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:09.735Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 5.040888826
+  "position": 4.980678726
 }
 
-[2025-09-15T19:17:16.680Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:09.735Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 5.040888826,
+  "position": 4.980678726,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:16.679Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:09.735Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 4032,
-  "lastUpdate": 3022,
-  "timeSinceLastUpdate": 1010,
+  "positionMillis": 3971,
+  "lastUpdate": 2964,
+  "timeSinceLastUpdate": 1007,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:16.679Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:09.735Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 4.032435166,
+  "currentPosition": 3.971522736,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:16.679Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:09.734Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 4.032435166
+  "position": 3.971522736
 }
 
-[2025-09-15T19:17:16.679Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:09.734Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 4.032435166,
+  "position": 3.971522736,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:15.674Z] INFO: Position successfully saved to storage (AudioScreen)
-Data: {
-  "position": 3022,
-  "title": "Chanting Japa",
-  "totalSongsInStorage": 28
-}
-
-[2025-09-15T19:17:15.668Z] INFO: Updated song position in storage (AudioScreen)
-Data: {
-  "title": "Chanting Japa",
-  "position": 3022,
-  "songIndex": 25,
-  "oldPosition": 3022
-}
-
-[2025-09-15T19:17:15.668Z] INFO: Song data to save (AudioScreen)
-Data: {
-  "title": "Chanting Japa",
-  "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-}
-
-[2025-09-15T19:17:15.668Z] INFO: Retrieved played songs from storage (AudioScreen)
-Data: {
-  "existingCount": 28,
-  "existingSongs": [
-    {
-      "title": "BKG - Camatkara Candrika-01 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-01_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "BKG - Camatkara Candrika-02 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-02_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Yamuna 01-04",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Yamuna_01-04.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Nandisvara 01-06",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Nandisvara_01-06.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Govardhan 01-05",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Govardhan_01-05.mp3"
-    },
-    {
-      "title": "02 - BKG Ananda Vrindavan Campu - Krishnas Appearance 02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/02_-_BKG_Ananda_Vrindavan_Campu_-_Krishnas_Appearance_02.mp3"
-    },
-    {
-      "title": "03 - BKG Ananda Vrindavan Campu - Putana 03",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/03_-_BKG_Ananda_Vrindavan_Campu_-_Putana_03.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Vrindavan 01-02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Vrindavan_01-02.mp3"
-    },
-    {
-      "title": "BKG - Camatkara Candrika-03 - Srila Visvanatha Cakravarti Thakur",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-03_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
-    },
-    {
-      "title": "BKG BG 03 - 2012-01-01 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03_-_2012-01-01_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 12 - Overview - 2022-08-08 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-12/BKG_BG_12_-_Overview_-_2022-08-08_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Overview-8th Chapter of the Bhagavad Gita - 2022-07-25 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Overview-8th_Chapter_of_the_Bhagavad_Gita_-_2022-07-25_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Basic Summary - 2016-12-11 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-11_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Introduction to Bhagavad Gita - 2011-12-04 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Introduction_to_Bhagavad_Gita_-_2011-12-04_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG - Basic Summary - 2016-12-09 North Carolina",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-09_North_Carolina.mp3"
-    },
-    {
-      "title": "BKG BG 02-41 - Determination - 2021-09-26 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-02/BKG_BG_02-41_-_Determination_-_2021-09-26_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-01-Prologue",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-01-Prologue.mp3"
-    },
-    {
-      "title": "BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3"
-    },
-    {
-      "title": "01 - BKG Ananda Vrindavan Campu - Seasons 01-03",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Seasons_01-03.mp3"
-    },
-    {
-      "title": "BKG BG 03-31 - Gita faith - 2011-07-04 Croatia",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03-31_-_Gita_faith_-_2011-07-04_Croatia.mp3"
-    },
-    {
-      "title": "BKG BG 09-34 - How to always think of Krishna - 2011-07-06 Bosnia",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09-34_-_How_to_always_think_of_Krishna_-_2011-07-06_Bosnia.mp3"
-    },
-    {
-      "title": "BKG BG 09 - 2014-01-26 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_2014-01-26_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 09 - Introduction to the Ninth Chapter of Gita - 2013-12-01 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Introduction_to_the_Ninth_Chapter_of_Gita_-_2013-12-01_New_Goloka.mp3"
-    },
-    {
-      "title": "BKG BG 09 - Overview - 2022-11-28 New Goloka",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Overview_-_2022-11-28_New_Goloka.mp3"
-    },
-    {
-      "title": "Chanting Japa",
-      "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-02-Interlude.mp3"
-    },
-    {
-      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-03-Part-02",
-      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-03-Part-02.mp3"
-    }
-  ]
-}
-
-[2025-09-15T19:17:15.667Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
-Data: {
-  "timeSinceLastUpdate": 2018,
-  "required": 30000
-}
-
-[2025-09-15T19:17:15.667Z] INFO: Checking if should save position (AudioScreen)
-Data: {
-  "positionMillis": 4032,
-  "lastUpdate": 2014,
-  "timeSinceLastUpdate": 2018,
-  "shouldSave": false,
-  "isFirstSave": false
-}
-
-[2025-09-15T19:17:15.667Z] INFO: updateState called (AudioScreen)
-Data: {
-  "currentPosition": 4.032435166,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "forceSave": false
-}
-
-[2025-09-15T19:17:15.666Z] INFO: Calling updateState from position change effect (AudioScreen)
-Data: {
-  "position": 4.032435166
-}
-
-[2025-09-15T19:17:15.666Z] INFO: Position change effect triggered (AudioScreen)
-Data: {
-  "position": 4.032435166,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-}
-
-[2025-09-15T19:17:15.666Z] INFO: Checking if should save position (AudioScreen)
-Data: {
-  "positionMillis": 3022,
-  "lastUpdate": 2014,
-  "timeSinceLastUpdate": 1008,
-  "shouldSave": true,
-  "isFirstSave": false
-}
-
-[2025-09-15T19:17:15.666Z] INFO: updateState called (AudioScreen)
-Data: {
-  "currentPosition": 3.022492988,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "forceSave": true
-}
-
-[2025-09-15T19:17:15.666Z] INFO: Saving final position on unmount (AudioScreen)
-Data: {
-  "position": 3.022492988
-}
-
-[2025-09-15T19:17:15.666Z] INFO: Component unmount effect triggered (AudioScreen)
-Data: {
-  "position": 3.022492988,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa"
-}
-
-[2025-09-15T19:17:15.477Z] INFO: App state changed (useTrackPlayer)
+[2025-09-15T19:29:09.008Z] INFO: App state changed (useTrackPlayer)
 Data: {
   "from": "inactive",
   "to": "background"
 }
 
-[2025-09-15T19:17:15.472Z] INFO: App moved to background, keeping watchdog running for auto-advance (useTrackPlayer)
+[2025-09-15T19:29:09.002Z] INFO: App moved to background, keeping watchdog running for auto-advance (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:15.472Z] INFO: App state changed (useTrackPlayer)
+[2025-09-15T19:29:09.002Z] INFO: App state changed (useTrackPlayer)
 Data: {
   "from": "active",
   "to": "inactive"
 }
 
-[2025-09-15T19:17:15.465Z] INFO: Starting playback watchdog (useTrackPlayer)
+[2025-09-15T19:29:08.993Z] INFO: Starting playback watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:15.465Z] INFO: App moved to foreground, restarting watchdog (useTrackPlayer)
+[2025-09-15T19:29:08.993Z] INFO: App moved to foreground, restarting watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:15.464Z] INFO: App state changed (useTrackPlayer)
+[2025-09-15T19:29:08.992Z] INFO: App state changed (useTrackPlayer)
 Data: {
   "from": "inactive",
   "to": "active"
 }
 
-[2025-09-15T19:17:14.665Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:08.743Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 2014,
+  "position": 2964,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:14.657Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:08.726Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 2014,
+  "position": 2964,
   "songIndex": 25,
-  "oldPosition": 2014
+  "oldPosition": 2964
 }
 
-[2025-09-15T19:17:14.657Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:08.726Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:14.657Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:08.726Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -2442,104 +2410,311 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:14.656Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:08.726Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
   "timeSinceLastUpdate": 2024,
   "required": 30000
 }
 
-[2025-09-15T19:17:14.656Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:08.726Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 3022,
-  "lastUpdate": 998,
+  "positionMillis": 3971,
+  "lastUpdate": 1947,
   "timeSinceLastUpdate": 2024,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:14.656Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:08.726Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 3.022492988,
+  "currentPosition": 3.971522736,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:14.656Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:08.725Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 3.022492988
+  "position": 3.971522736
 }
 
-[2025-09-15T19:17:14.656Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:08.725Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 3.022492988,
+  "position": 3.971522736,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:14.656Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:08.725Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 2014,
-  "lastUpdate": 998,
-  "timeSinceLastUpdate": 1016,
+  "positionMillis": 2964,
+  "lastUpdate": 1947,
+  "timeSinceLastUpdate": 1017,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:14.656Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:08.725Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 2.014265698,
+  "currentPosition": 2.964369134,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:14.656Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:08.725Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 2.014265698
+  "position": 2.964369134
 }
 
-[2025-09-15T19:17:14.656Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:08.725Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 2.014265698,
+  "position": 2.964369134,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:14.405Z] INFO: App moved to background, keeping watchdog running for auto-advance (useTrackPlayer)
+[2025-09-15T19:29:07.723Z] INFO: Position successfully saved to storage (AudioScreen)
+Data: {
+  "position": 1947,
+  "title": "Chanting Japa",
+  "totalSongsInStorage": 28
+}
+
+[2025-09-15T19:29:07.717Z] INFO: Updated song position in storage (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "position": 1947,
+  "songIndex": 25,
+  "oldPosition": 1947
+}
+
+[2025-09-15T19:29:07.717Z] INFO: Song data to save (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:07.717Z] INFO: Retrieved played songs from storage (AudioScreen)
+Data: {
+  "existingCount": 28,
+  "existingSongs": [
+    {
+      "title": "BKG - Camatkara Candrika-01 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-01_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-02 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-02_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Yamuna 01-04",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Yamuna_01-04.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Nandisvara 01-06",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Nandisvara_01-06.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Govardhan 01-05",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Govardhan_01-05.mp3"
+    },
+    {
+      "title": "02 - BKG Ananda Vrindavan Campu - Krishnas Appearance 02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/02_-_BKG_Ananda_Vrindavan_Campu_-_Krishnas_Appearance_02.mp3"
+    },
+    {
+      "title": "03 - BKG Ananda Vrindavan Campu - Putana 03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/03_-_BKG_Ananda_Vrindavan_Campu_-_Putana_03.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Vrindavan 01-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Vrindavan_01-02.mp3"
+    },
+    {
+      "title": "BKG - Camatkara Candrika-03 - Srila Visvanatha Cakravarti Thakur",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Camatkara_Candrika/BKG_-_Camatkara_Candrika-03_-_Srila_Visvanatha_Cakravarti_Thakur.mp3"
+    },
+    {
+      "title": "BKG BG 03 - 2012-01-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03_-_2012-01-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 12 - Overview - 2022-08-08 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-12/BKG_BG_12_-_Overview_-_2022-08-08_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Overview-8th Chapter of the Bhagavad Gita - 2022-07-25 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Overview-8th_Chapter_of_the_Bhagavad_Gita_-_2022-07-25_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-11 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-11_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Introduction to Bhagavad Gita - 2011-12-04 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Introduction_to_Bhagavad_Gita_-_2011-12-04_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG - Basic Summary - 2016-12-09 North Carolina",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Others/BKG_BG_-_Basic_Summary_-_2016-12-09_North_Carolina.mp3"
+    },
+    {
+      "title": "BKG BG 02-41 - Determination - 2021-09-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-02/BKG_BG_02-41_-_Determination_-_2021-09-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Mangal_Aarti_-_2008-11-07_Slovenia.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-01-Prologue",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-01-Prologue.mp3"
+    },
+    {
+      "title": "BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhajans/Various_Bhajans/BKG_Bhajans_-_Narsimha_Prayers_-_2008-11-08_Slovenia.mp3"
+    },
+    {
+      "title": "01 - BKG Ananda Vrindavan Campu - Seasons 01-03",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Ananda_Vrindavan_Campu/01_-_BKG_Ananda_Vrindavan_Campu_-_Seasons_01-03.mp3"
+    },
+    {
+      "title": "BKG BG 03-31 - Gita faith - 2011-07-04 Croatia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-03/BKG_BG_03-31_-_Gita_faith_-_2011-07-04_Croatia.mp3"
+    },
+    {
+      "title": "BKG BG 09-34 - How to always think of Krishna - 2011-07-06 Bosnia",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09-34_-_How_to_always_think_of_Krishna_-_2011-07-06_Bosnia.mp3"
+    },
+    {
+      "title": "BKG BG 09 - 2014-01-26 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_2014-01-26_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Introduction to the Ninth Chapter of Gita - 2013-12-01 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Introduction_to_the_Ninth_Chapter_of_Gita_-_2013-12-01_New_Goloka.mp3"
+    },
+    {
+      "title": "BKG BG 09 - Overview - 2022-11-28 New Goloka",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Bhagavad_Gita/Chapter-09/BKG_BG_09_-_Overview_-_2022-11-28_New_Goloka.mp3"
+    },
+    {
+      "title": "Chanting Japa",
+      "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-02-Interlude.mp3"
+    },
+    {
+      "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-03-Part-02",
+      "url": "https://audio.iskcondesiretree.com/02_-_ISKCON_Swamis/ISKCON_Swamis_-_A_to_C/His_Holiness_Bir_Krishna_Goswami/Audio_Books/Dana_Keli_Kaumudi/BKG_-_Dana_Keli_Kaumudi_by_Srila_Rupa_Goswami-03-Part-02.mp3"
+    }
+  ]
+}
+
+[2025-09-15T19:29:07.717Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+Data: {
+  "timeSinceLastUpdate": 2034,
+  "required": 30000
+}
+
+[2025-09-15T19:29:07.717Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 2964,
+  "lastUpdate": 930,
+  "timeSinceLastUpdate": 2034,
+  "shouldSave": false,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:07.717Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 2.964369134,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": false
+}
+
+[2025-09-15T19:29:07.717Z] INFO: Calling updateState from position change effect (AudioScreen)
+Data: {
+  "position": 2.964369134
+}
+
+[2025-09-15T19:29:07.716Z] INFO: Position change effect triggered (AudioScreen)
+Data: {
+  "position": 2.964369134,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:07.716Z] INFO: Checking if should save position (AudioScreen)
+Data: {
+  "positionMillis": 1947,
+  "lastUpdate": 930,
+  "timeSinceLastUpdate": 1017,
+  "shouldSave": true,
+  "isFirstSave": false
+}
+
+[2025-09-15T19:29:07.716Z] INFO: updateState called (AudioScreen)
+Data: {
+  "currentPosition": 1.9471149,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "forceSave": true
+}
+
+[2025-09-15T19:29:07.716Z] INFO: Saving final position on unmount (AudioScreen)
+Data: {
+  "position": 1.9471149
+}
+
+[2025-09-15T19:29:07.716Z] INFO: Component unmount effect triggered (AudioScreen)
+Data: {
+  "position": 1.9471149,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa"
+}
+
+[2025-09-15T19:29:07.592Z] INFO: App moved to background, keeping watchdog running for auto-advance (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:14.404Z] INFO: App state changed (useTrackPlayer)
+[2025-09-15T19:29:07.592Z] INFO: App state changed (useTrackPlayer)
 Data: {
   "from": "active",
   "to": "inactive"
 }
 
-[2025-09-15T19:17:13.661Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:06.724Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 998,
+  "position": 930,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:13.649Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:06.709Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 998,
+  "position": 930,
   "songIndex": 25,
-  "oldPosition": 998
+  "oldPosition": 930
 }
 
-[2025-09-15T19:17:13.649Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:06.709Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:13.649Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:06.709Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -2658,95 +2833,95 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:13.649Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
+[2025-09-15T19:29:06.709Z] INFO: Skipping save - not enough time elapsed (AudioScreen)
 Data: {
-  "timeSinceLastUpdate": 1016,
+  "timeSinceLastUpdate": 1017,
   "required": 30000
 }
 
-[2025-09-15T19:17:13.649Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:06.709Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 2014,
-  "lastUpdate": 998,
-  "timeSinceLastUpdate": 1016,
+  "positionMillis": 1947,
+  "lastUpdate": 930,
+  "timeSinceLastUpdate": 1017,
   "shouldSave": false,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:13.649Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:06.709Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 2.014265698,
+  "currentPosition": 1.9471149,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:13.649Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:06.709Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 2.014265698
+  "position": 1.9471149
 }
 
-[2025-09-15T19:17:13.648Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:06.708Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 2.014265698,
+  "position": 1.9471149,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:13.648Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:06.708Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 998,
-  "lastUpdate": 998,
+  "positionMillis": 930,
+  "lastUpdate": 930,
   "timeSinceLastUpdate": 0,
   "shouldSave": true,
   "isFirstSave": false
 }
 
-[2025-09-15T19:17:13.648Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:06.708Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 0.998033678,
+  "currentPosition": 0.930277702,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": true
 }
 
-[2025-09-15T19:17:13.648Z] INFO: Saving final position on unmount (AudioScreen)
+[2025-09-15T19:29:06.708Z] INFO: Saving final position on unmount (AudioScreen)
 Data: {
-  "position": 0.998033678
+  "position": 0.930277702
 }
 
-[2025-09-15T19:17:13.648Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:06.708Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
-  "position": 0.998033678,
+  "position": 0.930277702,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:12.646Z] INFO: Position successfully saved to storage (AudioScreen)
+[2025-09-15T19:29:05.708Z] INFO: Position successfully saved to storage (AudioScreen)
 Data: {
-  "position": 998,
+  "position": 930,
   "title": "Chanting Japa",
   "totalSongsInStorage": 28
 }
 
-[2025-09-15T19:17:12.641Z] INFO: Updated song position in storage (AudioScreen)
+[2025-09-15T19:29:05.705Z] INFO: Updated song position in storage (AudioScreen)
 Data: {
   "title": "Chanting Japa",
-  "position": 998,
+  "position": 930,
   "songIndex": 25,
-  "oldPosition": 998
+  "oldPosition": 930
 }
 
-[2025-09-15T19:17:12.641Z] INFO: Song data to save (AudioScreen)
+[2025-09-15T19:29:05.705Z] INFO: Song data to save (AudioScreen)
 Data: {
   "title": "Chanting Japa",
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:12.641Z] INFO: Retrieved played songs from storage (AudioScreen)
+[2025-09-15T19:29:05.705Z] INFO: Retrieved played songs from storage (AudioScreen)
 Data: {
   "existingCount": 28,
   "existingSongs": [
@@ -2865,45 +3040,45 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:12.634Z] INFO: Checking if should save position (AudioScreen)
+[2025-09-15T19:29:05.690Z] INFO: Checking if should save position (AudioScreen)
 Data: {
-  "positionMillis": 998,
+  "positionMillis": 930,
   "lastUpdate": 0,
-  "timeSinceLastUpdate": 998,
+  "timeSinceLastUpdate": 930,
   "shouldSave": true,
   "isFirstSave": true
 }
 
-[2025-09-15T19:17:12.634Z] INFO: updateState called (AudioScreen)
+[2025-09-15T19:29:05.690Z] INFO: updateState called (AudioScreen)
 Data: {
-  "currentPosition": 0.998033678,
+  "currentPosition": 0.930277702,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "forceSave": false
 }
 
-[2025-09-15T19:17:12.634Z] INFO: Calling updateState from position change effect (AudioScreen)
+[2025-09-15T19:29:05.690Z] INFO: Calling updateState from position change effect (AudioScreen)
 Data: {
-  "position": 0.998033678
+  "position": 0.930277702
 }
 
-[2025-09-15T19:17:12.633Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:05.690Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
-  "position": 0.998033678,
+  "position": 0.930277702,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:12.633Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:05.690Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
   "position": 0,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:11.533Z] DEBUG: AudioScreen state changed (AudioScreen)
+[2025-09-15T19:29:04.657Z] DEBUG: AudioScreen state changed (AudioScreen)
 Data: {
   "isPlaying": true,
   "isLoading": false,
@@ -2911,31 +3086,45 @@ Data: {
   "playlistLength": 0
 }
 
-[2025-09-15T19:17:11.533Z] INFO: Playback state changed (useTrackPlayer)
+[2025-09-15T19:29:04.656Z] INFO: Playback state changed (useTrackPlayer)
 Data: {
   "from": "paused",
   "to": "playing"
 }
 
-[2025-09-15T19:17:11.530Z] DEBUG: TrackPlayer event received (useTrackPlayer)
+[2025-09-15T19:29:04.654Z] DEBUG: AudioScreen state changed (AudioScreen)
+Data: {
+  "isPlaying": false,
+  "isLoading": false,
+  "currentIndex": 0,
+  "playlistLength": 0
+}
+
+[2025-09-15T19:29:04.654Z] DEBUG: TrackPlayer event received (useTrackPlayer)
 Data: {
   "type": "playback-state",
   "state": "playing"
 }
 
-[2025-09-15T19:17:11.530Z] DEBUG: TrackPlayer event received (useTrackPlayer)
+[2025-09-15T19:29:04.654Z] INFO: Playback state changed (useTrackPlayer)
+Data: {
+  "from": "playing",
+  "to": "paused"
+}
+
+[2025-09-15T19:29:04.649Z] DEBUG: TrackPlayer event received (useTrackPlayer)
 Data: {
   "type": "playback-state",
   "state": "ready"
 }
 
-[2025-09-15T19:17:11.141Z] DEBUG: Width changed (AudioScreen)
+[2025-09-15T19:29:04.192Z] DEBUG: Width changed (AudioScreen)
 Data: {
   "width": 430,
   "previousWidth": 430
 }
 
-[2025-09-15T19:17:10.626Z] INFO: Track change effect triggered (AudioScreen)
+[2025-09-15T19:29:03.673Z] INFO: Track change effect triggered (AudioScreen)
 Data: {
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa",
@@ -2943,14 +3132,14 @@ Data: {
   "position": 0
 }
 
-[2025-09-15T19:17:10.626Z] INFO: Not calling updateState (AudioScreen)
+[2025-09-15T19:29:03.673Z] INFO: Not calling updateState (AudioScreen)
 Data: {
   "position": 0,
   "hasCurrentTrack": true,
   "reason": "position <= 0"
 }
 
-[2025-09-15T19:17:10.626Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:03.673Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
   "position": 0,
   "hasCurrentTrack": true,
@@ -2958,25 +3147,105 @@ Data: {
   "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:10.626Z] INFO: Component unmount effect triggered (AudioScreen)
+[2025-09-15T19:29:03.673Z] INFO: Component unmount effect triggered (AudioScreen)
 Data: {
   "position": 0,
   "hasCurrentTrack": true,
   "currentTrackTitle": "Chanting Japa"
 }
 
-[2025-09-15T19:17:10.626Z] INFO: Track loaded callback (AudioScreen)
+[2025-09-15T19:29:03.673Z] INFO: Track loaded callback (AudioScreen)
 Data: {
   "loaded": true
 }
 
-[2025-09-15T19:17:10.624Z] INFO: Track changed (useTrackPlayer)
+[2025-09-15T19:29:03.669Z] INFO: Track changed (useTrackPlayer)
 Data: {
   "track": "Chanting Japa",
   "trackIndex": 0
 }
 
-[2025-09-15T19:17:10.619Z] INFO: Played songs loaded from storage (AudioScreen)
+[2025-09-15T19:29:03.669Z] DEBUG: AudioScreen state changed (AudioScreen)
+Data: {
+  "isPlaying": true,
+  "isLoading": false,
+  "currentIndex": 0,
+  "playlistLength": 0
+}
+
+[2025-09-15T19:29:03.669Z] DEBUG: Width changed (AudioScreen)
+Data: {
+  "width": 430,
+  "previousWidth": 430
+}
+
+[2025-09-15T19:29:03.669Z] INFO: Single track loaded successfully (AudioScreen)
+Data: {
+  "title": "Chanting Japa",
+  "savedPosition": 0
+}
+
+[2025-09-15T19:29:03.662Z] INFO: Track change effect triggered (AudioScreen)
+Data: {
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
+  "position": 0
+}
+
+[2025-09-15T19:29:03.662Z] INFO: Not calling updateState (AudioScreen)
+Data: {
+  "position": 0,
+  "hasCurrentTrack": true,
+  "reason": "position <= 0"
+}
+
+[2025-09-15T19:29:03.662Z] INFO: Position change effect triggered (AudioScreen)
+Data: {
+  "position": 0,
+  "hasCurrentTrack": true,
+  "currentTrackTitle": "Chanting Japa",
+  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
+}
+
+[2025-09-15T19:29:03.662Z] INFO: Component unmount effect triggered (AudioScreen)
+Data: {
+  "position": 0,
+  "hasCurrentTrack": false
+}
+
+[2025-09-15T19:29:03.662Z] DEBUG: AudioScreen state changed (AudioScreen)
+Data: {
+  "isPlaying": true,
+  "isLoading": true,
+  "currentIndex": 0,
+  "playlistLength": 0
+}
+
+[2025-09-15T19:29:03.662Z] INFO: Track loaded and started playing (useTrackPlayer)
+Data: {
+  "trackTitle": "Chanting Japa"
+}
+
+[2025-09-15T19:29:03.661Z] DEBUG: TrackPlayer event received (useTrackPlayer)
+Data: {
+  "type": "playback-state",
+  "state": "buffering"
+}
+
+[2025-09-15T19:29:03.661Z] DEBUG: TrackPlayer event received (useTrackPlayer)
+Data: {
+  "type": "playback-track-changed",
+  "nextTrack": 0
+}
+
+[2025-09-15T19:29:03.661Z] DEBUG: TrackPlayer event received (useTrackPlayer)
+Data: {
+  "type": "playback-state",
+  "state": "loading"
+}
+
+[2025-09-15T19:29:03.657Z] INFO: Played songs loaded from storage (AudioScreen)
 Data: {
   "songCount": 28,
   "songs": [
@@ -3108,7 +3377,7 @@ Data: {
     {
       "title": "Chanting Japa",
       "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-      "position": 21070
+      "position": 2919
     },
     {
       "title": "BKG - Dana Keli Kaumudi by Srila Rupa Goswami-02-Interlude",
@@ -3123,161 +3392,67 @@ Data: {
   ]
 }
 
-[2025-09-15T19:17:10.619Z] DEBUG: TrackPlayer event received (useTrackPlayer)
-Data: {
-  "type": "playback-state",
-  "state": "buffering"
-}
-
-[2025-09-15T19:17:10.619Z] DEBUG: TrackPlayer event received (useTrackPlayer)
-Data: {
-  "type": "playback-track-changed",
-  "nextTrack": 0
-}
-
-[2025-09-15T19:17:10.619Z] DEBUG: AudioScreen state changed (AudioScreen)
-Data: {
-  "isPlaying": false,
-  "isLoading": false,
-  "currentIndex": 0,
-  "playlistLength": 0
-}
-
-[2025-09-15T19:17:10.619Z] INFO: Playback state changed (useTrackPlayer)
-Data: {
-  "from": "playing",
-  "to": "paused"
-}
-
-[2025-09-15T19:17:10.616Z] DEBUG: AudioScreen state changed (AudioScreen)
-Data: {
-  "isPlaying": true,
-  "isLoading": false,
-  "currentIndex": 0,
-  "playlistLength": 0
-}
-
-[2025-09-15T19:17:10.616Z] DEBUG: Width changed (AudioScreen)
-Data: {
-  "width": 430,
-  "previousWidth": 430
-}
-
-[2025-09-15T19:17:10.616Z] DEBUG: TrackPlayer event received (useTrackPlayer)
-Data: {
-  "type": "playback-state",
-  "state": "loading"
-}
-
-[2025-09-15T19:17:10.616Z] INFO: Single track loaded successfully (AudioScreen)
-Data: {
-  "title": "Chanting Japa",
-  "savedPosition": 0
-}
-
-[2025-09-15T19:17:10.611Z] INFO: Track change effect triggered (AudioScreen)
-Data: {
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
-  "position": 0
-}
-
-[2025-09-15T19:17:10.611Z] INFO: Not calling updateState (AudioScreen)
-Data: {
-  "position": 0,
-  "hasCurrentTrack": true,
-  "reason": "position <= 0"
-}
-
-[2025-09-15T19:17:10.611Z] INFO: Position change effect triggered (AudioScreen)
-Data: {
-  "position": 0,
-  "hasCurrentTrack": true,
-  "currentTrackTitle": "Chanting Japa",
-  "currentTrackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
-}
-
-[2025-09-15T19:17:10.611Z] INFO: Component unmount effect triggered (AudioScreen)
-Data: {
-  "position": 0,
-  "hasCurrentTrack": false
-}
-
-[2025-09-15T19:17:10.611Z] DEBUG: AudioScreen state changed (AudioScreen)
-Data: {
-  "isPlaying": true,
-  "isLoading": true,
-  "currentIndex": 0,
-  "playlistLength": 0
-}
-
-[2025-09-15T19:17:10.610Z] INFO: Track loaded and started playing (useTrackPlayer)
-Data: {
-  "trackTitle": "Chanting Japa"
-}
-
-[2025-09-15T19:17:10.600Z] DEBUG: TrackPlayer event received (useTrackPlayer)
+[2025-09-15T19:29:03.644Z] DEBUG: TrackPlayer event received (useTrackPlayer)
 Data: {
   "type": "playback-state",
   "state": "none"
 }
 
-[2025-09-15T19:17:10.600Z] INFO: Track stopped (useTrackPlayer)
+[2025-09-15T19:29:03.643Z] INFO: Track stopped (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:10.600Z] DEBUG: TrackPlayer event received (useTrackPlayer)
+[2025-09-15T19:29:03.643Z] DEBUG: TrackPlayer event received (useTrackPlayer)
 Data: {
   "type": "playback-state",
   "state": "stopped"
 }
 
-[2025-09-15T19:17:10.600Z] INFO: Starting playback watchdog (useTrackPlayer)
+[2025-09-15T19:29:03.643Z] INFO: Starting playback watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:10.600Z] INFO: Audio session reactivated successfully (useTrackPlayer)
+[2025-09-15T19:29:03.643Z] INFO: Audio session reactivated successfully (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:10.599Z] INFO: Starting playback watchdog (useTrackPlayer)
+[2025-09-15T19:29:03.642Z] INFO: Starting playback watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:10.599Z] INFO: App moved to foreground, restarting watchdog (useTrackPlayer)
+[2025-09-15T19:29:03.642Z] INFO: App moved to foreground, restarting watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:10.599Z] INFO: App state changed (useTrackPlayer)
+[2025-09-15T19:29:03.642Z] INFO: App state changed (useTrackPlayer)
 Data: {
   "from": "inactive",
   "to": "active"
 }
 
-[2025-09-15T19:17:10.599Z] INFO: Navigation changed (Navigation)
+[2025-09-15T19:29:03.642Z] INFO: Navigation changed (Navigation)
 Data: {
   "pathname": "/AudioScreen"
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Track change effect triggered (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: Track change effect triggered (AudioScreen)
 Data: {
   "hasCurrentTrack": false,
   "position": 0
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Not calling updateState (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: Not calling updateState (AudioScreen)
 Data: {
   "position": 0,
   "hasCurrentTrack": false,
   "reason": "no current track"
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Position change effect triggered (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: Position change effect triggered (AudioScreen)
 Data: {
   "position": 0,
   "hasCurrentTrack": false
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Loading played songs from storage (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: Loading played songs from storage (AudioScreen)
 Data: {}
 
-[2025-09-15T19:17:10.594Z] INFO: Loading track (useTrackPlayer)
+[2025-09-15T19:29:03.635Z] INFO: Loading track (useTrackPlayer)
 Data: {
   "trackTitle": "Chanting Japa",
   "trackUrl": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
@@ -3288,25 +3463,25 @@ Data: {
   "platform": "ios"
 }
 
-[2025-09-15T19:17:10.594Z] INFO: PlayedSongs not loaded yet, starting from beginning (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: PlayedSongs not loaded yet, starting from beginning (AudioScreen)
 Data: {
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3"
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Looking for saved position (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: Looking for saved position (AudioScreen)
 Data: {
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "playedSongsCount": 0,
   "playedSongs": []
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Loading single track (no playlist/category) (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: Loading single track (no playlist/category) (AudioScreen)
 Data: {
   "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
   "title": "Chanting Japa"
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Initializing playlist (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: Initializing playlist (AudioScreen)
 Data: {
   "hasPlaylist": false,
   "hasCategory": false,
@@ -3316,7 +3491,7 @@ Data: {
   "hasTitle": true
 }
 
-[2025-09-15T19:17:10.594Z] DEBUG: AudioScreen state changed (AudioScreen)
+[2025-09-15T19:29:03.635Z] DEBUG: AudioScreen state changed (AudioScreen)
 Data: {
   "isPlaying": false,
   "isLoading": true,
@@ -3324,19 +3499,19 @@ Data: {
   "playlistLength": 0
 }
 
-[2025-09-15T19:17:10.594Z] INFO: Ensuring audio session is active (useTrackPlayer)
+[2025-09-15T19:29:03.635Z] INFO: Ensuring audio session is active (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:10.594Z] INFO: Setting up audio session and watchdog (useTrackPlayer)
+[2025-09-15T19:29:03.635Z] INFO: Setting up audio session and watchdog (useTrackPlayer)
 Data: {}
 
-[2025-09-15T19:17:10.594Z] INFO: useTrackPlayer hook initialized (useTrackPlayer)
+[2025-09-15T19:29:03.635Z] INFO: useTrackPlayer hook initialized (useTrackPlayer)
 Data: {
   "hasOnTrackLoaded": true,
   "initialAppState": "inactive"
 }
 
-[2025-09-15T19:17:10.594Z] INFO: AudioScreen initialized (AudioScreen)
+[2025-09-15T19:29:03.635Z] INFO: AudioScreen initialized (AudioScreen)
 Data: {
   "file": {
     "url": "https://atourcity.com/bkgoswami.com/wp/wp-content/uploads/Original_Miami_Japa_1981.mp3",
@@ -3349,41 +3524,46 @@ Data: {
   "debugMode": true
 }
 
-[2025-09-15T19:17:08.016Z] INFO: Navigation changed (Navigation)
+[2025-09-15T19:29:00.870Z] INFO: Navigation changed (Navigation)
 Data: {
   "pathname": "/ChantingScreen"
 }
 
-[2025-09-15T19:17:06.614Z] INFO: Background fetch registered (BackgroundFetch)
+[2025-09-15T19:28:53.701Z] INFO: Background fetch registered (BackgroundFetch)
 Data: {}
 
-[2025-09-15T19:17:06.529Z] INFO: TrackPlayer setup complete with background capabilities (TrackPlayer)
+[2025-09-15T19:28:53.693Z] INFO: TrackPlayer setup complete with background capabilities (TrackPlayer)
 Data: {
   "platform": "ios"
 }
 
-[2025-09-15T19:17:06.496Z] INFO: Fonts loaded successfully (AppLayout)
+[2025-09-15T19:28:53.668Z] INFO: Fonts loaded successfully (AppLayout)
 Data: {
   "fontCount": 5
 }
 
-[2025-09-15T19:17:06.496Z] INFO: App started (AppStart)
+[2025-09-15T19:28:53.668Z] INFO: App started (AppStart)
 Data: {
   "isDebugEnabled": true,
   "platform": "ios",
-  "timestamp": "2025-09-15T19:17:06.496Z"
+  "timestamp": "2025-09-15T19:28:53.668Z"
 }
 
-[2025-09-15T19:17:06.496Z] INFO: Navigation changed (Navigation)
+[2025-09-15T19:28:53.668Z] INFO: Navigation changed (Navigation)
 Data: {
   "pathname": "/"
 }
 
-[2025-09-15T19:17:06.496Z] INFO: Drawer rendered (Drawer)
+[2025-09-15T19:28:53.668Z] INFO: Drawer rendered (Drawer)
 Data: {
   "isDebugEnabled": true,
   "orientation": "PORTRAIT",
   "platform": "ios"
 }
 
-[2025-09-15T19:17:06.471Z] DEBUG: App not loaded yet, waiting for fonts (AppLayout)
+[2025-09-15T19:28:53.644Z] DEBUG: App not loaded yet, waiting for fonts (AppLayout)
+
+[2025-09-15T19:28:43.590Z] INFO: Navigation changed (Navigation)
+Data: {
+  "pathname": "/"
+}

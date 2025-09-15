@@ -10,16 +10,16 @@ import App from './App';
 registerRootComponent(App);
 
 // Register TrackPlayer service AFTER registerRootComponent (like BKGAudio)
+logger.info('INDEX.JS: About to register TrackPlayer service', {}, 'Index');
 
-logger.info('About to register TrackPlayer service...', {}, 'Index');
 try {
   TrackPlayer.registerPlaybackService(() => {
-    logger.info('TrackPlayer service function called', {}, 'Index');
-    return require('./service.js');
+    logger.info('INDEX.JS: TrackPlayer service function called', {}, 'Index');
+    return require('./service');
   });
-  logger.info('TrackPlayer service registered successfully', {}, 'Index');
+  logger.info('INDEX.JS: TrackPlayer service registered successfully', {}, 'Index');
 } catch (error) {
-  logger.error('Failed to register TrackPlayer service', { 
+  logger.error('INDEX.JS: Failed to register TrackPlayer service', { 
     error: error instanceof Error ? error.message : String(error) 
   }, 'Index');
 }
