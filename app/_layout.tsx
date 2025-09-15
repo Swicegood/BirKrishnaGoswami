@@ -70,26 +70,22 @@ export default function RootLayout() {
           autoHandleInterruptions: true,
         });
         
-        // Configure capabilities for background playback
+        // Configure capabilities for background playback including seek/jump
         await TrackPlayer.updateOptions({
           capabilities: [
             Capability.Play,
             Capability.Pause,
             Capability.SkipToNext,
             Capability.SkipToPrevious,
-            Capability.Stop,
+            Capability.SeekTo,
           ],
           compactCapabilities: [
             Capability.Play,
             Capability.Pause,
             Capability.SkipToNext,
-          ],
-          notificationCapabilities: [
-            Capability.Play,
-            Capability.Pause,
-            Capability.SkipToNext,
             Capability.SkipToPrevious,
           ],
+          progressUpdateEventInterval: 1,
         });
         
         logger.info('TrackPlayer setup complete with background capabilities', { platform: Platform.OS }, 'TrackPlayer');

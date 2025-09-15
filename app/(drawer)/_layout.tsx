@@ -97,14 +97,6 @@ function CustomDrawerContent() {
                 <Ionicons name='newspaper-outline' size={18} color='black' />    News
             </Text>
             </Link>
-            {/* Debug logs enabled for debug builds */}
-            {debugMode && (
-              <Link href="../DebugLogsScreen" asChild>
-                <Text style={[styles.drawerText, { backgroundColor: '#FFF3CD', padding: 8, borderRadius: 5, borderWidth: 1, borderColor: '#FF9500' }]}>
-                  <Ionicons name='bug-outline' size={18} color='#FF9500' />    Debug Logs
-                </Text>
-              </Link>
-            )}
             {isApple ?
                   <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
                     <Text style={styles.drawerText}>
@@ -113,6 +105,14 @@ function CustomDrawerContent() {
                   </Link>
                   : null
                 }
+            {/* Hidden debug link at bottom of white section */}
+            <View style={{ position: 'absolute', bottom: 10, left: 40 }}>
+              <Link href="../DebugLogsScreen" asChild>
+                <Text style={{ color: '#FFFFFF', backgroundColor: '#FFFFFF', fontSize: 12, padding: 4 }}>
+                  Debug Logs
+                </Text>
+              </Link>
+            </View>
           </View>
         ) : (
           <View style={styles.content}>
@@ -133,14 +133,6 @@ function CustomDrawerContent() {
                   <Ionicons name='newspaper-outline' size={18} color='black' />    News
                 </Text>
               </Link>
-              {/* Debug logs enabled for debug builds */}
-              {debugMode && (
-                <Link href="../DebugLogsScreen" asChild>
-                  <Text style={[styles.drawerText, { backgroundColor: '#FFF3CD', padding: 8, borderRadius: 5, borderWidth: 1, borderColor: '#FF9500' }]}>
-                    <Ionicons name='bug-outline' size={18} color='#FF9500' />    Debug Logs
-                  </Text>
-                </Link>
-              )}
                 {isApple ?
                    <Link href="https://apps.apple.com/us/app/apple-store/6449051568" asChild>
                    <Text style={{ ...styles.drawerText, paddingLeft: 40 }}>
@@ -149,6 +141,14 @@ function CustomDrawerContent() {
                </Link>
                   : null
                 }
+            </View>
+            {/* Hidden debug link at bottom of white section */}
+            <View style={{ position: 'absolute', bottom: 10, left: 40 }}>
+              <Link href="../DebugLogsScreen" asChild>
+                <Text style={{ color: '#FFFFFF', backgroundColor: '#FFFFFF', fontSize: 12, padding: 4 }}>
+                  Debug Logs
+                </Text>
+              </Link>
             </View>
           </View>
         )}

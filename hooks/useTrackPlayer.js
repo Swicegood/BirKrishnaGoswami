@@ -32,24 +32,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     }, 'useTrackPlayer');
   }, []);
 
-  const ensureAudioSessionActive = async () => {
-    logger.info('Ensuring audio session is active', {}, 'useTrackPlayer');
-    try {
-      await Audio.setAudioModeAsync({
-        staysActiveInBackground: true,
-        interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-        playsInSilentModeIOS: true,
-        shouldDuckAndroid: true,
-        interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
-        playThroughEarpieceAndroid: false,
-      });
-      logger.info('Audio session reactivated successfully', {}, 'useTrackPlayer');
-    } catch (error) {
-      logger.error('Error reactivating audio session', { 
-        error: error instanceof Error ? error.message : String(error) 
-      }, 'useTrackPlayer');
-    }
-  };
+  // Audio session management removed - handled by service.js to prevent conflicts
 
   const startPlaybackWatchdog = () => {
     logger.info('Starting playback watchdog', {}, 'useTrackPlayer');
@@ -110,7 +93,7 @@ const useTrackPlayer = (onTrackLoaded) => {
   useEffect(() => {
     const setupAudioAndWatchdog = async () => {
       logger.info('Setting up audio session and watchdog', {}, 'useTrackPlayer');
-      await ensureAudioSessionActive();
+      // Audio session management removed - handled by service.js
       
       // Start the watchdog
       watchdogIntervalRef.current = startPlaybackWatchdog();
@@ -658,7 +641,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     cleanup,
     
     // Utilities
-    ensureAudioSessionActive,
+    // ensureAudioSessionActive removed - handled by service.js
   };
 };
 

@@ -136,15 +136,24 @@ class Logger {
           console.log(logMessage, data);
       }
     }
+
+    // Always mirror TrackPlayerService logs to the native console so they appear in device logs
+    if (source === 'TrackPlayerService') {
+      const svcMsg = `[${logEntry.timestamp.toISOString()}] ${level.toUpperCase()} [TrackPlayerService]: ${message}`;
+      if (level === 'error') console.error(svcMsg, data);
+      else if (level === 'warn') console.warn(svcMsg, data);
+      else if (level === 'debug') console.debug(svcMsg, data);
+      else console.log(svcMsg, data);
+    }
   }
 
   private isCriticalLog(message: string, source?: string): boolean {
     const criticalKeywords = [
       'loading', 'error', 'failed', 'timeout', 'crash', 'hang', 'stuck',
-      'initialization', 'trackplayer', 'audioscreen', 'playlist'
+      'initialization', 'trackplayer', 'audioscreen', 'playlist', 'remote'
     ];
     
-    const criticalSources = ['useTrackPlayer', 'AudioScreen'];
+    const criticalSources = ['useTrackPlayer', 'AudioScreen', 'TrackPlayerService'];
     
     const messageLower = message.toLowerCase();
     const sourceLower = source?.toLowerCase() || '';

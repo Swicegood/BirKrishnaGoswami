@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   },
   levelFilter: {
     backgroundColor: '#fff',
-    paddingVertical: 12,
+    paddingVertical: 4,
     paddingHorizontal: 16,
   },
   levelButton: {

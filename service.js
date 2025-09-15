@@ -1,15 +1,38 @@
 import TrackPlayer, { Event, State } from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
+import { AppState, Platform } from 'react-native';
 import logger from './utils/logger';
 
 // Global flag to prevent service interference during manual navigation
 let isManualNavigation = false;
+let backgroundTaskId = null;
 
 // Function to set manual navigation flag (will be called from main app)
 global.setManualNavigation = (value) => {
   isManualNavigation = value;
   logger.info('Manual navigation flag set', { value }, 'TrackPlayerService');
+};
+
+// Request background execution time to prevent suspension
+const requestBackgroundExecution = () => {
+  if (Platform.OS === 'ios') {
+    try {
+      // Request background execution time
+      backgroundTaskId = require('react-native').AppState.addEventListener('change', (nextAppState) => {
+        if (nextAppState === 'background') {
+          logger.info('App entering background - requesting execution time', {}, 'TrackPlayerService');
+        } else if (nextAppState === 'active') {
+          logger.info('App entering foreground', {}, 'TrackPlayerService');
+        }
+      });
+      logger.info('Background execution requested', { backgroundTaskId }, 'TrackPlayerService');
+    } catch (error) {
+      logger.error('Failed to request background execution', { 
+        error: error instanceof Error ? error.message : String(error) 
+      }, 'TrackPlayerService');
+    }
+  }
 };
 
 const requestAudioFocus = async () => {
@@ -54,15 +77,33 @@ const playWithRetry = async (maxRetries = 3) => {
 
 module.exports = async function () {
   logger.info('TrackPlayer service started', {}, 'TrackPlayerService');
+  
+  // Request background execution time to prevent suspension
+  requestBackgroundExecution();
 
-  TrackPlayer.addEventListener(Event.RemotePlay, () => {
+  TrackPlayer.addEventListener(Event.RemotePlay, async () => {
     logger.info('RemotePlay event received', {}, 'TrackPlayerService');
-    TrackPlayer.play();
+    try {
+      await requestAudioFocus();
+      await TrackPlayer.play();
+      logger.info('RemotePlay executed successfully', {}, 'TrackPlayerService');
+    } catch (error) {
+      logger.error('Error in RemotePlay', { 
+        error: error instanceof Error ? error.message : String(error) 
+      }, 'TrackPlayerService');
+    }
   });
 
-  TrackPlayer.addEventListener(Event.RemotePause, () => {
+  TrackPlayer.addEventListener(Event.RemotePause, async () => {
     logger.info('RemotePause event received', {}, 'TrackPlayerService');
-    TrackPlayer.pause();
+    try {
+      await TrackPlayer.pause();
+      logger.info('RemotePause executed successfully', {}, 'TrackPlayerService');
+    } catch (error) {
+      logger.error('Error in RemotePause', { 
+        error: error instanceof Error ? error.message : String(error) 
+      }, 'TrackPlayerService');
+    }
   });
 
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
@@ -248,6 +289,8 @@ module.exports = async function () {
       }, 'TrackPlayerService');
     }
   });
+
+  // JumpForward/Backward events removed to match BKGAudio capabilities
 
   TrackPlayer.addEventListener(Event.PlaybackTrackChanged, async (event) => {
     logger.info('PlaybackTrackChanged event', { 

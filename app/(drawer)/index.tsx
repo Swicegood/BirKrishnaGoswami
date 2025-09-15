@@ -21,6 +21,8 @@ import NotificationHandler from '../api/notifications';
 import { db } from '../api/firebase';
 import GuageView from '../../components/GuageView';
 import * as SafeAreaViewContext from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import logger from '../../utils/logger';
 
 const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
 
@@ -113,6 +115,42 @@ export default function TabOneScireen() {
     }
 
     fetchWhatsAppUrl();
+  }, []);
+
+  // Clean up logs older than 24 hours when home screen renders
+  useEffect(() => {
+    const cleanupOldLogs = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@debug_logs');
+        if (jsonValue !== null) {
+          const logs = JSON.parse(jsonValue);
+          const now = Date.now();
+          const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000); // 24 hours in milliseconds
+          
+          // Filter out logs older than 24 hours
+          const recentLogs = logs.filter((log: any) => {
+            const logTime = new Date(log.timestamp).getTime();
+            return logTime > twentyFourHoursAgo;
+          });
+          
+          // Only update storage if we actually removed some logs
+          if (recentLogs.length < logs.length) {
+            await AsyncStorage.setItem('@debug_logs', JSON.stringify(recentLogs));
+            logger.info('Cleaned up old debug logs', {
+              originalCount: logs.length,
+              remainingCount: recentLogs.length,
+              removedCount: logs.length - recentLogs.length
+            }, 'HomeScreen');
+          }
+        }
+      } catch (error) {
+        logger.error('Error cleaning up old debug logs', {
+          error: error instanceof Error ? error.message : String(error)
+        }, 'HomeScreen');
+      }
+    };
+
+    cleanupOldLogs();
   }, []);
 
 
