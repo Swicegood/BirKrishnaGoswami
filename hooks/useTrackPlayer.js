@@ -32,68 +32,58 @@ const useTrackPlayer = (onTrackLoaded) => {
     }, 'useTrackPlayer');
   }, []);
 
-  // Audio session management removed - handled by service.js to prevent conflicts
+  const ensureAudioSessionActive = async () => {
+    logger.info('Ensuring audio session is active', {}, 'useTrackPlayer');
+    try {
+      await Audio.setAudioModeAsync({
+        staysActiveInBackground: true,
+        interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+        playThroughEarpieceAndroid: false,
+      });
+      logger.info('Audio session reactivated successfully', {}, 'useTrackPlayer');
+    } catch (error) {
+      logger.error('Error reactivating audio session', { 
+        error: error instanceof Error ? error.message : String(error) 
+      }, 'useTrackPlayer');
+    }
+  };
 
   const startPlaybackWatchdog = () => {
     logger.info('Starting playback watchdog', {}, 'useTrackPlayer');
     
-    // Clear any existing progress interval
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
+    // Clear any existing watchdog first
+    if (watchdogIntervalRef.current) {
+      clearInterval(watchdogIntervalRef.current);
     }
     
-    return setInterval(async () => {
+    watchdogIntervalRef.current = setInterval(async () => {
       try {
         const playerState = await TrackPlayer.getState();
-        
-        // Check for stopped state which indicates track completion
-        if (playerState === State.Stopped) {
-          logger.info('Watchdog detected track stopped, attempting to advance', {
-            state: playerState,
-            appState: appState.current
-          }, 'useTrackPlayer');
-          await goToNextTrack();
-          return;
-        }
-        
-        if (playerState === State.Playing) {
-          const currentTrackIndex = await TrackPlayer.getCurrentTrack();
-          if (currentTrackIndex !== null) {
-            const track = await TrackPlayer.getTrack(currentTrackIndex);
-            if (track) {
-              const position = await TrackPlayer.getPosition();
-              const duration = await TrackPlayer.getDuration();
-              
-              // Check if track has ended (more lenient threshold)
-              // Only advance if we're actually near the end AND have played for at least 10 seconds
-              // AND at least 30 seconds have passed since the track started
-              const remainingTime = duration - position;
-              const timeSinceStart = Date.now() - lastTrackStartTime.current;
-              if (duration > 0 && remainingTime <= 2 && position > 10 && timeSinceStart > 30000) {
-                logger.info('Watchdog detected track near end, advancing to next', {
-                  track: track.title,
-                  position,
-                  duration,
-                  remaining: remainingTime,
-                  timeSinceStart
-                }, 'useTrackPlayer');
-                await goToNextTrack();
-              }
-            }
-          }
+        if (playerState === State.Ready && !hasAutoPlayedOnce.current) {
+          logger.info('Player ready but not playing, attempting to resume (first load only)', {}, 'useTrackPlayer');
+          await ensureAudioSessionActive();
+          await TrackPlayer.play();
+          hasAutoPlayedOnce.current = true;
+        } else if (playerState === State.Ready) {
+          logger.info('Player ready but not auto-resuming (not first load)', {}, 'useTrackPlayer');
         }
       } catch (error) {
-        logger.error('Watchdog error', { 
+        logger.error('Error in playback watchdog', { 
           error: error instanceof Error ? error.message : String(error) 
         }, 'useTrackPlayer');
       }
-    }, 3000); // Increased interval to 3 seconds
+    }, 5000); // Check every 5 seconds
+    
+    return watchdogIntervalRef.current;
   };
 
   useEffect(() => {
     const setupAudioAndWatchdog = async () => {
       logger.info('Setting up audio session and watchdog', {}, 'useTrackPlayer');
-      // Audio session management removed - handled by service.js
+      await ensureAudioSessionActive();
       
       // Start the watchdog
       watchdogIntervalRef.current = startPlaybackWatchdog();
@@ -641,7 +631,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     cleanup,
     
     // Utilities
-    // ensureAudioSessionActive removed - handled by service.js
+    ensureAudioSessionActive,
   };
 };
 
