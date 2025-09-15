@@ -1,3 +1,5 @@
+// Service file loaded - this will be logged when the module is required
+
 import TrackPlayer, { Event, State } from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
@@ -76,6 +78,7 @@ const playWithRetry = async (maxRetries = 3) => {
 };
 
 module.exports = async function () {
+  logger.info('TrackPlayer service module loaded and function called', {}, 'TrackPlayerService');
   logger.info('TrackPlayer service started', {}, 'TrackPlayerService');
   
   // Request background execution time to prevent suspension
