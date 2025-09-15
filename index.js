@@ -1,5 +1,6 @@
 import { registerRootComponent } from 'expo';
 import TrackPlayer from 'react-native-track-player';
+import logger from './utils/logger';
 
 import App from './App';
 
@@ -9,7 +10,6 @@ import App from './App';
 registerRootComponent(App);
 
 // Register TrackPlayer service AFTER registerRootComponent (like BKGAudio)
-import logger from './utils/logger';
 
 logger.info('About to register TrackPlayer service...', {}, 'Index');
 try {
