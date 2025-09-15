@@ -43,7 +43,7 @@ class Logger {
       });
       
       // Enable debug mode for debug-preview builds
-      const forceDebugMode = true;
+      const forceDebugMode = isDebugMode;
       console.log('FORCE DEBUG MODE:', forceDebugMode);
       
       // Enable debug logging for debug-preview builds

@@ -368,8 +368,8 @@ const AudioScreen = () => {
 
           const categoryFiles = categorizedFiles.filter((fileItem: any) => fileItem.category === file.category);
           
-          // Sort alphabetically by title for consistent ordering
-          categoryFiles.sort((a: any, b: any) => a.title.localeCompare(b.title));
+          // Don't sort - keep the same order as FilesScreen (database order)
+          // This ensures consistent play order between FilesScreen and AudioScreen
           
           // Find current track index
           const currentIdx = categoryFiles.findIndex((track: any) => track.url === file.url);
@@ -433,7 +433,7 @@ const AudioScreen = () => {
 
     // Don't wait for playedSongs to load - initialize immediately
     initializePlaylist();
-  }, [file.url, file.title, file.playlist, file.currentIndex, file.category, loadPlaylist, loadTrack]);
+  }, [file.url, file.title, file.playlist, file.currentIndex, file.category]);
 
 
 
@@ -625,7 +625,7 @@ const AudioScreen = () => {
         reason: !currentTrack ? 'no current track' : 'position <= 0'
       }, 'AudioScreen');
     }
-  }, [position, currentTrack, updateState]);
+  }, [position, currentTrack]);
 
   // Save position when track changes
   useEffect(() => {
@@ -659,7 +659,7 @@ const AudioScreen = () => {
         updateState(position, true); // Force save on unmount
       }
     };
-  }, [position, currentTrack, updateState]);
+  }, [position, currentTrack]);
 
   // Handle navigation away (back button) - stop playback and save position
   // Using a different approach - detect when the back button is pressed
@@ -697,7 +697,7 @@ const AudioScreen = () => {
     });
 
     return unsubscribe;
-  }, [navigation, position, currentTrack, isPlaying, updateState, togglePlayback]);
+  }, [navigation, position, currentTrack, isPlaying]);
 
   const handleTrackCompletion = async () => {
     if (playlist?.length > 0 && currentIndex < playlist.length - 1) {
