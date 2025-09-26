@@ -23,6 +23,7 @@ try {
     if (logger) {
       logger.info('INDEX.JS: TrackPlayer service function called', {}, 'Index');
     }
+    // Import the service module and return the function
     return require('./service');
   });
   if (logger) {

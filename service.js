@@ -78,6 +78,7 @@ const playWithRetry = async (maxRetries = 3) => {
 };
 
 module.exports = async function () {
+  console.log('SERVICE.JS: TrackPlayer service function called!');
   logger.info('TrackPlayer service module loaded and function called', {}, 'TrackPlayerService');
   logger.info('TrackPlayer service started', {}, 'TrackPlayerService');
   
