@@ -47,7 +47,6 @@
     "release": {
       "android": {
         "buildType": "app-bundle",
-        "gradleCommand": ":app:assembleRelease",
         "resourceClass": "medium"
       },
       "env": {
