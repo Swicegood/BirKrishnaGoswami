@@ -1,0 +1,234 @@
+diff --git a/node_modules/react-native-image-gallery/src/Gallery.js b/node_modules/react-native-image-gallery/src/Gallery.js
+index 5cc4835..87707a7 100644
+--- a/node_modules/react-native-image-gallery/src/Gallery.js
++++ b/node_modules/react-native-image-gallery/src/Gallery.js
+@@ -1,5 +1,6 @@
+-import React, { PureComponent } from 'react';
+-import { View, ViewPropTypes } from 'react-native';
++import React, { PureComponent, createRef } from 'react';
++import { View } from 'react-native';
++import { ViewPropTypes } from 'deprecated-react-native-prop-types';
+ import PropTypes from 'prop-types';
+ import { createResponder } from './libraries/GestureResponder';
+ import TransformableImage from './libraries/TransformableImage';
+@@ -41,6 +42,7 @@ export default class Gallery extends PureComponent {
+     currentPage = 0;
+     pageCount = 0;
+     gestureResponder = undefined;
++    viewPagerRef = createRef();
+ 
+     constructor (props) {
+         super(props);
+@@ -58,7 +60,7 @@ export default class Gallery extends PureComponent {
+         this.activeImageResponder = this.activeImageResponder.bind(this);
+     }
+ 
+-    componentWillMount () {
++    UNSAFE_componentWillMount () {
+         let onResponderReleaseOrTerminate = (evt, gestureState) => {
+             if (this.activeResponder) {
+                 if (this.activeResponder === this.viewPagerResponder &&
+@@ -113,13 +115,16 @@ export default class Gallery extends PureComponent {
+ 
+         this.viewPagerResponder = {
+             onStart: (evt, gestureState) => {
+-                this.getViewPagerInstance().onResponderGrant(evt, gestureState);
++                const viewPager = this.getViewPagerInstance();
++                viewPager && viewPager.onResponderGrant(evt, gestureState);
+             },
+             onMove: (evt, gestureState) => {
+-                this.getViewPagerInstance().onResponderMove(evt, gestureState);
++                const viewPager = this.getViewPagerInstance();
++                viewPager && viewPager.onResponderMove(evt, gestureState);
+             },
+             onEnd: (evt, gestureState, disableSettle) => {
+-                this.getViewPagerInstance().onResponderRelease(evt, gestureState, disableSettle);
++                const viewPager = this.getViewPagerInstance();
++                viewPager && viewPager.onResponderRelease(evt, gestureState, disableSettle);
+             }
+         };
+ 
+@@ -209,7 +214,7 @@ export default class Gallery extends PureComponent {
+     }
+ 
+     getViewPagerInstance () {
+-        return this.refs['galleryViewPager'];
++        return this.viewPagerRef.current;
+     }
+ 
+     onPageSelected (page) {
+@@ -277,16 +282,16 @@ export default class Gallery extends PureComponent {
+         return (
+             <ViewPager
+               {...this.props}
+               flatListProps={flatListProps}
+-              ref={'galleryViewPager'}
+-              scrollViewStyle={this.props.scrollViewStyle}
+-              scrollEnabled={false}
++              ref={this.viewPagerRef}
+               renderPage={this.renderPage}
+-              pageDataArray={images}
+-              {...gestureResponder}
+               onPageSelected={this.onPageSelected}
++              scrollViewStyle={this.props.scrollViewStyle}
+               onPageScrollStateChanged={this.onPageScrollStateChanged}
+               onPageScroll={this.props.onPageScroll}
++              pageMargin={this.props.pageMargin}
++              initialPage={this.props.initialPage}
+               removeClippedSubviews={this.props.removeClippedSubviews}
+-              onPageSelected={this.onPageSelected}
+-              pageMargin={this.props.pageMargin}
+-              initialPage={this.props.initialPage}
++              pageDataArray={images}
++              {...gestureResponder}
+             />
+         );
+     }
+diff --git a/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js b/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js
+index 8ff8469..95b71f7 100644
+--- a/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js
++++ b/node_modules/react-native-image-gallery/src/libraries/TransformableImage/index.js
+@@ -1,5 +1,6 @@
+-import React, { PureComponent } from 'react';
+-import { View, Text, Image, ViewPropTypes } from 'react-native';
++import React, { PureComponent, createRef } from 'react';
++import { View, Text, Image } from 'react-native';
++import { ViewPropTypes } from 'deprecated-react-native-prop-types';
+ import PropTypes from 'prop-types';
+ import ViewTransformer from '../ViewTransformer';
+ 
+@@ -36,6 +37,8 @@ export default class TransformableImage extends PureComponent {
+         this.getViewTransformerInstance = this.getViewTransformerInstance.bind(this);
+         this.renderError = this.renderError.bind(this);
+ 
++        this.viewTransformerRef = createRef();
++
+         this.state = {
+             viewWidth: 0,
+             viewHeight: 0,
+@@ -45,7 +48,7 @@ export default class TransformableImage extends PureComponent {
+         };
+     }
+ 
+-    componentWillMount () {
++    UNSAFE_componentWillMount () {
+         if (!this.state.imageDimensions) {
+             this.getImageSize(this.props.image);
+         }
+@@ -132,7 +135,7 @@ export default class TransformableImage extends PureComponent {
+     }
+ 
+     getViewTransformerInstance () {
+-        return this.refs['viewTransformer'];
++        return this.viewTransformerRef.current;
+     }
+ 
+     renderError () {
+@@ -179,7 +182,7 @@ export default class TransformableImage extends PureComponent {
+ 
+         return (
+             <ViewTransformer
+-              ref={'viewTransformer'}
++              ref={this.viewTransformerRef}
+               key={'viewTransformer#' + keyAccumulator} // when image source changes, we should use a different node to avoid reusing previous transform state
+               enableTransform={enableTransform && imageLoaded} // disable transform until image is loaded
+               enableScale={enableScale}
+diff --git a/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js b/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js
+index b786ad1..4fc5adc 100644
+--- a/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js
++++ b/node_modules/react-native-image-gallery/src/libraries/ViewPager/index.js
+@@ -1,4 +1,4 @@
+-import React, { PureComponent } from 'react';
++import React, { PureComponent, createRef } from 'react';
+ import {
+     View,
+     FlatList,
+@@ -43,6 +43,8 @@ export default class ViewPager extends PureComponent {
+         this.onResponderRelease = this.onResponderRelease.bind(this);
+         this.getItemLayout = this.getItemLayout.bind(this);
+ 
++        this.innerFlatListRef = createRef();
++
+         this.scroller = this.createScroller();
+     }
+ 
+@@ -64,7 +66,7 @@ export default class ViewPager extends PureComponent {
+             } else {
+                 const curX = this.scroller.getCurrX();
+-                this.refs['innerFlatList'] && this.refs['innerFlatList'].scrollToOffset({ offset: curX, animated: false });
++                this.innerFlatListRef.current && this.innerFlatListRef.current.scrollToOffset({ offset: curX, animated: false });
+ 
+                 let position = Math.floor(curX / (this.state.width + this.props.pageMargin));
+                 position = this.validPage(position);
+@@ -90,7 +92,7 @@ export default class ViewPager extends PureComponent {
+     }
+ 
+-    componentWillMount () {
++    UNSAFE_componentWillMount () {
+         this.gestureResponder = createResponder({
+             onStartShouldSetResponder: (evt, gestureState) => true,
+             onResponderGrant: this.onResponderGrant,
+@@ -225,8 +227,8 @@ export default class ViewPager extends PureComponent {
+             InteractionManager.runAfterInteractions(() => {
+                 this.scroller.startScroll(this.scroller.getCurrX(), 0, finalX - this.scroller.getCurrX(), 0, 0);
+-                this.refs['innerFlatList'] && this.refs['innerFlatList'].scrollToOffset({offset: finalX, animated: false});
+-                this.refs['innerFlatList'] && this.refs['innerFlatList'].recordInteraction();
++                this.innerFlatListRef.current && this.innerFlatListRef.current.scrollToOffset({offset: finalX, animated: false});
++                this.innerFlatListRef.current && this.innerFlatListRef.current.recordInteraction();
+             });
+         } else {
+             this.scroller.startScroll(this.scroller.getCurrX(), 0, finalX - this.scroller.getCurrX(), 0, 400);
+@@ -322,7 +324,7 @@ export default class ViewPager extends PureComponent {
+                 <FlatList
+                   {...this.props.flatListProps}
+                   style={[{ flex: 1 }, scrollViewStyle]}
+-                  ref={'innerFlatList'}
++                  ref={this.innerFlatListRef}
+                   keyExtractor={this.keyExtractor}
+                   scrollEnabled={false}
+                   horizontal={true}
+diff --git a/node_modules/react-native-image-gallery/src/libraries/ViewTransformer/index.js b/node_modules/react-native-image-gallery/src/libraries/ViewTransformer/index.js
+index 690b0b8..d4f4b15 100644
+--- a/node_modules/react-native-image-gallery/src/libraries/ViewTransformer/index.js
++++ b/node_modules/react-native-image-gallery/src/libraries/ViewTransformer/index.js
+@@ -1,4 +1,4 @@
+-import React from 'react';
++import React, { createRef } from 'react';
+ import ReactNative, { View, Animated, Easing, NativeModules } from 'react-native';
+ import Scroller from '../Scroller';
+ import PropTypes from 'prop-types';
+@@ -19,6 +19,8 @@ export default class ViewTransformer extends React.Component {
+     transform = new Transform();
+     state = { ...Transform.getInitialState() };
+ 
++    innerViewRef = createRef();
++
+     constructor (props) {
+         super(props);
+ 
+@@ -98,7 +100,7 @@ export default class ViewTransformer extends React.Component {
+         this.handleDoubleTap = this.handleDoubleTap.bind(this);
+     }
+ 
+-    componentWillMount () {
++    UNSAFE_componentWillMount () {
+         this.gestureResponder = createResponder({
+             onStartShouldSetResponder: (evt, gestureState) => true,
+             onMoveShouldSetResponderCapture: (evt, gestureState) => true,
+@@ -163,7 +165,7 @@ export default class ViewTransformer extends React.Component {
+     }
+ 
+     measureLayout () {
+-        let handle = ReactNative.findNodeHandle(this.refs['innerViewRef']);
++        let handle = ReactNative.findNodeHandle(this.innerViewRef.current);
+         NativeModules.UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
+             if (typeof pageX === 'number' && typeof pageY === 'number') { // avoid undefined values on Android devices
+                 if (this.state.pageX !== pageX || this.state.pageY !== pageY) {
+@@ -184,7 +186,7 @@ export default class ViewTransformer extends React.Component {
+             <Scroller>
+                 <View
+-                  ref={'innerViewRef'}
++                  ref={this.innerViewRef}
+                   style={[
+                     {
+                         flex: 1,
