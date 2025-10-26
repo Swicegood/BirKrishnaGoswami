@@ -145,7 +145,7 @@ function RootLayoutNav() {
     <>
       <Stack
         screenOptions={{
-          header: () =>  null
+          headerShown: false
         }}
       >
         <Stack.Screen name="YoutubePlayer" options={{ animation: 'none', header: () => <CustomHeaderMain title='VIDEOS' /> }} />
