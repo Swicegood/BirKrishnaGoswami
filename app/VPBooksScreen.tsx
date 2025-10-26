@@ -1,4 +1,4 @@
-r// TODO: Add SDKs for Firebase products that you want to use
+// TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries  
 import { Platform, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
