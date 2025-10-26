@@ -396,7 +396,7 @@ export default function TabOneScireen() {
                     <Text style={styles.buttonText}>VYASA PUJA</Text>
                   </TouchableOpacity>
                 </Link>
-                <Link href="../(tabs3)/VPBooksScreen" asChild>
+                <Link href="../VPBooksScreen" asChild>
                   <TouchableOpacity style={styles.buttonContainer}>
                     <Image
                       source={require('../../assets/images/vyasa-puja-books.png')} // Replace with your local or network image
@@ -518,7 +518,7 @@ export default function TabOneScireen() {
                       <Text style={styles.buttonText}>VYASA PUJA</Text>
                     </TouchableOpacity>
                   </Link>
-                  <Link href="../(tabs3)/VPBooksScreen" asChild>
+                  <Link href="../VPBooksScreen" asChild>
                     <TouchableOpacity style={styles.buttonContainer}>
                       <Image
                         source={require('../../assets/images/vyasa-puja-books.png')} // Replace with your local or network image
