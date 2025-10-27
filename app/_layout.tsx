@@ -46,6 +46,22 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  // Register TrackPlayer service FIRST (must happen before setupPlayer)
+  useEffect(() => {
+    if (Platform.OS === 'web') return; // Skip on web
+    
+    try {
+      logger.info('Registering TrackPlayer playback service', { platform: Platform.OS }, 'TrackPlayer');
+      TrackPlayer.registerPlaybackService(() => require('../service'));
+      logger.info('TrackPlayer playback service registered successfully', { platform: Platform.OS }, 'TrackPlayer');
+    } catch (error) {
+      logger.error('Failed to register TrackPlayer playback service', { 
+        error: error instanceof Error ? error.message : String(error),
+        platform: Platform.OS 
+      }, 'TrackPlayer');
+    }
+  }, []); // Run once on mount
+
   // Initialize TrackPlayer and Background Fetch
   useEffect(() => {
     if (!loaded) return; // Wait for fonts to load first
