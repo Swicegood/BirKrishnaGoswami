@@ -88,6 +88,18 @@ module.exports = async function () {
   TrackPlayer.addEventListener(Event.RemotePlay, async () => {
     logger.info('RemotePlay event received', {}, 'TrackPlayerService');
     try {
+      // Log current player state before handling
+      const state = await TrackPlayer.getState();
+      const currentTrack = await TrackPlayer.getCurrentTrack();
+      const queue = await TrackPlayer.getQueue();
+      logger.info('RemotePlay - Current player state', { 
+        state,
+        hasTrack: currentTrack !== null,
+        trackIndex: currentTrack,
+        queueLength: queue.length,
+        platform: Platform.OS
+      }, 'TrackPlayerService');
+      
       await requestAudioFocus();
       await TrackPlayer.play();
       logger.info('RemotePlay executed successfully', {}, 'TrackPlayerService');
@@ -101,6 +113,18 @@ module.exports = async function () {
   TrackPlayer.addEventListener(Event.RemotePause, async () => {
     logger.info('RemotePause event received', {}, 'TrackPlayerService');
     try {
+      // Log current player state before handling
+      const state = await TrackPlayer.getState();
+      const currentTrack = await TrackPlayer.getCurrentTrack();
+      const queue = await TrackPlayer.getQueue();
+      logger.info('RemotePause - Current player state', { 
+        state,
+        hasTrack: currentTrack !== null,
+        trackIndex: currentTrack,
+        queueLength: queue.length,
+        platform: Platform.OS
+      }, 'TrackPlayerService');
+      
       await TrackPlayer.pause();
       logger.info('RemotePause executed successfully', {}, 'TrackPlayerService');
     } catch (error) {
@@ -142,6 +166,15 @@ module.exports = async function () {
     logger.info('Manual navigation flag set to true for RemoteNext', {}, 'TrackPlayerService');
     
     try {
+      // Log current player state before handling
+      const state = await TrackPlayer.getState();
+      const queue = await TrackPlayer.getQueue();
+      logger.info('RemoteNext - Current player state', { 
+        state,
+        queueLength: queue.length,
+        platform: Platform.OS
+      }, 'TrackPlayerService');
+      
       // Get next track from current playlist or go to next file
       const currentTrack = await TrackPlayer.getCurrentTrack();
       if (currentTrack !== null) {
@@ -216,6 +249,15 @@ module.exports = async function () {
     logger.info('Manual navigation flag set to true for RemotePrevious', {}, 'TrackPlayerService');
     
     try {
+      // Log current player state before handling
+      const state = await TrackPlayer.getState();
+      const queue = await TrackPlayer.getQueue();
+      logger.info('RemotePrevious - Current player state', { 
+        state,
+        queueLength: queue.length,
+        platform: Platform.OS
+      }, 'TrackPlayerService');
+      
       const currentTrack = await TrackPlayer.getCurrentTrack();
       if (currentTrack !== null) {
         const trackObject = await TrackPlayer.getTrack(currentTrack);
