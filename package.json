@@ -54,7 +54,7 @@
     "axios": "^1.6.7",
     "cors": "^2.8.5",
     "deprecated-react-native-prop-types": "^5.0.0",
-    "expo": "^53.0.0",
+    "expo": "~54.0.0",
     "expo-av": "~15.1.7",
     "expo-background-fetch": "^13.1.6",
     "expo-build-properties": "~0.14.8",
