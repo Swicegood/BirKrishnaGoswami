@@ -31,7 +31,7 @@
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "versionCode": 35,
+      "versionCode": 36,
       "userInterfaceStyle": "light",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/bkgsquare.png",
@@ -75,7 +75,11 @@
             "targetSdkVersion": 35,
             "minSdkVersion": 24,
             "buildToolsVersion": "35.0.0",
-            "ndkVersion": "28.0.12077973"
+            "ndkVersion": "28.0.12077973",
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "enablePngCrunchInReleaseBuilds": true,
+            "enableBundleCompression": false
           }
         }
       ],
