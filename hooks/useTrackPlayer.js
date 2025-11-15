@@ -27,11 +27,19 @@ const useTrackPlayer = (onTrackLoaded) => {
   const trackLoadMutex = useRef(false);
   const progressIntervalRef = useRef(null);
   const hasAutoPlayedOnce = useRef(false);
+  const lastMetadataDurationRef = useRef(0);
   
   const buildTrackPlayerEntry = (track, index) => {
     if (!track || !track.url) {
       return null;
     }
+
+    const normalizedDuration =
+      typeof track.duration === 'number' && track.duration > 0
+        ? track.duration
+        : typeof track.estimatedDuration === 'number' && track.estimatedDuration > 0
+          ? track.estimatedDuration
+          : 1;
     
     return {
       id: track.id ?? `track-${index}-${track.url}`,
@@ -40,7 +48,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       artist: track.artist ?? DEFAULT_ARTIST,
       album: track.album ?? DEFAULT_ALBUM,
       genre: track.genre ?? DEFAULT_GENRE,
-      duration: typeof track.duration === 'number' && track.duration > 0 ? track.duration : undefined,
+      duration: normalizedDuration,
       artwork: track.artwork,
     };
   };
@@ -122,6 +130,50 @@ const useTrackPlayer = (onTrackLoaded) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    // Reset duration cache whenever the active track changes
+    lastMetadataDurationRef.current = 0;
+  }, [currentTrack?.id]);
+
+  useEffect(() => {
+    if (!currentTrack) {
+      return;
+    }
+    if (typeof duration !== 'number' || duration <= 1) {
+      return;
+    }
+
+    const roundedDuration = Math.round(duration);
+    if (roundedDuration <= 1 || lastMetadataDurationRef.current === roundedDuration) {
+      return;
+    }
+
+    lastMetadataDurationRef.current = roundedDuration;
+
+    const trackIdentifier = (
+      currentTrack.id ??
+      (typeof currentIndex === 'number' ? currentIndex : currentTrack.url ?? 'current-track')
+    ).toString();
+
+    (async () => {
+      try {
+        await TrackPlayer.updateMetadataForTrack(trackIdentifier, {
+          ...currentTrack,
+          duration: roundedDuration,
+        });
+        logger.info('Updated now playing metadata with measured duration', {
+          trackId: trackIdentifier,
+          duration: roundedDuration,
+        }, LOG_SCOPE);
+      } catch (metadataError) {
+        logger.warn('Failed to update metadata with measured duration', {
+          error: metadataError instanceof Error ? metadataError.message : String(metadataError),
+          trackId: trackIdentifier,
+        }, LOG_SCOPE);
+      }
+    })();
+  }, [currentTrack, currentIndex, duration]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', nextAppState => {
