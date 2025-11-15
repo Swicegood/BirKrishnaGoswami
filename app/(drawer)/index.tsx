@@ -846,12 +846,15 @@ const styles = StyleSheet.create<Styles>({
     textAlign: 'center',
   },
   webLandscapeRow: {
-    width: '100%',
+    alignSelf: 'stretch',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+    flexGrow: 1,
+    flexShrink: 1,
   },
   webLandscapeButtonContainer: {
-    width: '12.5%',
+    flexGrow: 1,
+    flexShrink: 1,
     maxWidth: 150,
     minWidth: 110,
     paddingHorizontal: 6,
@@ -869,5 +872,7 @@ const styles = StyleSheet.create<Styles>({
   },
   webLandscapePlaceholder: {
     opacity: 0,
+    flexGrow: 1,
+    flexShrink: 1,
   },
 });
