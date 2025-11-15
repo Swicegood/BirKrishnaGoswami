@@ -160,73 +160,21 @@ module.exports = async function () {
 
   TrackPlayer.addEventListener(Event.RemoteNext, async () => {
     logger.info('RemoteNext event received', {}, 'TrackPlayerService');
-    
-    // Set manual navigation flag to prevent auto-continuation interference
     isManualNavigation = true;
-    logger.info('Manual navigation flag set to true for RemoteNext', {}, 'TrackPlayerService');
-    
     try {
-      // Log current player state before handling
-      const state = await TrackPlayer.getState();
-      const queue = await TrackPlayer.getQueue();
-      logger.info('RemoteNext - Current player state', { 
-        state,
-        queueLength: queue.length,
-        platform: Platform.OS
-      }, 'TrackPlayerService');
+      const focusGranted = await requestAudioFocus();
+      if (!focusGranted) {
+        logger.error('Failed to get audio focus for RemoteNext', {}, 'TrackPlayerService');
+        return;
+      }
       
-      // Get next track from current playlist or go to next file
-      const currentTrack = await TrackPlayer.getCurrentTrack();
-      if (currentTrack !== null) {
-        const trackObject = await TrackPlayer.getTrack(currentTrack);
-        const playlistData = await AsyncStorage.getItem('currentPlaylist');
-        const currentIndex = await AsyncStorage.getItem('currentIndex');
-        
-        logger.info('Processing RemoteNext', { 
-          currentTrack: trackObject?.title,
-          hasPlaylist: !!playlistData,
-          currentIndex
-        }, 'TrackPlayerService');
-        
-        if (playlistData && currentIndex !== null) {
-          const playlist = JSON.parse(playlistData);
-          const nextIndex = parseInt(currentIndex) + 1;
-          
-          if (nextIndex < playlist.length) {
-            const nextTrack = playlist[nextIndex];
-            logger.info('Loading next track from playlist', { 
-              nextTrack: nextTrack.title,
-              nextIndex,
-              fromIndex: currentIndex
-            }, 'TrackPlayerService');
-            
-            await TrackPlayer.reset();
-            await TrackPlayer.add({
-              id: nextIndex.toString(),
-              url: nextTrack.url,
-              title: nextTrack.title,
-            });
-            
-            await AsyncStorage.setItem('currentIndex', nextIndex.toString());
-            
-            const focusGranted = await requestAudioFocus();
-            if (focusGranted) {
-              await playWithRetry();
-            } else {
-              logger.error('Failed to get audio focus for next track', {}, 'TrackPlayerService');
-            }
-          } else {
-            logger.info('No more tracks in playlist', { 
-              nextIndex, 
-              playlistLength: playlist.length 
-            }, 'TrackPlayerService');
-          }
-        } else {
-          logger.warn('No playlist data or current index for RemoteNext', {
-            hasPlaylist: !!playlistData,
-            currentIndex
-          }, 'TrackPlayerService');
-        }
+      await TrackPlayer.skipToNext();
+      await playWithRetry();
+      
+      const nextIndex = await TrackPlayer.getCurrentTrack();
+      if (typeof nextIndex === 'number') {
+        await AsyncStorage.setItem('currentIndex', nextIndex.toString());
+        logger.info('RemoteNext advanced queue', { nextIndex }, 'TrackPlayerService');
       }
     } catch (error) {
       logger.error('Error in RemoteNext event', { 
@@ -243,72 +191,21 @@ module.exports = async function () {
 
   TrackPlayer.addEventListener(Event.RemotePrevious, async () => {
     logger.info('RemotePrevious event received', {}, 'TrackPlayerService');
-    
-    // Set manual navigation flag to prevent auto-continuation interference
     isManualNavigation = true;
-    logger.info('Manual navigation flag set to true for RemotePrevious', {}, 'TrackPlayerService');
-    
     try {
-      // Log current player state before handling
-      const state = await TrackPlayer.getState();
-      const queue = await TrackPlayer.getQueue();
-      logger.info('RemotePrevious - Current player state', { 
-        state,
-        queueLength: queue.length,
-        platform: Platform.OS
-      }, 'TrackPlayerService');
+      const focusGranted = await requestAudioFocus();
+      if (!focusGranted) {
+        logger.error('Failed to get audio focus for RemotePrevious', {}, 'TrackPlayerService');
+        return;
+      }
       
-      const currentTrack = await TrackPlayer.getCurrentTrack();
-      if (currentTrack !== null) {
-        const trackObject = await TrackPlayer.getTrack(currentTrack);
-        const playlistData = await AsyncStorage.getItem('currentPlaylist');
-        const currentIndex = await AsyncStorage.getItem('currentIndex');
-        
-        logger.info('Processing RemotePrevious', { 
-          currentTrack: trackObject?.title,
-          hasPlaylist: !!playlistData,
-          currentIndex
-        }, 'TrackPlayerService');
-        
-        if (playlistData && currentIndex !== null) {
-          const playlist = JSON.parse(playlistData);
-          const prevIndex = parseInt(currentIndex) - 1;
-          
-          if (prevIndex >= 0) {
-            const prevTrack = playlist[prevIndex];
-            logger.info('Loading previous track from playlist', { 
-              prevTrack: prevTrack.title,
-              prevIndex,
-              fromIndex: currentIndex
-            }, 'TrackPlayerService');
-            
-            await TrackPlayer.reset();
-            await TrackPlayer.add({
-              id: prevIndex.toString(),
-              url: prevTrack.url,
-              title: prevTrack.title,
-            });
-            
-            await AsyncStorage.setItem('currentIndex', prevIndex.toString());
-            
-            const focusGranted = await requestAudioFocus();
-            if (focusGranted) {
-              await playWithRetry();
-            } else {
-              logger.error('Failed to get audio focus for previous track', {}, 'TrackPlayerService');
-            }
-          } else {
-            logger.info('Already at first track in playlist', { 
-              prevIndex, 
-              currentIndex 
-            }, 'TrackPlayerService');
-          }
-        } else {
-          logger.warn('No playlist data or current index for RemotePrevious', {
-            hasPlaylist: !!playlistData,
-            currentIndex
-          }, 'TrackPlayerService');
-        }
+      await TrackPlayer.skipToPrevious();
+      await playWithRetry();
+      
+      const prevIndex = await TrackPlayer.getCurrentTrack();
+      if (typeof prevIndex === 'number') {
+        await AsyncStorage.setItem('currentIndex', prevIndex.toString());
+        logger.info('RemotePrevious moved queue backwards', { prevIndex }, 'TrackPlayerService');
       }
     } catch (error) {
       logger.error('Error in RemotePrevious event', { 
@@ -381,65 +278,8 @@ module.exports = async function () {
 
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, async (event) => {
     logger.info('PlaybackQueueEnded event', { event }, 'TrackPlayerService');
-    
     if (isManualNavigation) {
-      logger.info('Manual navigation in progress, skipping auto-continuation', {}, 'TrackPlayerService');
-      return;
-    }
-    
-    try {
-      // Auto-continue to next track if available
-      const playlistData = await AsyncStorage.getItem('currentPlaylist');
-      const currentIndex = await AsyncStorage.getItem('currentIndex');
-      
-      logger.info('Processing PlaybackQueueEnded', { 
-        hasPlaylist: !!playlistData,
-        currentIndex
-      }, 'TrackPlayerService');
-      
-      if (playlistData && currentIndex !== null) {
-        const playlist = JSON.parse(playlistData);
-        const nextIndex = parseInt(currentIndex) + 1;
-        
-        if (nextIndex < playlist.length) {
-          const nextTrack = playlist[nextIndex];
-          logger.info('Auto-continuing to next track', { 
-            nextTrack: nextTrack.title,
-            nextIndex,
-            fromIndex: currentIndex
-          }, 'TrackPlayerService');
-          
-          await TrackPlayer.reset();
-          await TrackPlayer.add({
-            id: nextIndex.toString(),
-            url: nextTrack.url,
-            title: nextTrack.title,
-          });
-          
-          await AsyncStorage.setItem('currentIndex', nextIndex.toString());
-          
-          const focusGranted = await requestAudioFocus();
-          if (focusGranted) {
-            await playWithRetry();
-          } else {
-            logger.error('Failed to get audio focus for auto-continuation', {}, 'TrackPlayerService');
-          }
-        } else {
-          logger.info('End of playlist reached', { 
-            nextIndex, 
-            playlistLength: playlist.length 
-          }, 'TrackPlayerService');
-        }
-      } else {
-        logger.warn('No playlist data or current index for auto-continuation', {
-          hasPlaylist: !!playlistData,
-          currentIndex
-        }, 'TrackPlayerService');
-      }
-    } catch (error) {
-      logger.error('Error in PlaybackQueueEnded event', { 
-        error: error instanceof Error ? error.message : String(error) 
-      }, 'TrackPlayerService');
+      logger.info('Manual navigation in progress, ignoring queue end', {}, 'TrackPlayerService');
     }
   });
 };
