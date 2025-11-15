@@ -1,29 +1,14 @@
-  const loadTrack = async (trackUrl, trackTitle, shouldPlay = true, startPosition = 0) => {
-    if (!trackUrl) {
-      logger.warn('Attempted to load track without URL', { trackTitle }, 'useTrackPlayer');
-      return;
-    }
-    
-    await loadPlaylist(
-      [{
-        title: trackTitle,
-        url: trackUrl,
-        artist: DEFAULT_ARTIST,
-        album: DEFAULT_ALBUM,
-        genre: DEFAULT_GENRE,
-      }],
-      0,
-      startPosition,
-      shouldPlay
-    );
-  };
-
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { AppState, Platform } from 'react-native';
+import { AppState } from 'react-native';
 import TrackPlayer, { State, Event, useTrackPlayerEvents, useProgress } from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import logger from '../utils/logger';
+
+const DEFAULT_ARTIST = 'BKG Audio';
+const DEFAULT_ALBUM = 'Spiritual Discourses';
+const DEFAULT_GENRE = 'Spiritual';
+const LOG_SCOPE = 'useTrackPlayer';
 
 const useTrackPlayer = (onTrackLoaded) => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
@@ -41,9 +26,7 @@ const useTrackPlayer = (onTrackLoaded) => {
   const lastTrackStartTime = useRef(0);
   const trackLoadMutex = useRef(false);
   const progressIntervalRef = useRef(null);
-  const DEFAULT_ARTIST = 'BKG Audio';
-  const DEFAULT_ALBUM = 'Spiritual Discourses';
-  const DEFAULT_GENRE = 'Spiritual';
+  const hasAutoPlayedOnce = useRef(false);
   
   const buildTrackPlayerEntry = (track, index) => {
     if (!track || !track.url) {
@@ -310,7 +293,35 @@ const useTrackPlayer = (onTrackLoaded) => {
       
       await TrackPlayer.reset();
       await TrackPlayer.add(normalizedQueue);
+
+      try {
+        const queueSnapshot = await TrackPlayer.getQueue();
+        logger.info('TrackPlayer queue hydrated', {
+          queueLength: queueSnapshot.length,
+          firstTrack: queueSnapshot[0]?.title,
+          startIndex: safeStartIndex,
+          requestedTrack: selectedTrack.title,
+        }, LOG_SCOPE);
+      } catch (queueError) {
+        logger.error('Unable to inspect TrackPlayer queue after load', {
+          error: queueError instanceof Error ? queueError.message : String(queueError),
+        }, LOG_SCOPE);
+      }
+
       await TrackPlayer.skip(selectedTrack.id);
+
+      try {
+        await TrackPlayer.updateMetadataForTrack(selectedTrack.id, selectedTrack);
+        logger.info('Now playing metadata primed for first track', {
+          trackId: selectedTrack.id,
+          title: selectedTrack.title,
+        }, LOG_SCOPE);
+      } catch (metadataError) {
+        logger.warn('Failed to prime lock-screen metadata for first track', {
+          error: metadataError instanceof Error ? metadataError.message : String(metadataError),
+          trackId: selectedTrack.id,
+        }, LOG_SCOPE);
+      }
       
       if (savedPosition > 0) {
         await TrackPlayer.seekTo(savedPosition);
@@ -352,6 +363,26 @@ const useTrackPlayer = (onTrackLoaded) => {
       isLoadingNewFile.current = false;
     }
   }, [ensureAudioSessionActive, onTrackLoaded]);
+
+  const loadTrack = useCallback(async (trackUrl, trackTitle, shouldPlay = true, startPosition = 0) => {
+    if (!trackUrl) {
+      logger.warn('Attempted to load track without URL', { trackTitle }, LOG_SCOPE);
+      return;
+    }
+
+    await loadPlaylist(
+      [{
+        title: trackTitle,
+        url: trackUrl,
+        artist: DEFAULT_ARTIST,
+        album: DEFAULT_ALBUM,
+        genre: DEFAULT_GENRE,
+      }],
+      0,
+      startPosition,
+      shouldPlay
+    );
+  }, [loadPlaylist]);
 
   const goToNextTrack = async () => {
     if (isTransitioning.current) {
