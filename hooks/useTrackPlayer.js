@@ -28,6 +28,9 @@ const useTrackPlayer = (onTrackLoaded) => {
   const progressIntervalRef = useRef(null);
   const hasAutoPlayedOnce = useRef(false);
   const lastMetadataDurationRef = useRef(0);
+  const diagnosticsRunCounterRef = useRef(0);
+  const playlistLoadCounterRef = useRef(0);
+  const appStateTransitionCounterRef = useRef(0);
   
   const buildTrackPlayerEntry = (track, index) => {
     if (!track || !track.url) {
@@ -82,7 +85,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     }
   }, []);
 
-  const startPlaybackWatchdog = () => {
+  const startPlaybackWatchdog = useCallback(() => {
     logger.info('Starting playback watchdog', {}, 'useTrackPlayer');
     
     // Clear any existing watchdog first
@@ -109,7 +112,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     }, 5000); // Check every 5 seconds
     
     return watchdogIntervalRef.current;
-  };
+  }, [ensureAudioSessionActive]);
 
   useEffect(() => {
     const setupAudioAndWatchdog = async () => {
@@ -129,7 +132,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         clearInterval(watchdogIntervalRef.current);
       }
     };
-  }, []);
+  }, [ensureAudioSessionActive, startPlaybackWatchdog]);
 
   useEffect(() => {
     // Reset duration cache whenever the active track changes
@@ -176,32 +179,41 @@ const useTrackPlayer = (onTrackLoaded) => {
   }, [currentTrack, currentIndex, duration]);
 
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
+    logPlaybackDiagnostics('hook-mounted').catch(() => {});
+  }, [logPlaybackDiagnostics]);
+
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState) => {
+      appStateTransitionCounterRef.current += 1;
+      const transitionId = appStateTransitionCounterRef.current;
       logger.info('App state changed', { 
         from: appState.current, 
-        to: nextAppState 
-      }, 'useTrackPlayer');
+        to: nextAppState,
+        transitionId,
+      }, LOG_SCOPE);
       
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        // App has come to the foreground
-        logger.info('App moved to foreground, restarting watchdog', {}, 'useTrackPlayer');
+        logger.info('App moved to foreground, restarting watchdog', { transitionId }, LOG_SCOPE);
         if (watchdogIntervalRef.current) {
           clearInterval(watchdogIntervalRef.current);
         }
         watchdogIntervalRef.current = startPlaybackWatchdog();
+        logPlaybackDiagnostics('appstate-active', { transitionId }).catch(() => {});
       } else if (appState.current === 'active' && nextAppState.match(/inactive|background/)) {
-        // App is going to background - keep watchdog running for auto-advance
-        logger.info('App moved to background, keeping watchdog running for auto-advance', {}, 'useTrackPlayer');
+        logger.info('App moved to background/inactive', { transitionId }, LOG_SCOPE);
+        logPlaybackDiagnostics(`appstate-${nextAppState}`, { transitionId }).catch(() => {});
       }
       appState.current = nextAppState;
       setAppStateVisible(nextAppState);
-    });
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
 
     return () => {
-      logger.info('Removing app state listener', {}, 'useTrackPlayer');
+      logger.info('Removing app state listener', {}, LOG_SCOPE);
       subscription.remove();
     };
-  }, []);
+  }, [logPlaybackDiagnostics, startPlaybackWatchdog]);
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackState, Event.PlaybackError, Event.PlaybackQueueEnded], async (event) => {
     logger.debug('TrackPlayer event received', { 
@@ -268,7 +280,9 @@ const useTrackPlayer = (onTrackLoaded) => {
     }
   });
 
-  const logPlaybackDiagnostics = useCallback(async (contextLabel = 'diagnostics') => {
+  const logPlaybackDiagnostics = useCallback(async (contextLabel = 'diagnostics', extraFields = {}) => {
+    diagnosticsRunCounterRef.current += 1;
+    const runId = diagnosticsRunCounterRef.current;
     try {
       const [state, queue, currentIdx] = await Promise.all([
         TrackPlayer.getState(),
@@ -281,16 +295,20 @@ const useTrackPlayer = (onTrackLoaded) => {
 
       logger.info('TrackPlayer diagnostics snapshot', {
         context: contextLabel,
+        runId,
         state,
         queueLength: queue.length,
         currentIndex: currentIdx,
         currentTrackTitle: activeTrack?.title || null,
         currentTrackDuration: activeTrack?.duration || null,
+        ...extraFields,
       }, LOG_SCOPE);
     } catch (diagError) {
       logger.error('Failed to capture TrackPlayer diagnostics', {
         context: contextLabel,
+        runId,
         error: diagError instanceof Error ? diagError.message : String(diagError),
+        ...extraFields,
       }, LOG_SCOPE);
     }
   }, []);
@@ -311,12 +329,15 @@ const useTrackPlayer = (onTrackLoaded) => {
       return;
     }
     
+    const playlistLoadId = ++playlistLoadCounterRef.current;
+
     logger.info('Loading playlist into TrackPlayer queue', { 
       trackCount: playlistData.length, 
       startIndex,
       startTrack: playlistData[startIndex]?.title,
       savedPosition,
-      shouldPlay
+      shouldPlay,
+      playlistLoadId,
     }, 'useTrackPlayer');
     
     const normalizedQueue = playlistData
@@ -330,7 +351,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       .filter(Boolean);
     
     if (normalizedQueue.length === 0) {
-      logger.error('No valid tracks available to enqueue', { playlistLength: playlistData.length }, 'useTrackPlayer');
+      logger.error('No valid tracks available to enqueue', { playlistLength: playlistData.length, playlistLoadId }, 'useTrackPlayer');
       return;
     }
     
@@ -344,7 +365,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     
     const loadingTimeout = setTimeout(() => {
       if (isLoadingNewFile.current) {
-        logger.error('Playlist loading timeout - forcing completion', { timeout: '15 seconds' }, 'useTrackPlayer');
+        logger.error('Playlist loading timeout - forcing completion', { timeout: '15 seconds', playlistLoadId }, 'useTrackPlayer');
         setIsLoading(false);
         isLoadingNewFile.current = false;
         trackLoadMutex.current = false;
@@ -362,7 +383,8 @@ const useTrackPlayer = (onTrackLoaded) => {
         await AsyncStorage.setItem('currentIndex', safeStartIndex.toString());
         logger.debug('Playlist stored in AsyncStorage', { 
           trackCount: playlistData.length, 
-          startIndex: safeStartIndex 
+          startIndex: safeStartIndex,
+          playlistLoadId,
         }, 'useTrackPlayer');
       } catch (error) {
         logger.error('Error storing playlist in AsyncStorage', { 
@@ -370,8 +392,11 @@ const useTrackPlayer = (onTrackLoaded) => {
         }, 'useTrackPlayer');
       }
       
+      await logPlaybackDiagnostics('pre-reset', { playlistLoadId, startIndex: safeStartIndex, trackCount: normalizedQueue.length });
       await TrackPlayer.reset();
+      await logPlaybackDiagnostics('post-reset', { playlistLoadId });
       await TrackPlayer.add(normalizedQueue);
+      await logPlaybackDiagnostics('post-add', { playlistLoadId, queueLength: normalizedQueue.length });
 
       try {
         const queueSnapshot = await TrackPlayer.getQueue();
@@ -380,35 +405,40 @@ const useTrackPlayer = (onTrackLoaded) => {
           firstTrack: queueSnapshot[0]?.title,
           startIndex: safeStartIndex,
           requestedTrack: selectedTrack.title,
+          playlistLoadId,
         }, LOG_SCOPE);
       } catch (queueError) {
         logger.error('Unable to inspect TrackPlayer queue after load', {
           error: queueError instanceof Error ? queueError.message : String(queueError),
+          playlistLoadId,
         }, LOG_SCOPE);
       }
 
       await TrackPlayer.skip(selectedTrack.id);
-      await logPlaybackDiagnostics('post-skip');
+      await logPlaybackDiagnostics('post-skip', { playlistLoadId, selectedTrackId: selectedTrack.id });
 
       try {
         await TrackPlayer.updateMetadataForTrack(selectedTrack.id, selectedTrack);
         logger.info('Now playing metadata primed for first track', {
           trackId: selectedTrack.id,
           title: selectedTrack.title,
+          playlistLoadId,
         }, LOG_SCOPE);
       } catch (metadataError) {
         logger.warn('Failed to prime lock-screen metadata for first track', {
           error: metadataError instanceof Error ? metadataError.message : String(metadataError),
           trackId: selectedTrack.id,
+          playlistLoadId,
         }, LOG_SCOPE);
       }
-      await logPlaybackDiagnostics('post-metadata');
+      await logPlaybackDiagnostics('post-metadata', { playlistLoadId, selectedTrackId: selectedTrack.id });
       
       if (savedPosition > 0) {
         await TrackPlayer.seekTo(savedPosition);
         logger.info('Playlist seeked to saved position', { 
           startTrack: selectedTrack.title, 
-          savedPosition 
+          savedPosition,
+          playlistLoadId,
         }, 'useTrackPlayer');
       }
       
@@ -419,12 +449,13 @@ const useTrackPlayer = (onTrackLoaded) => {
         lastTrackStartTime.current = Date.now();
         logger.info('Playlist started playback', { 
           startTrack: selectedTrack.title, 
-          startIndex: safeStartIndex 
+          startIndex: safeStartIndex,
+          playlistLoadId,
         }, 'useTrackPlayer');
-        await logPlaybackDiagnostics('post-play');
+        await logPlaybackDiagnostics('post-play', { playlistLoadId, selectedTrackId: selectedTrack.id });
       } else {
         setIsPlaying(false);
-        logger.info('Playlist loaded without playback', { startTrack: selectedTrack.title }, 'useTrackPlayer');
+        logger.info('Playlist loaded without playback', { startTrack: selectedTrack.title, playlistLoadId }, 'useTrackPlayer');
       }
       
       setCurrentTrack(selectedTrack);
@@ -434,7 +465,8 @@ const useTrackPlayer = (onTrackLoaded) => {
     } catch (error) {
       logger.error('Error loading playlist queue', { 
         error: error instanceof Error ? error.message : String(error),
-        startIndex: safeStartIndex
+        startIndex: safeStartIndex,
+        playlistLoadId,
       }, 'useTrackPlayer');
       clearTimeout(loadingTimeout);
       setIsLoading(false);
