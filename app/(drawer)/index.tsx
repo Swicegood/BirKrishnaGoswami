@@ -11,7 +11,6 @@ import {
   Linking,
   ImageBackground,
   Platform,
-  ImageSourcePropType,
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Text, View } from '../../components/Themed';
@@ -26,88 +25,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import logger from '../../utils/logger';
 
 const ORIENTATION_THRESHOLD = 0.1; // 10% threshold
-
-type HomeButton = {
-  key: string;
-  label: string;
-  href: string;
-  image: ImageSourcePropType;
-};
-
-const HOME_BUTTONS: HomeButton[] = [
-  {
-    key: 'live',
-    label: 'LIVE',
-    href: './LiveScreen',
-    image: require('../../assets/images/Live_Streaming.png'),
-  },
-  {
-    key: 'audio',
-    label: 'AUDIO',
-    href: './AudioStartScreen',
-    image: require('../../assets/images/Audio.png'),
-  },
-  {
-    key: 'pictures',
-    label: 'PICTURES',
-    href: './GurudevaPicsScreen',
-    image: require('../../assets/images/Pictures.png'),
-  },
-  {
-    key: 'deities',
-    label: 'DEITIES',
-    href: './DeityGallery',
-    image: require('../../assets/images/Deities.png'),
-  },
-  {
-    key: 'temples',
-    label: 'TEMPLES',
-    href: './TemplesScreen',
-    image: require('../../assets/images/Temples.png'),
-  },
-  {
-    key: 'blog',
-    label: 'BLOG',
-    href: './BlogScreen',
-    image: require('../../assets/images/Blog.png'),
-  },
-  {
-    key: 'searchVideos',
-    label: 'SEARCH VIDEOS',
-    href: './SearchYouTubeScreen',
-    image: require('../../assets/images/Search_Videos.png'),
-  },
-  {
-    key: 'recentUploads',
-    label: 'RECENT UPLOADS',
-    href: './(tabs)/RecentUploads',
-    image: require('../../assets/images/Recent_Uploads.png'),
-  },
-  {
-    key: 'quotes',
-    label: 'QUOTES',
-    href: './QuoteScreen',
-    image: require('../../assets/images/quotes.png'),
-  },
-  {
-    key: 'books',
-    label: 'BOOKS',
-    href: './BooksScreen',
-    image: require('../../assets/images/Books.png'),
-  },
-  {
-    key: 'vyasaPuja',
-    label: 'VYASA PUJA',
-    href: '../(tabs3)/VPPlaylistScreen',
-    image: require('../../assets/images/Vyasa-Puja-Button.png'),
-  },
-  {
-    key: 'vpBooks',
-    label: 'VP BOOKS',
-    href: '../VPBooksScreen',
-    image: require('../../assets/images/vyasa-puja-books.png'),
-  },
-];
 
 const ENTRIES = [
   { title: 'Slide 1', image: require('../../assets/images/Thought_of_the_Day.png'), link: '../QuoteScreen' },
@@ -140,7 +57,6 @@ export default function TabOneScireen() {
   const [orientation, setOrientation] = useState(
     Dimensions.get('window').width > Dimensions.get('window').height ? 'LANDSCAPE' : 'PORTRAIT'
   );
-  const isWebLandscape = Platform.OS === 'web' && orientation === 'LANDSCAPE';
 
 
   if (Platform.OS !== 'web') {
@@ -328,53 +244,6 @@ export default function TabOneScireen() {
     );
   }
 
-  const renderWebLandscapeButtons = () => {
-    if (!isWebLandscape) {
-      return null;
-    }
-
-    const maxButtons = 16;
-    const buttonsToUse = HOME_BUTTONS.slice(0, maxButtons);
-    const rows: HomeButton[][] = [];
-
-    for (let i = 0; i < buttonsToUse.length; i += 8) {
-      rows.push(buttonsToUse.slice(i, i + 8));
-    }
-
-    while (rows.length < 2) {
-      rows.push([]);
-    }
-
-    return rows.slice(0, 2).map((row, rowIndex) => (
-      <View key={`web-row-${rowIndex}`} style={[styles.buttonRow, styles.webLandscapeRow]}>
-        {row.map((button) => (
-          <Link key={button.key} href={button.href} asChild>
-            <TouchableOpacity style={[styles.buttonContainer, styles.webLandscapeButtonContainer]}>
-              <Image
-                source={button.image}
-                style={[styles.buttonImage, styles.webLandscapeButtonImage]}
-              />
-              <Text style={[styles.buttonText, styles.webLandscapeButtonText]}>
-                {button.label}
-              </Text>
-            </TouchableOpacity>
-          </Link>
-        ))}
-        {row.length < 8 &&
-          Array.from({ length: 8 - row.length }).map((_, placeholderIndex) => (
-            <View
-              key={`placeholder-${rowIndex}-${placeholderIndex}`}
-              style={[
-                styles.buttonContainer,
-                styles.webLandscapeButtonContainer,
-                styles.webLandscapePlaceholder,
-              ]}
-            />
-          ))}
-      </View>
-    ));
-  };
-
   return (
     <>
       <SafeAreaView style={styles.safeArea}>
@@ -540,132 +409,126 @@ export default function TabOneScireen() {
             </React.Fragment>
           ) : (
             <>
-              {isWebLandscape ? (
-                renderWebLandscapeButtons()
-              ) : (
-                <>
-                  <View style={styles.buttonRow}>
-                    {/* Button components */}
-                    <Link href="./LiveScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Live_Streaming.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>LIVE</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    <Link href="./AudioStartScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Audio.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>AUDIO</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    {/* More buttons */}
-                    <Link href="./GurudevaPicsScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Pictures.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>PICTURES</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    <Link href="./DeityGallery" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Deities.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>DEITIES</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    {/* More buttons */}
-                    <Link href="./TemplesScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Temples.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>TEMPLES</Text>
-                      </TouchableOpacity>
-                    </Link>
-                  </View>
-                  <View style={styles.buttonRow}>
-                    <Link href="./BlogScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Blog.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>BLOG</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    {/* More buttons */}
-                    <Link href="./SearchYouTubeScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Search_Videos.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    <Link href="./(tabs)/RecentUploads" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Recent_Uploads.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>RECENT UPLOADS</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    {/* More buttons */}
-                    <Link href="./QuoteScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/quotes.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>QUOTES</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    <Link href="./BooksScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Books.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>BOOKS</Text>
-                      </TouchableOpacity>
-                    </Link>
-                  </View>
-                  <View style={styles.buttonRow}>
-                    {/* Button components */}
-                    <Link href="../(tabs3)/VPPlaylistScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/Vyasa-Puja-Button.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>VYASA PUJA</Text>
-                      </TouchableOpacity>
-                    </Link>
-                    <Link href="../VPBooksScreen" asChild>
-                      <TouchableOpacity style={styles.buttonContainer}>
-                        <Image
-                          source={require('../../assets/images/vyasa-puja-books.png')} // Replace with your local or network image
-                          style={styles.buttonImage}
-                        />
-                        <Text style={styles.buttonText}>VP BOOKS</Text>
-                      </TouchableOpacity>
-                    </Link>
-                  </View>
-                </>
-              )}
+              <View style={styles.buttonRow}>
+                {/* Button components */}
+                <Link href="./LiveScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Live_Streaming.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>LIVE</Text>
+                  </TouchableOpacity>
+                </Link>
+                <Link href="./AudioStartScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Audio.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>AUDIO</Text>
+                  </TouchableOpacity>
+                </Link>
+                {/* More buttons */}
+                <Link href="./GurudevaPicsScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Pictures.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>PICTURES</Text>
+                  </TouchableOpacity>
+                </Link>
+                <Link href="./DeityGallery" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Deities.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>DEITIES</Text>
+                  </TouchableOpacity>
+                </Link>
+                {/* More buttons */}
+                <Link href="./TemplesScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Temples.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>TEMPLES</Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
+              <View style={styles.buttonRow}>
+                <Link href="./BlogScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Blog.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>BLOG</Text>
+                  </TouchableOpacity>
+                </Link>
+                {/* More buttons */}
+                <Link href="./SearchYouTubeScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Search_Videos.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>SEARCH VIDEOS</Text>
+                  </TouchableOpacity>
+                </Link>
+                <Link href="./(tabs)/RecentUploads" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Recent_Uploads.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>RECENT UPLOADS</Text>
+                  </TouchableOpacity>
+                </Link>
+                {/* More buttons */}
+                <Link href="./QuoteScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/quotes.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>QUOTES</Text>
+                  </TouchableOpacity>
+                </Link>
+                <Link href="./BooksScreen" asChild>
+                  <TouchableOpacity style={styles.buttonContainer}>
+                    <Image
+                      source={require('../../assets/images/Books.png')} // Replace with your local or network image
+                      style={styles.buttonImage}
+                    />
+                    <Text style={styles.buttonText}>BOOKS</Text>
+                  </TouchableOpacity>
+                </Link>
+                <View style={styles.buttonRow}>
+                  {/* Button components */}
+                  <Link href="../(tabs3)/VPPlaylistScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/Vyasa-Puja-Button.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>VYASA PUJA</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="../VPBooksScreen" asChild>
+                    <TouchableOpacity style={styles.buttonContainer}>
+                      <Image
+                        source={require('../../assets/images/vyasa-puja-books.png')} // Replace with your local or network image
+                        style={styles.buttonImage}
+                      />
+                      <Text style={styles.buttonText}>VP BOOKS</Text>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
+              </View>
             </>
           )
           }
@@ -737,11 +600,6 @@ interface Styles {
   footerButtonBig: ViewStyle;
   footerText: TextStyle;
   imageWide: ImageStyle;
-  webLandscapeRow: ViewStyle;
-  webLandscapeButtonContainer: ViewStyle;
-  webLandscapeButtonImage: ImageStyle;
-  webLandscapeButtonText: TextStyle;
-  webLandscapePlaceholder: ViewStyle;
 }
 
 const styles = StyleSheet.create<Styles>({
@@ -844,30 +702,5 @@ const styles = StyleSheet.create<Styles>({
     marginLeft: -10,
     marginRight: -10,
     textAlign: 'center',
-  },
-  webLandscapeRow: {
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-  },
-  webLandscapeButtonContainer: {
-    width: '12.5%',
-    maxWidth: 150,
-    minWidth: 110,
-    paddingHorizontal: 6,
-    marginVertical: 10,
-  },
-  webLandscapeButtonImage: {
-    width: '100%',
-    height: undefined,
-    aspectRatio: 178 / 100,
-  },
-  webLandscapeButtonText: {
-    marginLeft: 0,
-    marginRight: 0,
-    fontSize: 12,
-  },
-  webLandscapePlaceholder: {
-    opacity: 0,
   },
 });
