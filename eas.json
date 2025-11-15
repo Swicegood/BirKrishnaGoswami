@@ -55,6 +55,15 @@
       "env": {
         "EXPO_PACKAGE_MANAGER": "npm"
       }
+    },
+    "release-apk": {
+      "android": {
+        "buildType": "apk",
+        "resourceClass": "medium"
+      },
+      "env": {
+        "EXPO_PACKAGE_MANAGER": "npm"
+      }
     }
   },
   "submit": {
