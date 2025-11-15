@@ -268,6 +268,33 @@ const useTrackPlayer = (onTrackLoaded) => {
     }
   });
 
+  const logPlaybackDiagnostics = useCallback(async (contextLabel = 'diagnostics') => {
+    try {
+      const [state, queue, currentIdx] = await Promise.all([
+        TrackPlayer.getState(),
+        TrackPlayer.getQueue(),
+        TrackPlayer.getCurrentTrack(),
+      ]);
+      const activeTrack = typeof currentIdx === 'number'
+        ? await TrackPlayer.getTrack(currentIdx)
+        : null;
+
+      logger.info('TrackPlayer diagnostics snapshot', {
+        context: contextLabel,
+        state,
+        queueLength: queue.length,
+        currentIndex: currentIdx,
+        currentTrackTitle: activeTrack?.title || null,
+        currentTrackDuration: activeTrack?.duration || null,
+      }, LOG_SCOPE);
+    } catch (diagError) {
+      logger.error('Failed to capture TrackPlayer diagnostics', {
+        context: contextLabel,
+        error: diagError instanceof Error ? diagError.message : String(diagError),
+      }, LOG_SCOPE);
+    }
+  }, []);
+
   const loadPlaylist = useCallback(async (playlistData, startIndex = 0, savedPosition = 0, shouldPlay = true) => {
     if (!Array.isArray(playlistData) || playlistData.length === 0) {
       logger.warn('Attempted to load empty playlist', {}, 'useTrackPlayer');
@@ -361,6 +388,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       }
 
       await TrackPlayer.skip(selectedTrack.id);
+      await logPlaybackDiagnostics('post-skip');
 
       try {
         await TrackPlayer.updateMetadataForTrack(selectedTrack.id, selectedTrack);
@@ -374,6 +402,7 @@ const useTrackPlayer = (onTrackLoaded) => {
           trackId: selectedTrack.id,
         }, LOG_SCOPE);
       }
+      await logPlaybackDiagnostics('post-metadata');
       
       if (savedPosition > 0) {
         await TrackPlayer.seekTo(savedPosition);
@@ -392,6 +421,7 @@ const useTrackPlayer = (onTrackLoaded) => {
           startTrack: selectedTrack.title, 
           startIndex: safeStartIndex 
         }, 'useTrackPlayer');
+        await logPlaybackDiagnostics('post-play');
       } else {
         setIsPlaying(false);
         logger.info('Playlist loaded without playback', { startTrack: selectedTrack.title }, 'useTrackPlayer');
