@@ -31,6 +31,9 @@ const useTrackPlayer = (onTrackLoaded) => {
   const diagnosticsRunCounterRef = useRef(0);
   const playlistLoadCounterRef = useRef(0);
   const appStateTransitionCounterRef = useRef(0);
+  const pendingPlaybackCleanupTimeoutRef = useRef(null);
+  const pendingPlaybackRef = useRef(null);
+  const activePlaylistLoadIdRef = useRef(null);
   
   const buildTrackPlayerEntry = (track, index) => {
     if (!track || !track.url) {
@@ -113,6 +116,50 @@ const useTrackPlayer = (onTrackLoaded) => {
     
     return watchdogIntervalRef.current;
   }, [ensureAudioSessionActive]);
+
+  const logPendingPlaybackState = useCallback((contextLabel = 'pending-playback', extraFields = {}) => {
+    const snapshot = pendingPlaybackRef.current;
+    if (!snapshot) {
+      logger.info('Pending playback state snapshot (none)', {
+        context: contextLabel,
+        currentAppState: appState.current,
+        ...extraFields,
+      }, LOG_SCOPE);
+      return;
+    }
+
+    const ageMs = Date.now() - (snapshot.requestedAt ?? Date.now());
+    logger.info('Pending playback state snapshot', {
+      context: contextLabel,
+      currentAppState: appState.current,
+      ageMs,
+      ...snapshot,
+      ...extraFields,
+    }, LOG_SCOPE);
+  }, []);
+
+  const clearPendingPlaybackContext = useCallback((reason = 'unspecified', extraFields = {}) => {
+    if (!pendingPlaybackRef.current) {
+      logger.info('No pending playback context to clear', { reason, ...extraFields }, LOG_SCOPE);
+      return;
+    }
+
+    if (pendingPlaybackCleanupTimeoutRef.current) {
+      clearTimeout(pendingPlaybackCleanupTimeoutRef.current);
+      pendingPlaybackCleanupTimeoutRef.current = null;
+    }
+
+    logger.info('Clearing pending playback context', {
+      reason,
+      currentAppState: appState.current,
+      playlistLoadId: pendingPlaybackRef.current.playlistLoadId,
+      trackId: pendingPlaybackRef.current.trackId,
+      trackTitle: pendingPlaybackRef.current.trackTitle,
+      stage: pendingPlaybackRef.current.stage,
+      ...extraFields,
+    }, LOG_SCOPE);
+    pendingPlaybackRef.current = null;
+  }, []);
 
   useEffect(() => {
     const setupAudioAndWatchdog = async () => {
@@ -198,9 +245,11 @@ const useTrackPlayer = (onTrackLoaded) => {
           clearInterval(watchdogIntervalRef.current);
         }
         watchdogIntervalRef.current = startPlaybackWatchdog();
+        logPendingPlaybackState('appstate-active', { transitionId });
         logPlaybackDiagnostics('appstate-active', { transitionId }).catch(() => {});
       } else if (appState.current === 'active' && nextAppState.match(/inactive|background/)) {
         logger.info('App moved to background/inactive', { transitionId }, LOG_SCOPE);
+        logPendingPlaybackState(`appstate-${nextAppState}`, { transitionId });
         logPlaybackDiagnostics(`appstate-${nextAppState}`, { transitionId }).catch(() => {});
       }
       appState.current = nextAppState;
@@ -213,14 +262,23 @@ const useTrackPlayer = (onTrackLoaded) => {
       logger.info('Removing app state listener', {}, LOG_SCOPE);
       subscription.remove();
     };
-  }, [logPlaybackDiagnostics, startPlaybackWatchdog]);
+  }, [logPlaybackDiagnostics, startPlaybackWatchdog, logPendingPlaybackState]);
+
+  useEffect(() => {
+    return () => {
+      if (pendingPlaybackCleanupTimeoutRef.current) {
+        clearTimeout(pendingPlaybackCleanupTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackState, Event.PlaybackError, Event.PlaybackQueueEnded], async (event) => {
     logger.debug('TrackPlayer event received', { 
       type: event.type, 
       state: event.state,
       nextTrack: event.nextTrack,
-      error: event.error
+      error: event.error,
+      activePlaylistLoadId: activePlaylistLoadIdRef.current,
     }, 'useTrackPlayer');
     
     if (event.type === Event.PlaybackError) {
@@ -230,14 +288,14 @@ const useTrackPlayer = (onTrackLoaded) => {
       await goToNextTrack();
     } else if (event.type === Event.PlaybackTrackChanged && event.nextTrack !== null) {
       try {
-        const track = await TrackPlayer.getTrack(event.nextTrack);
-        if (track) {
-          logger.info('Track changed', { 
-            track: track.title,
-            trackIndex: event.nextTrack
-          }, 'useTrackPlayer');
-          setCurrentTrack(track);
-          onTrackLoaded?.(true);
+      const track = await TrackPlayer.getTrack(event.nextTrack);
+      if (track) {
+        logger.info('Track changed', { 
+          track: track.title,
+          trackIndex: event.nextTrack
+        }, 'useTrackPlayer');
+        setCurrentTrack(track);
+        onTrackLoaded?.(true);
         }
       } catch (error) {
         logger.error('Error retrieving track after change', { 
@@ -265,6 +323,15 @@ const useTrackPlayer = (onTrackLoaded) => {
       const wasPlaying = isPlaying;
       const nowPlaying = event.state === State.Playing;
       setIsPlaying(nowPlaying);
+      if (pendingPlaybackRef.current && pendingPlaybackRef.current.playlistLoadId === activePlaylistLoadIdRef.current) {
+        pendingPlaybackRef.current.lastKnownState = event.state;
+        pendingPlaybackRef.current.lastStateAt = Date.now();
+        if (event.state === State.Playing) {
+          pendingPlaybackRef.current.stage = 'state-playing';
+          pendingPlaybackRef.current.playbackConfirmedAt = Date.now();
+          logPendingPlaybackState('state-playing', { playlistLoadId: pendingPlaybackRef.current.playlistLoadId });
+        }
+      }
       
       // Only log significant state changes
       if (wasPlaying !== nowPlaying) {
@@ -292,6 +359,22 @@ const useTrackPlayer = (onTrackLoaded) => {
       const activeTrack = typeof currentIdx === 'number'
         ? await TrackPlayer.getTrack(currentIdx)
         : null;
+      const pendingSnapshot = pendingPlaybackRef.current
+        ? {
+            pendingPlaylistLoadId: pendingPlaybackRef.current.playlistLoadId,
+            pendingStage: pendingPlaybackRef.current.stage ?? null,
+            pendingTrackTitle: pendingPlaybackRef.current.trackTitle ?? null,
+            pendingAgeMs: Date.now() - (pendingPlaybackRef.current.requestedAt ?? Date.now()),
+            pendingAppStateAtRequest: pendingPlaybackRef.current.appStateAtRequest ?? null,
+            pendingMetadataPrimedAt: pendingPlaybackRef.current.metadataPrimedAt ?? null,
+            pendingPlayRequestedAt: pendingPlaybackRef.current.playRequestedAt ?? null,
+            pendingPlayResolvedAt: pendingPlaybackRef.current.playResolvedAt ?? null,
+            pendingPlaybackConfirmedAt: pendingPlaybackRef.current.playbackConfirmedAt ?? null,
+            pendingSavedPosition: pendingPlaybackRef.current.savedPosition ?? null,
+            pendingShouldPlay: pendingPlaybackRef.current.shouldPlay ?? null,
+            pendingLastKnownState: pendingPlaybackRef.current.lastKnownState ?? null,
+          }
+        : {};
 
       logger.info('TrackPlayer diagnostics snapshot', {
         context: contextLabel,
@@ -301,6 +384,9 @@ const useTrackPlayer = (onTrackLoaded) => {
         currentIndex: currentIdx,
         currentTrackTitle: activeTrack?.title || null,
         currentTrackDuration: activeTrack?.duration || null,
+        activePlaylistLoadId: activePlaylistLoadIdRef.current,
+        appState: appState.current,
+        ...pendingSnapshot,
         ...extraFields,
       }, LOG_SCOPE);
     } catch (diagError) {
@@ -323,12 +409,12 @@ const useTrackPlayer = (onTrackLoaded) => {
       logger.warn('Track load mutex locked, skipping playlist request', { startIndex }, 'useTrackPlayer');
       return;
     }
-    
+
     if (isLoadingNewFile.current) {
       logger.warn('Already loading audio, skipping playlist request', { startIndex }, 'useTrackPlayer');
       return;
     }
-    
+
     const playlistLoadId = ++playlistLoadCounterRef.current;
 
     logger.info('Loading playlist into TrackPlayer queue', { 
@@ -338,7 +424,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       savedPosition,
       shouldPlay,
       playlistLoadId,
-    }, 'useTrackPlayer');
+      }, 'useTrackPlayer');
     
     const normalizedQueue = playlistData
       .map((track, index) => {
@@ -354,15 +440,38 @@ const useTrackPlayer = (onTrackLoaded) => {
       logger.error('No valid tracks available to enqueue', { playlistLength: playlistData.length, playlistLoadId }, 'useTrackPlayer');
       return;
     }
-    
+
     const safeStartIndex = Math.min(Math.max(startIndex, 0), normalizedQueue.length - 1);
     const selectedTrack = normalizedQueue[safeStartIndex];
-    
+    if (pendingPlaybackCleanupTimeoutRef.current) {
+      clearTimeout(pendingPlaybackCleanupTimeoutRef.current);
+      pendingPlaybackCleanupTimeoutRef.current = null;
+    }
+
+    activePlaylistLoadIdRef.current = playlistLoadId;
+    pendingPlaybackRef.current = {
+      playlistLoadId,
+      trackId: selectedTrack.id,
+      trackTitle: selectedTrack.title,
+      stage: shouldPlay ? 'initializing-playback' : 'initialized-no-play',
+      requestedAt: Date.now(),
+      appStateAtRequest: appState.current,
+      shouldPlay, 
+      savedPosition,
+      metadataPrimedAt: null,
+      playRequestedAt: null,
+      playResolvedAt: null,
+      playbackConfirmedAt: null,
+      lastKnownState: null,
+      lastStateAt: null,
+    };
+    logPendingPlaybackState('playlist-load-start', { playlistLoadId });
+
     // Acquire mutex
     trackLoadMutex.current = true;
     isLoadingNewFile.current = true;
     setIsLoading(true);
-    
+
     const loadingTimeout = setTimeout(() => {
       if (isLoadingNewFile.current) {
         logger.error('Playlist loading timeout - forcing completion', { timeout: '15 seconds', playlistLoadId }, 'useTrackPlayer');
@@ -415,10 +524,18 @@ const useTrackPlayer = (onTrackLoaded) => {
       }
 
       await TrackPlayer.skip(selectedTrack.id);
+      if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
+        pendingPlaybackRef.current.stage = 'track-selected';
+      }
+      logPendingPlaybackState('post-skip', { playlistLoadId });
       await logPlaybackDiagnostics('post-skip', { playlistLoadId, selectedTrackId: selectedTrack.id });
 
       try {
         await TrackPlayer.updateMetadataForTrack(selectedTrack.id, selectedTrack);
+        if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
+          pendingPlaybackRef.current.stage = 'metadata-primed';
+          pendingPlaybackRef.current.metadataPrimedAt = Date.now();
+        }
         logger.info('Now playing metadata primed for first track', {
           trackId: selectedTrack.id,
           title: selectedTrack.title,
@@ -430,6 +547,7 @@ const useTrackPlayer = (onTrackLoaded) => {
           trackId: selectedTrack.id,
           playlistLoadId,
         }, LOG_SCOPE);
+        logPendingPlaybackState('metadata-primed', { playlistLoadId });
       }
       await logPlaybackDiagnostics('post-metadata', { playlistLoadId, selectedTrackId: selectedTrack.id });
       
@@ -440,11 +558,24 @@ const useTrackPlayer = (onTrackLoaded) => {
           savedPosition,
           playlistLoadId,
         }, 'useTrackPlayer');
+        if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
+          pendingPlaybackRef.current.stage = 'position-restored';
+        }
+        logPendingPlaybackState('position-restored', { playlistLoadId });
       }
-      
+
       if (shouldPlay) {
+        if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
+          pendingPlaybackRef.current.stage = 'play-requested';
+          pendingPlaybackRef.current.playRequestedAt = Date.now();
+        }
+        logPendingPlaybackState('pre-play', { playlistLoadId });
         await ensureAudioSessionActive();
         await TrackPlayer.play();
+        if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
+          pendingPlaybackRef.current.stage = 'play-resolved';
+          pendingPlaybackRef.current.playResolvedAt = Date.now();
+        }
         setIsPlaying(true);
         lastTrackStartTime.current = Date.now();
         logger.info('Playlist started playback', { 
@@ -452,10 +583,19 @@ const useTrackPlayer = (onTrackLoaded) => {
           startIndex: safeStartIndex,
           playlistLoadId,
         }, 'useTrackPlayer');
+        logPendingPlaybackState('post-play', { playlistLoadId });
+        if (pendingPlaybackCleanupTimeoutRef.current) {
+          clearTimeout(pendingPlaybackCleanupTimeoutRef.current);
+        }
+        pendingPlaybackCleanupTimeoutRef.current = setTimeout(() => {
+          clearPendingPlaybackContext('post-play-auto-clean', { playlistLoadId });
+        }, 20000);
         await logPlaybackDiagnostics('post-play', { playlistLoadId, selectedTrackId: selectedTrack.id });
       } else {
         setIsPlaying(false);
         logger.info('Playlist loaded without playback', { startTrack: selectedTrack.title, playlistLoadId }, 'useTrackPlayer');
+        logPendingPlaybackState('playlist-loaded-without-play', { playlistLoadId });
+        clearPendingPlaybackContext('playlist-loaded-without-play', { playlistLoadId });
       }
       
       setCurrentTrack(selectedTrack);
@@ -468,6 +608,8 @@ const useTrackPlayer = (onTrackLoaded) => {
         startIndex: safeStartIndex,
         playlistLoadId,
       }, 'useTrackPlayer');
+      logPendingPlaybackState('playlist-load-error', { playlistLoadId });
+      clearPendingPlaybackContext('playlist-load-error', { playlistLoadId });
       clearTimeout(loadingTimeout);
       setIsLoading(false);
       setCurrentTrack(selectedTrack);
@@ -476,7 +618,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       trackLoadMutex.current = false;
       isLoadingNewFile.current = false;
     }
-  }, [ensureAudioSessionActive, onTrackLoaded]);
+  }, [ensureAudioSessionActive, onTrackLoaded, logPlaybackDiagnostics, logPendingPlaybackState, clearPendingPlaybackContext]);
 
   const loadTrack = useCallback(async (trackUrl, trackTitle, shouldPlay = true, startPosition = 0) => {
     if (!trackUrl) {
@@ -503,7 +645,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       logger.warn('Track transition already in progress, skipping next request', {}, 'useTrackPlayer');
       return;
     }
-    
+
     isTransitioning.current = true;
     global.setManualNavigation?.(true);
     
@@ -537,18 +679,18 @@ const useTrackPlayer = (onTrackLoaded) => {
         } catch (trackError) {
           logger.error('Error retrieving next track metadata', { 
             error: trackError instanceof Error ? trackError.message : String(trackError) 
-          }, 'useTrackPlayer');
-        }
+        }, 'useTrackPlayer');
+      }
       }
     } catch (error) {
       logger.error('Error skipping to next track', { 
         error: error instanceof Error ? error.message : String(error) 
-      }, 'useTrackPlayer');
-    } finally {
-      isTransitioning.current = false;
-      setTimeout(() => {
-        global.setManualNavigation?.(false);
-      }, 3000);
+        }, 'useTrackPlayer');
+      } finally {
+        isTransitioning.current = false;
+        setTimeout(() => {
+          global.setManualNavigation?.(false);
+        }, 3000);
     }
   };
 
@@ -559,9 +701,9 @@ const useTrackPlayer = (onTrackLoaded) => {
     }
     
     isTransitioning.current = true;
-    global.setManualNavigation?.(true);
-    
-    try {
+      global.setManualNavigation?.(true);
+      
+      try {
       await TrackPlayer.skipToPrevious();
       await ensureAudioSessionActive();
       await TrackPlayer.play();
@@ -570,7 +712,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       if (typeof prevIndex === 'number') {
         setCurrentIndex(prevIndex);
         try {
-          await AsyncStorage.setItem('currentIndex', prevIndex.toString());
+        await AsyncStorage.setItem('currentIndex', prevIndex.toString());
         } catch (error) {
           logger.error('Error storing previous index', { 
             error: error instanceof Error ? error.message : String(error) 
@@ -584,25 +726,25 @@ const useTrackPlayer = (onTrackLoaded) => {
           } else if (playlist[prevIndex]) {
             setCurrentTrack(playlist[prevIndex]);
           }
-          logger.info('Successfully went to previous track', { 
-            newIndex: prevIndex, 
+        logger.info('Successfully went to previous track', { 
+          newIndex: prevIndex, 
             trackTitle: track?.title || playlist[prevIndex]?.title 
           }, 'useTrackPlayer');
         } catch (trackError) {
           logger.error('Error retrieving previous track metadata', { 
             error: trackError instanceof Error ? trackError.message : String(trackError) 
-          }, 'useTrackPlayer');
+        }, 'useTrackPlayer');
         }
       }
-    } catch (error) {
+      } catch (error) {
       logger.error('Error skipping to previous track', { 
         error: error instanceof Error ? error.message : String(error) 
-      }, 'useTrackPlayer');
-    } finally {
-      isTransitioning.current = false;
-      setTimeout(() => {
-        global.setManualNavigation?.(false);
-      }, 3000);
+        }, 'useTrackPlayer');
+      } finally {
+        isTransitioning.current = false;
+        setTimeout(() => {
+          global.setManualNavigation?.(false);
+        }, 3000);
     }
   };
 
