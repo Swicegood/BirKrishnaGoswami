@@ -932,27 +932,46 @@ const AudioScreen = () => {
                   Track {currentIndex + 1} of {playlist?.length || 0}
                 </Text>
               )}
-              <Slider
-                style={styles.slider}
-                thumbTintColor="#FFFFFF" // Color of the knob
-                minimumTrackTintColor="#FFF" // Color of the used track
-                maximumTrackTintColor="#808080" // Color of the unused track
-                value={position}
-                maximumValue={duration}
-                onSlidingComplete={async (value) => {
-                  logger.info('User seeking to position', { 
-                    from: position, 
-                    to: value, 
-                    title: (currentTrack as any)?.title || file.title || 'Unknown' 
-                  }, 'AudioScreen');
-                  await seekTo(value);
-                  // Save position after seeking
-                  if (value > 0 && currentTrack) {
-                    logger.info('Saving position after slider seek', { value }, 'AudioScreen');
-                    updateState(value);
-                  }
-                }}
-              />
+              {Platform.OS === 'web' ? (
+                // Basic web slider to avoid findDOMNode usage from community slider on React 19
+                <input
+                  type="range"
+                  min={0}
+                  max={Math.max(Number(duration) || 0, 0)}
+                  value={Math.max(Math.min(Number(position) || 0, Number(duration) || 0), 0)}
+                  onChange={() => {}}
+                  onMouseUp={async (e: any) => {
+                    const value = Number(e.target?.value ?? 0);
+                    logger.info('User seeking to position (web input)', { from: position, to: value }, 'AudioScreen');
+                    await seekTo(value);
+                    if (value > 0 && currentTrack) {
+                      updateState(value);
+                    }
+                  }}
+                  style={{ width: '90%' }}
+                />
+              ) : (
+                <Slider
+                  style={styles.slider}
+                  thumbTintColor="#FFFFFF"
+                  minimumTrackTintColor="#FFF"
+                  maximumTrackTintColor="#808080"
+                  value={position}
+                  maximumValue={duration}
+                  onSlidingComplete={async (value) => {
+                    logger.info('User seeking to position', { 
+                      from: position, 
+                      to: value, 
+                      title: (currentTrack as any)?.title || file.title || 'Unknown' 
+                    }, 'AudioScreen');
+                    await seekTo(value);
+                    if (value > 0 && currentTrack) {
+                      logger.info('Saving position after slider seek', { value }, 'AudioScreen');
+                      updateState(value);
+                    }
+                  }}
+                />
+              )}
               <View style={styles.timeContainer}>
                 <Text style={styles.title}>{formatTime(position)}</Text>
                 <Text style={styles.title}>{formatTime(duration)}</Text>
