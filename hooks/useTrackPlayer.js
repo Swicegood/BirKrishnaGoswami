@@ -294,10 +294,14 @@ const useTrackPlayer = (onTrackLoaded) => {
 
     lastMetadataDurationRef.current = roundedDuration;
 
-    const trackIdentifier = (
-      currentTrack.id ??
-      (typeof currentIndex === 'number' ? currentIndex : currentTrack.url ?? 'current-track')
-    ).toString();
+    // On Android, updateMetadataForTrack expects a numeric index. Prefer index when available.
+    const trackIdentifier = typeof currentIndex === 'number'
+      ? currentIndex
+      : (typeof currentTrack?.id === 'number'
+          ? currentTrack.id
+          : (typeof currentTrack?.id === 'string'
+              ? currentIndex // fallback to index-like value; will be NaN if not a number
+              : currentIndex));
 
     (async () => {
       try {
