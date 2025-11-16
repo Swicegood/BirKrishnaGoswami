@@ -563,7 +563,11 @@ const useTrackPlayer = (onTrackLoaded) => {
               webAudioRef.current.pause();
             } catch (_) {}
           }
-          const audio = new Audio(selectedTrack.url);
+          const WebAudioCtor = (typeof window !== 'undefined' && window.Audio) ? window.Audio : (typeof globalThis !== 'undefined' ? globalThis.Audio : null);
+          if (!WebAudioCtor) {
+            throw new Error('HTML5 Audio API not available');
+          }
+          const audio = new WebAudioCtor(selectedTrack.url);
           audio.preload = 'metadata';
           audio.onloadedmetadata = () => {
             const d = isFinite(audio.duration) ? audio.duration : 0;
@@ -878,7 +882,12 @@ const useTrackPlayer = (onTrackLoaded) => {
         // Lazily create audio element if none exists but we have a track to play
         if (!audio && (currentTrack?.url || playlist[currentIndex]?.url)) {
           const selected = currentTrack ?? playlist[currentIndex];
-          const newAudio = new Audio(selected.url);
+          const WebAudioCtor = (typeof window !== 'undefined' && window.Audio) ? window.Audio : (typeof globalThis !== 'undefined' ? globalThis.Audio : null);
+          if (!WebAudioCtor) {
+            logger.error('HTML5 Audio API not available on toggle', {}, 'useTrackPlayer');
+            return;
+          }
+          const newAudio = new WebAudioCtor(selected.url);
           newAudio.preload = 'metadata';
           newAudio.onloadedmetadata = () => {
             const d = isFinite(newAudio.duration) ? newAudio.duration : 0;
