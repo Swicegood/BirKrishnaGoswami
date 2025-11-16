@@ -35,6 +35,9 @@ const useTrackPlayer = (onTrackLoaded) => {
   const pendingPlaybackRef = useRef(null);
   const activePlaylistLoadIdRef = useRef(null);
   
+  // Define diagnostics logger early to avoid temporal dead zone when referenced in hooks
+  // (moved earlier)
+
   const buildTrackPlayerEntry = (track, index) => {
     if (!track || !track.url) {
       return null;
