@@ -1,6 +1,6 @@
 
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useColorScheme, useWindowDimensions } from 'react-native';
+import { useColorScheme, useWindowDimensions, Platform } from 'react-native';
 import CustomHeader from '../../components/CustomHeader';
 import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';
@@ -172,6 +172,11 @@ function TabBarIcon(props: {
 
 export default function DrawerLayout() {
   const colorScheme = useColorScheme();
+  const { width: winWidth } = useWindowDimensions();
+  // On web, prefer a numeric drawer width to avoid percent-based off-screen issues in landscape
+  const webDrawerWidth = Platform.OS === 'web'
+    ? Math.min(420, Math.max(300, Math.floor(winWidth * 0.3)))
+    : undefined;
 
   return (
     <Drawer
@@ -181,9 +186,12 @@ export default function DrawerLayout() {
       screenOptions={{
         drawerType: "front",
         drawerStyle: {
-          width: "70%",
-          maxWidth: 400,
+          width: webDrawerWidth ?? "70%",
+          maxWidth: Platform.OS === 'web' ? undefined : 400,
         },
+        // Prevent swipe gestures on web which can cause unexpected offsets
+        swipeEdgeWidth: Platform.OS === 'web' ? 0 : undefined,
+        swipeEnabled: Platform.OS === 'web' ? false : undefined,
       }}
     >
       <Drawer.Screen
