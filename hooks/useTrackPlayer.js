@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AppState } from 'react-native';
-import TrackPlayer, { State, Event, useTrackPlayerEvents, useProgress } from 'react-native-track-player';
+import TrackPlayer, { State, Event, useTrackPlayerEvents, useProgress, Capability } from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import logger from '../utils/logger';
@@ -67,6 +67,32 @@ const useTrackPlayer = (onTrackLoaded) => {
       hasOnTrackLoaded: !!onTrackLoaded,
       initialAppState: appState.current
     }, 'useTrackPlayer');
+  }, []);
+
+  const configureRemoteCapabilities = useCallback(async () => {
+    try {
+      await TrackPlayer.updateOptions({
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.SeekTo,
+        ],
+        compactCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+        ],
+        progressUpdateEventInterval: 1,
+      });
+      logger.info('Reapplied remote capabilities', {}, LOG_SCOPE);
+    } catch (error) {
+      logger.error('Failed to reapply remote capabilities', {
+        error: error instanceof Error ? error.message : String(error)
+      }, LOG_SCOPE);
+    }
   }, []);
 
   const ensureAudioSessionActive = useCallback(async () => {
@@ -245,6 +271,8 @@ const useTrackPlayer = (onTrackLoaded) => {
           clearInterval(watchdogIntervalRef.current);
         }
         watchdogIntervalRef.current = startPlaybackWatchdog();
+        // Re-apply capabilities when returning to foreground (AOD -> active)
+        await configureRemoteCapabilities();
         logPendingPlaybackState('appstate-active', { transitionId });
         logPlaybackDiagnostics('appstate-active', { transitionId }).catch(() => {});
       } else if (appState.current === 'active' && nextAppState.match(/inactive|background/)) {
@@ -262,7 +290,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       logger.info('Removing app state listener', {}, LOG_SCOPE);
       subscription.remove();
     };
-  }, [logPlaybackDiagnostics, startPlaybackWatchdog, logPendingPlaybackState]);
+  }, [logPlaybackDiagnostics, startPlaybackWatchdog, logPendingPlaybackState, configureRemoteCapabilities]);
 
   useEffect(() => {
     return () => {
@@ -271,6 +299,11 @@ const useTrackPlayer = (onTrackLoaded) => {
       }
     };
   }, []);
+
+  // Re-apply capabilities any time playlist size changes (ensures Skip commands visible)
+  useEffect(() => {
+    configureRemoteCapabilities();
+  }, [playlist?.length, configureRemoteCapabilities]);
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackState, Event.PlaybackError, Event.PlaybackQueueEnded], async (event) => {
     logger.debug('TrackPlayer event received', { 
@@ -506,6 +539,8 @@ const useTrackPlayer = (onTrackLoaded) => {
       await logPlaybackDiagnostics('post-reset', { playlistLoadId });
       await TrackPlayer.add(normalizedQueue);
       await logPlaybackDiagnostics('post-add', { playlistLoadId, queueLength: normalizedQueue.length });
+      // Ensure remote command capabilities are applied after queue is ready
+      await configureRemoteCapabilities();
 
       try {
         const queueSnapshot = await TrackPlayer.getQueue();
