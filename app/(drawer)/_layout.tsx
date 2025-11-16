@@ -5,7 +5,7 @@ import CustomHeader from '../../components/CustomHeader';
 import CustomBackHeader from '../../components/CustomBackHeader';
 import { Drawer } from 'expo-router/drawer';
 import React, { useState, useEffect } from 'react';
-import { View, Text, Dimensions, StyleSheet, Image, Platform } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
