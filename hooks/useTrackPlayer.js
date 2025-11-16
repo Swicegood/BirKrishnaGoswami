@@ -678,10 +678,11 @@ const useTrackPlayer = (onTrackLoaded) => {
       await logPlaybackDiagnostics('post-metadata', { playlistLoadId, selectedTrackIndex: safeStartIndex });
       
       if (savedPosition > 0) {
-        await TrackPlayer.seekTo(savedPosition);
+        const numericSavedPosition = Number(savedPosition) || 0;
+        await TrackPlayer.seekTo(numericSavedPosition);
         logger.info('Playlist seeked to saved position', { 
           startTrack: selectedTrack.title, 
-          savedPosition,
+          savedPosition: numericSavedPosition,
           playlistLoadId,
         }, 'useTrackPlayer');
         if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
@@ -962,8 +963,9 @@ const useTrackPlayer = (onTrackLoaded) => {
         setWebPosition(newPos);
         return;
       }
-      await TrackPlayer.seekTo(position);
-      logger.info('Seek completed', { position }, 'useTrackPlayer');
+      const numericPosition = Number(position) || 0;
+      await TrackPlayer.seekTo(numericPosition);
+      logger.info('Seek completed', { position: numericPosition }, 'useTrackPlayer');
     } catch (error) {
       logger.error('Error seeking to position', { 
         error: error instanceof Error ? error.message : String(error),
@@ -984,8 +986,8 @@ const useTrackPlayer = (onTrackLoaded) => {
         return;
       }
       const currentPosition = await TrackPlayer.getPosition();
-      const newPosition = Math.min(currentPosition + seconds, duration);
-      await TrackPlayer.seekTo(newPosition);
+      const newPosition = Math.min(currentPosition + Number(seconds || 0), duration);
+      await TrackPlayer.seekTo(Number(newPosition) || 0);
       logger.info('Seek forward completed', { 
         from: currentPosition, 
         to: newPosition, 
@@ -1011,8 +1013,8 @@ const useTrackPlayer = (onTrackLoaded) => {
         return;
       }
       const currentPosition = await TrackPlayer.getPosition();
-      const newPosition = Math.max(currentPosition - seconds, 0);
-      await TrackPlayer.seekTo(newPosition);
+      const newPosition = Math.max(currentPosition - Number(seconds || 0), 0);
+      await TrackPlayer.seekTo(Number(newPosition) || 0);
       logger.info('Seek backward completed', { 
         from: currentPosition, 
         to: newPosition, 

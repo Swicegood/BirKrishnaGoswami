@@ -223,8 +223,9 @@ module.exports = async function () {
   TrackPlayer.addEventListener(Event.RemoteSeek, async (event) => {
     logger.info('RemoteSeek event received', { position: event.position }, 'TrackPlayerService');
     try {
-      await TrackPlayer.seekTo(event.position);
-      logger.info('Remote seek completed', { position: event.position }, 'TrackPlayerService');
+      const numericPosition = Number(event.position) || 0;
+      await TrackPlayer.seekTo(numericPosition);
+      logger.info('Remote seek completed', { position: numericPosition }, 'TrackPlayerService');
     } catch (error) {
       logger.error('Error in RemoteSeek event', { 
         error: error instanceof Error ? error.message : String(error),
