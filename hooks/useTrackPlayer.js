@@ -561,33 +561,44 @@ const useTrackPlayer = (onTrackLoaded) => {
         }, LOG_SCOPE);
       }
 
-      await TrackPlayer.skip(selectedTrack.id);
+      // Prefer skipping by numeric index to avoid any potential mismatches with track ids
+      await TrackPlayer.skip(safeStartIndex);
       if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
         pendingPlaybackRef.current.stage = 'track-selected';
       }
       logPendingPlaybackState('post-skip', { playlistLoadId });
-      await logPlaybackDiagnostics('post-skip', { playlistLoadId, selectedTrackId: selectedTrack.id });
+      try {
+        const activeIndexAfterSkip = await TrackPlayer.getCurrentTrack();
+        logger.info('Verified current track after skip', {
+          requestedIndex: safeStartIndex,
+          activeIndexAfterSkip,
+          requestedTitle: selectedTrack.title,
+          playlistLoadId,
+        }, LOG_SCOPE);
+      } catch {}
+      await logPlaybackDiagnostics('post-skip', { playlistLoadId, selectedTrackIndex: safeStartIndex });
 
       try {
-        await TrackPlayer.updateMetadataForTrack(selectedTrack.id, selectedTrack);
+        // Update metadata using the same identifier form as skip (index)
+        await TrackPlayer.updateMetadataForTrack(safeStartIndex, selectedTrack);
         if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
           pendingPlaybackRef.current.stage = 'metadata-primed';
           pendingPlaybackRef.current.metadataPrimedAt = Date.now();
         }
         logger.info('Now playing metadata primed for first track', {
-          trackId: selectedTrack.id,
+          trackIndex: safeStartIndex,
           title: selectedTrack.title,
           playlistLoadId,
         }, LOG_SCOPE);
       } catch (metadataError) {
         logger.warn('Failed to prime lock-screen metadata for first track', {
           error: metadataError instanceof Error ? metadataError.message : String(metadataError),
-          trackId: selectedTrack.id,
+          trackIndex: safeStartIndex,
           playlistLoadId,
         }, LOG_SCOPE);
         logPendingPlaybackState('metadata-primed', { playlistLoadId });
       }
-      await logPlaybackDiagnostics('post-metadata', { playlistLoadId, selectedTrackId: selectedTrack.id });
+      await logPlaybackDiagnostics('post-metadata', { playlistLoadId, selectedTrackIndex: safeStartIndex });
       
       if (savedPosition > 0) {
         await TrackPlayer.seekTo(savedPosition);
