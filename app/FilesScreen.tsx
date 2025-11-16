@@ -197,9 +197,21 @@ const FilesScreen = () => {
       </View>
     );
   }
-  const renderItem = ({ item }: { item: File & { hasListenedTrack?: boolean } }) => (
+  const renderItem = ({ item, index }: { item: File & { hasListenedTrack?: boolean }, index: number }) => (
     <View style={styles.container}>
-      <Link href={{ pathname: "AudioScreen", params: { url: item.url, title: item.title, category: category } }} asChild>
+      <Link
+        href={{
+          pathname: "AudioScreen",
+          params: {
+            url: item.url,
+            title: item.title,
+            // Pass the full playlist and the selected index so AudioScreen starts at the correct track
+            playlist: JSON.stringify(files.map(f => ({ title: f.title, url: f.url }))),
+            currentIndex: String(index),
+          }
+        }}
+        asChild
+      >
         <TouchableOpacity style={styles.playButton}>
           <Image source={require('../assets/images/vecteezy_jogar-design-de-sinal-de-icone-de-botao_10148443.png')} style={styles.playIcon} />
         </TouchableOpacity>
