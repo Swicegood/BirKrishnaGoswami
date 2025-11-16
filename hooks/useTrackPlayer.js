@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import TrackPlayer, { State, Event, useTrackPlayerEvents, useProgress, Capability } from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
@@ -11,12 +11,17 @@ const DEFAULT_GENRE = 'Spiritual';
 const LOG_SCOPE = 'useTrackPlayer';
 
 const useTrackPlayer = (onTrackLoaded) => {
+  const isWeb = Platform.OS === 'web';
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [playlist, setPlaylist] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Web-only audio backing state
+  const webAudioRef = useRef(null);
+  const [webPosition, setWebPosition] = useState(0);
+  const [webDuration, setWebDuration] = useState(0);
   
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
@@ -35,6 +40,64 @@ const useTrackPlayer = (onTrackLoaded) => {
   const pendingPlaybackRef = useRef(null);
   const activePlaylistLoadIdRef = useRef(null);
   
+  // Define diagnostics logger early to avoid temporal dead zone when referenced in hooks
+  // (moved earlier)
+  const logPlaybackDiagnostics = useCallback(async (contextLabel = 'diagnostics', extraFields = {}) => {
+    if (isWeb) {
+      logger.debug('Skipping TrackPlayer diagnostics on web', { context: contextLabel, ...extraFields }, LOG_SCOPE);
+      return;
+    }
+    diagnosticsRunCounterRef.current += 1;
+    const runId = diagnosticsRunCounterRef.current;
+    try {
+      const [state, queue, currentIdx] = await Promise.all([
+        TrackPlayer.getState(),
+        TrackPlayer.getQueue(),
+        TrackPlayer.getCurrentTrack(),
+      ]);
+      const activeTrack = typeof currentIdx === 'number'
+        ? await TrackPlayer.getTrack(currentIdx)
+        : null;
+      const pendingSnapshot = pendingPlaybackRef.current
+        ? {
+            pendingPlaylistLoadId: pendingPlaybackRef.current.playlistLoadId,
+            pendingStage: pendingPlaybackRef.current.stage ?? null,
+            pendingTrackTitle: pendingPlaybackRef.current.trackTitle ?? null,
+            pendingAgeMs: Date.now() - (pendingPlaybackRef.current.requestedAt ?? Date.now()),
+            pendingAppStateAtRequest: pendingPlaybackRef.current.appStateAtRequest ?? null,
+            pendingMetadataPrimedAt: pendingPlaybackRef.current.metadataPrimedAt ?? null,
+            pendingPlayRequestedAt: pendingPlaybackRef.current.playRequestedAt ?? null,
+            pendingPlayResolvedAt: pendingPlaybackRef.current.playResolvedAt ?? null,
+            pendingPlaybackConfirmedAt: pendingPlaybackRef.current.playbackConfirmedAt ?? null,
+            pendingSavedPosition: pendingPlaybackRef.current.savedPosition ?? null,
+            pendingShouldPlay: pendingPlaybackRef.current.shouldPlay ?? null,
+            pendingLastKnownState: pendingPlaybackRef.current.lastKnownState ?? null,
+          }
+        : {};
+
+      logger.info('TrackPlayer diagnostics snapshot', {
+        context: contextLabel,
+        runId,
+        state,
+        queueLength: queue.length,
+        currentIndex: currentIdx,
+        currentTrackTitle: activeTrack?.title || null,
+        currentTrackDuration: activeTrack?.duration || null,
+        activePlaylistLoadId: activePlaylistLoadIdRef.current,
+        appState: appState.current,
+        ...pendingSnapshot,
+        ...extraFields,
+      }, LOG_SCOPE);
+    } catch (diagError) {
+      logger.error('Failed to capture TrackPlayer diagnostics', {
+        context: contextLabel,
+        runId,
+        error: diagError instanceof Error ? diagError.message : String(diagError),
+        ...extraFields,
+      }, LOG_SCOPE);
+    }
+  }, []);
+
   const buildTrackPlayerEntry = (track, index) => {
     if (!track || !track.url) {
       return null;
@@ -115,6 +178,10 @@ const useTrackPlayer = (onTrackLoaded) => {
   }, []);
 
   const startPlaybackWatchdog = useCallback(() => {
+    if (isWeb) {
+      logger.debug('Skipping playback watchdog on web', {}, 'useTrackPlayer');
+      return null;
+    }
     logger.info('Starting playback watchdog', {}, 'useTrackPlayer');
     
     // Clear any existing watchdog first
@@ -306,6 +373,10 @@ const useTrackPlayer = (onTrackLoaded) => {
   }, [playlist?.length, configureRemoteCapabilities]);
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackState, Event.PlaybackError, Event.PlaybackQueueEnded], async (event) => {
+    if (isWeb) {
+      // Skip handling native TrackPlayer events on web
+      return;
+    }
     logger.debug('TrackPlayer event received', { 
       type: event.type, 
       state: event.state,
@@ -380,58 +451,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     }
   });
 
-  const logPlaybackDiagnostics = useCallback(async (contextLabel = 'diagnostics', extraFields = {}) => {
-    diagnosticsRunCounterRef.current += 1;
-    const runId = diagnosticsRunCounterRef.current;
-    try {
-      const [state, queue, currentIdx] = await Promise.all([
-        TrackPlayer.getState(),
-        TrackPlayer.getQueue(),
-        TrackPlayer.getCurrentTrack(),
-      ]);
-      const activeTrack = typeof currentIdx === 'number'
-        ? await TrackPlayer.getTrack(currentIdx)
-        : null;
-      const pendingSnapshot = pendingPlaybackRef.current
-        ? {
-            pendingPlaylistLoadId: pendingPlaybackRef.current.playlistLoadId,
-            pendingStage: pendingPlaybackRef.current.stage ?? null,
-            pendingTrackTitle: pendingPlaybackRef.current.trackTitle ?? null,
-            pendingAgeMs: Date.now() - (pendingPlaybackRef.current.requestedAt ?? Date.now()),
-            pendingAppStateAtRequest: pendingPlaybackRef.current.appStateAtRequest ?? null,
-            pendingMetadataPrimedAt: pendingPlaybackRef.current.metadataPrimedAt ?? null,
-            pendingPlayRequestedAt: pendingPlaybackRef.current.playRequestedAt ?? null,
-            pendingPlayResolvedAt: pendingPlaybackRef.current.playResolvedAt ?? null,
-            pendingPlaybackConfirmedAt: pendingPlaybackRef.current.playbackConfirmedAt ?? null,
-            pendingSavedPosition: pendingPlaybackRef.current.savedPosition ?? null,
-            pendingShouldPlay: pendingPlaybackRef.current.shouldPlay ?? null,
-            pendingLastKnownState: pendingPlaybackRef.current.lastKnownState ?? null,
-          }
-        : {};
-
-      logger.info('TrackPlayer diagnostics snapshot', {
-        context: contextLabel,
-        runId,
-        state,
-        queueLength: queue.length,
-        currentIndex: currentIdx,
-        currentTrackTitle: activeTrack?.title || null,
-        currentTrackDuration: activeTrack?.duration || null,
-        activePlaylistLoadId: activePlaylistLoadIdRef.current,
-        appState: appState.current,
-        ...pendingSnapshot,
-        ...extraFields,
-      }, LOG_SCOPE);
-    } catch (diagError) {
-      logger.error('Failed to capture TrackPlayer diagnostics', {
-        context: contextLabel,
-        runId,
-        error: diagError instanceof Error ? diagError.message : String(diagError),
-        ...extraFields,
-      }, LOG_SCOPE);
-    }
-  }, []);
-
+  
   const loadPlaylist = useCallback(async (playlistData, startIndex = 0, savedPosition = 0, shouldPlay = true) => {
     if (!Array.isArray(playlistData) || playlistData.length === 0) {
       logger.warn('Attempted to load empty playlist', {}, 'useTrackPlayer');
@@ -533,7 +553,63 @@ const useTrackPlayer = (onTrackLoaded) => {
           error: error instanceof Error ? error.message : String(error) 
         }, 'useTrackPlayer');
       }
-      
+
+      if (isWeb) {
+        // Web shim: use HTMLAudioElement for playback
+        try {
+          // Cleanup any existing audio
+          if (webAudioRef.current) {
+            try {
+              webAudioRef.current.pause();
+            } catch (_) {}
+          }
+          const audio = new Audio(selectedTrack.url);
+          audio.preload = 'metadata';
+          audio.onloadedmetadata = () => {
+            const d = isFinite(audio.duration) ? audio.duration : 0;
+            setWebDuration(d);
+            logger.info('Web audio loaded metadata', { duration: d, playlistLoadId }, LOG_SCOPE);
+          };
+          audio.ontimeupdate = () => {
+            setWebPosition(audio.currentTime || 0);
+          };
+          audio.onended = () => {
+            setIsPlaying(false);
+          };
+          audio.onerror = (e) => {
+            logger.error('Web audio error', { error: `${audio.error?.code ?? 'unknown'}`, playlistLoadId }, LOG_SCOPE);
+          };
+          webAudioRef.current = audio;
+          // Apply saved position if provided
+          if (savedPosition > 0) {
+            audio.currentTime = savedPosition;
+            setWebPosition(savedPosition);
+            logger.info('Web audio seeked to saved position', { savedPosition, playlistLoadId }, LOG_SCOPE);
+          }
+          // Autoplay if requested
+          if (shouldPlay) {
+            try {
+              await audio.play();
+              setIsPlaying(true);
+              logger.info('Web audio started', { playlistLoadId }, LOG_SCOPE);
+            } catch (playErr) {
+              logger.error('Web audio play() failed (likely autoplay blocked)', { error: String(playErr) }, LOG_SCOPE);
+              setIsPlaying(false);
+            }
+          } else {
+            setIsPlaying(false);
+          }
+        } finally {
+          setCurrentTrack(selectedTrack);
+          setIsLoading(false);
+          clearTimeout(loadingTimeout);
+          onTrackLoaded?.(true);
+          clearPendingPlaybackContext('web-skip-trackplayer', { playlistLoadId });
+          logger.info('Web platform: completed web audio queue setup', { playlistLoadId }, LOG_SCOPE);
+        }
+        return;
+      }
+
       await logPlaybackDiagnostics('pre-reset', { playlistLoadId, startIndex: safeStartIndex, trackCount: normalizedQueue.length });
       await TrackPlayer.reset();
       await logPlaybackDiagnostics('post-reset', { playlistLoadId });
@@ -676,6 +752,10 @@ const useTrackPlayer = (onTrackLoaded) => {
   }, [loadPlaylist]);
 
   const goToNextTrack = async () => {
+    if (isWeb) {
+      logger.warn('goToNextTrack is not supported on web (TrackPlayer)', {}, 'useTrackPlayer');
+      return;
+    }
     if (isTransitioning.current) {
       logger.warn('Track transition already in progress, skipping next request', {}, 'useTrackPlayer');
       return;
@@ -730,6 +810,10 @@ const useTrackPlayer = (onTrackLoaded) => {
   };
 
   const goToPreviousTrack = async () => {
+    if (isWeb) {
+      logger.warn('goToPreviousTrack is not supported on web (TrackPlayer)', {}, 'useTrackPlayer');
+      return;
+    }
     if (isTransitioning.current) {
       logger.warn('Track transition already in progress, skipping previous request', {}, 'useTrackPlayer');
       return;
@@ -789,6 +873,47 @@ const useTrackPlayer = (onTrackLoaded) => {
     }, 'useTrackPlayer');
     
     try {
+      if (isWeb) {
+        let audio = webAudioRef.current;
+        // Lazily create audio element if none exists but we have a track to play
+        if (!audio && (currentTrack?.url || playlist[currentIndex]?.url)) {
+          const selected = currentTrack ?? playlist[currentIndex];
+          const newAudio = new Audio(selected.url);
+          newAudio.preload = 'metadata';
+          newAudio.onloadedmetadata = () => {
+            const d = isFinite(newAudio.duration) ? newAudio.duration : 0;
+            setWebDuration(d);
+          };
+          newAudio.ontimeupdate = () => {
+            setWebPosition(newAudio.currentTime || 0);
+          };
+          newAudio.onended = () => {
+            setIsPlaying(false);
+          };
+          newAudio.onerror = () => {};
+          webAudioRef.current = newAudio;
+          audio = newAudio;
+          logger.info('Web audio lazily created on toggle', { hasTrack: true }, 'useTrackPlayer');
+        }
+        if (!audio) {
+          logger.warn('togglePlayback called on web without audio element', {}, 'useTrackPlayer');
+          return;
+        }
+        if (isPlaying) {
+          audio.pause();
+          setIsPlaying(false);
+          logger.info('Web audio paused', {}, 'useTrackPlayer');
+        } else {
+          try {
+            await audio.play();
+            setIsPlaying(true);
+            logger.info('Web audio started', {}, 'useTrackPlayer');
+          } catch (err) {
+            logger.error('Web audio play() failed', { error: String(err) }, 'useTrackPlayer');
+          }
+        }
+        return;
+      }
       if (isPlaying) {
         await TrackPlayer.pause();
         setIsPlaying(false);
@@ -809,6 +934,14 @@ const useTrackPlayer = (onTrackLoaded) => {
   const seekTo = async (position) => {
     logger.info('Seeking to position', { position }, 'useTrackPlayer');
     try {
+      if (isWeb) {
+        const audio = webAudioRef.current;
+        if (!audio) return;
+        const newPos = Math.max(0, Math.min(Number(position) || 0, webDuration || Number.MAX_SAFE_INTEGER));
+        audio.currentTime = newPos;
+        setWebPosition(newPos);
+        return;
+      }
       await TrackPlayer.seekTo(position);
       logger.info('Seek completed', { position }, 'useTrackPlayer');
     } catch (error) {
@@ -822,6 +955,14 @@ const useTrackPlayer = (onTrackLoaded) => {
   const seekForward = async (seconds = 30) => {
     logger.info('Seeking forward', { seconds }, 'useTrackPlayer');
     try {
+      if (isWeb) {
+        const audio = webAudioRef.current;
+        if (!audio) return;
+        const next = Math.min((audio.currentTime || 0) + seconds, webDuration || Number.MAX_SAFE_INTEGER);
+        audio.currentTime = next;
+        setWebPosition(next);
+        return;
+      }
       const currentPosition = await TrackPlayer.getPosition();
       const newPosition = Math.min(currentPosition + seconds, duration);
       await TrackPlayer.seekTo(newPosition);
@@ -841,6 +982,14 @@ const useTrackPlayer = (onTrackLoaded) => {
   const seekBackward = async (seconds = 15) => {
     logger.info('Seeking backward', { seconds }, 'useTrackPlayer');
     try {
+      if (isWeb) {
+        const audio = webAudioRef.current;
+        if (!audio) return;
+        const prev = Math.max((audio.currentTime || 0) - seconds, 0);
+        audio.currentTime = prev;
+        setWebPosition(prev);
+        return;
+      }
       const currentPosition = await TrackPlayer.getPosition();
       const newPosition = Math.max(currentPosition - seconds, 0);
       await TrackPlayer.seekTo(newPosition);
@@ -860,6 +1009,14 @@ const useTrackPlayer = (onTrackLoaded) => {
   const stopPlayback = async () => {
     logger.info('Stopping playback', {}, 'useTrackPlayer');
     try {
+      if (isWeb) {
+        const audio = webAudioRef.current;
+        if (audio) {
+          try { audio.pause(); } catch (_) {}
+          setIsPlaying(false);
+        }
+        return;
+      }
       await TrackPlayer.stop();
       setIsPlaying(false);
       logger.info('Playback stopped', {}, 'useTrackPlayer');
@@ -885,9 +1042,22 @@ const useTrackPlayer = (onTrackLoaded) => {
       trackLoadMutex.current = false;
       isTransitioning.current = false;
       isLoadingNewFile.current = false;
-      
-      await TrackPlayer.destroy();
-      logger.info('TrackPlayer cleanup completed', {}, 'useTrackPlayer');
+
+      if (!isWeb) {
+        await TrackPlayer.destroy();
+        logger.info('TrackPlayer cleanup completed', {}, 'useTrackPlayer');
+      } else {
+        // Cleanup web audio element
+        const audio = webAudioRef.current;
+        if (audio) {
+          try { audio.pause(); } catch (_) {}
+          try { audio.src = ''; } catch (_) {}
+        }
+        webAudioRef.current = null;
+        setWebPosition(0);
+        setWebDuration(0);
+        logger.debug('Cleaned up web audio element', {}, 'useTrackPlayer');
+      }
     } catch (error) {
       logger.error('Error cleaning up TrackPlayer', { 
         error: error instanceof Error ? error.message : String(error) 
@@ -902,8 +1072,8 @@ const useTrackPlayer = (onTrackLoaded) => {
     currentTrack,
     playlist,
     currentIndex,
-    position,
-    duration,
+    position: isWeb ? webPosition : position,
+    duration: isWeb ? webDuration : duration,
     appStateVisible,
     
     // Actions
