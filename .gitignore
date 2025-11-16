@@ -93,3 +93,4 @@ package-lock.json
 log.txt
 scratch*
 *.log
+package.json.backup
