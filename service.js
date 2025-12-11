@@ -245,8 +245,27 @@ module.exports = async function () {
         const track = await TrackPlayer.getTrack(event.nextTrack);
         logger.info('Now playing track', { 
           title: track?.title,
+          artist: track?.artist,
+          album: track?.album,
           trackIndex: event.nextTrack
         }, 'TrackPlayerService');
+        
+        // Ensure metadata is updated for lockscreen controls
+        // On Android, updateMetadataForTrack expects a numeric index
+        if (track && typeof event.nextTrack === 'number') {
+          try {
+            await TrackPlayer.updateMetadataForTrack(event.nextTrack, track);
+            logger.info('Updated metadata for track change', {
+              trackIndex: event.nextTrack,
+              title: track.title,
+            }, 'TrackPlayerService');
+          } catch (metadataError) {
+            logger.warn('Failed to update metadata on track change', {
+              error: metadataError instanceof Error ? metadataError.message : String(metadataError),
+              trackIndex: event.nextTrack,
+            }, 'TrackPlayerService');
+          }
+        }
       } catch (error) {
         logger.error('Error getting track info', { 
           error: error instanceof Error ? error.message : String(error),

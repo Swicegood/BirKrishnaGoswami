@@ -294,25 +294,41 @@ const useTrackPlayer = (onTrackLoaded) => {
 
     lastMetadataDurationRef.current = roundedDuration;
 
-    const trackIdentifier = (
-      currentTrack.id ??
-      (typeof currentIndex === 'number' ? currentIndex : currentTrack.url ?? 'current-track')
-    ).toString();
+    // On Android, updateMetadataForTrack expects a numeric index, not a string ID
+    const trackIdentifier = typeof currentIndex === 'number' 
+      ? currentIndex 
+      : (typeof currentTrack?.id === 'number' ? currentTrack.id : null);
+
+    if (trackIdentifier === null) {
+      logger.warn('Cannot update metadata - no valid numeric track identifier', {
+        currentIndex,
+        trackId: currentTrack?.id,
+      }, LOG_SCOPE);
+      return;
+    }
 
     (async () => {
       try {
-        await TrackPlayer.updateMetadataForTrack(trackIdentifier, {
+        // Ensure we have all required metadata fields
+        const metadataUpdate = {
           ...currentTrack,
           duration: roundedDuration,
-        });
+          // Ensure required fields are present
+          title: currentTrack?.title || 'Unknown Track',
+          artist: currentTrack?.artist || DEFAULT_ARTIST,
+          album: currentTrack?.album || DEFAULT_ALBUM,
+          genre: currentTrack?.genre || DEFAULT_GENRE,
+        };
+        await TrackPlayer.updateMetadataForTrack(trackIdentifier, metadataUpdate);
         logger.info('Updated now playing metadata with measured duration', {
-          trackId: trackIdentifier,
+          trackIndex: trackIdentifier,
           duration: roundedDuration,
+          title: metadataUpdate.title,
         }, LOG_SCOPE);
       } catch (metadataError) {
         logger.warn('Failed to update metadata with measured duration', {
           error: metadataError instanceof Error ? metadataError.message : String(metadataError),
-          trackId: trackIdentifier,
+          trackIndex: trackIdentifier,
         }, LOG_SCOPE);
       }
     })();
@@ -656,17 +672,23 @@ const useTrackPlayer = (onTrackLoaded) => {
       await logPlaybackDiagnostics('post-skip', { playlistLoadId, selectedTrackIndex: safeStartIndex });
 
       try {
-        // Update metadata using the same identifier form as skip (index)
-        await TrackPlayer.updateMetadataForTrack(safeStartIndex, selectedTrack);
-        if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
-          pendingPlaybackRef.current.stage = 'metadata-primed';
-          pendingPlaybackRef.current.metadataPrimedAt = Date.now();
+        // Use the normalized track entry which has all required metadata fields
+        const normalizedTrack = normalizedQueue[safeStartIndex];
+        if (normalizedTrack) {
+          // On Android, updateMetadataForTrack expects a numeric index
+          await TrackPlayer.updateMetadataForTrack(safeStartIndex, normalizedTrack);
+          if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
+            pendingPlaybackRef.current.stage = 'metadata-primed';
+            pendingPlaybackRef.current.metadataPrimedAt = Date.now();
+          }
+          logger.info('Now playing metadata primed for first track', {
+            trackIndex: safeStartIndex,
+            title: normalizedTrack.title,
+            artist: normalizedTrack.artist,
+            album: normalizedTrack.album,
+            playlistLoadId,
+          }, LOG_SCOPE);
         }
-        logger.info('Now playing metadata primed for first track', {
-          trackIndex: safeStartIndex,
-          title: selectedTrack.title,
-          playlistLoadId,
-        }, LOG_SCOPE);
       } catch (metadataError) {
         logger.warn('Failed to prime lock-screen metadata for first track', {
           error: metadataError instanceof Error ? metadataError.message : String(metadataError),
