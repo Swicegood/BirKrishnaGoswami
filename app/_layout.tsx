@@ -5,7 +5,7 @@ import { SplashScreen, Stack, usePathname } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import CustomHeaderMain from '../components/CustomHeaderMain';
-import TrackPlayer, { Capability } from 'react-native-track-player';
+import TrackPlayer, { PlayerCommand } from '@rntp/player';
 import logger from '../utils/logger';
 import { registerBackgroundFetch, unregisterBackgroundFetch } from '../backgroundFetch';
 
@@ -46,71 +46,45 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  // Register TrackPlayer service FIRST (must happen before setupPlayer)
-  useEffect(() => {
-    if (Platform.OS === 'web') return; // Skip on web
-    
-    try {
-      logger.info('Registering TrackPlayer playback service', { platform: Platform.OS }, 'TrackPlayer');
-      TrackPlayer.registerPlaybackService(() => require('../service'));
-      logger.info('TrackPlayer playback service registered successfully', { platform: Platform.OS }, 'TrackPlayer');
-    } catch (error) {
-      logger.error('Failed to register TrackPlayer playback service', { 
-        error: error instanceof Error ? error.message : String(error),
-        platform: Platform.OS 
-      }, 'TrackPlayer');
-    }
-  }, []); // Run once on mount
-
   // Initialize TrackPlayer and Background Fetch
   useEffect(() => {
-    if (!loaded) return; // Wait for fonts to load first
-    
+    if (!loaded) return;
+
     const setupTrackPlayer = async () => {
       try {
-        // Only setup TrackPlayer on native platforms
         if (Platform.OS === 'web') {
           logger.info('TrackPlayer not needed on web platform', { platform: Platform.OS }, 'TrackPlayer');
           return;
         }
-        
-        // Check if TrackPlayer is available
+
         if (!TrackPlayer) {
           logger.warn('TrackPlayer is not available - skipping setup', null, 'TrackPlayer');
           return;
         }
-        
-        // Setup the player with background capabilities
-        await TrackPlayer.setupPlayer({
-          waitForBuffer: true,
-          autoHandleInterruptions: true,
+
+        TrackPlayer.setupPlayer({
+          contentType: 'speech',
+          handleAudioBecomingNoisy: true,
+          android: {
+            wakeMode: 'network',
+            taskRemovedBehavior: 'continue',
+          },
         });
-        
-        // Configure capabilities for background playback including seek/jump
-        await TrackPlayer.updateOptions({
+
+        TrackPlayer.setCommands({
           capabilities: [
-            Capability.Play,
-            Capability.Pause,
-            Capability.SkipToNext,
-            Capability.SkipToPrevious,
-            Capability.SeekTo,
+            PlayerCommand.PlayPause,
+            PlayerCommand.Next,
+            PlayerCommand.Previous,
+            PlayerCommand.Seek,
           ],
-          compactCapabilities: [
-            Capability.Play,
-            Capability.Pause,
-            Capability.SkipToNext,
-            Capability.SkipToPrevious,
-          ],
-          progressUpdateEventInterval: 1,
         });
-        
+
         logger.info('TrackPlayer setup complete with background capabilities', { platform: Platform.OS }, 'TrackPlayer');
-        
-        // Register background fetch for auto-advancing tracks
+
         await registerBackgroundFetch();
       } catch (error) {
         logger.error('Error setting up TrackPlayer', { error: error instanceof Error ? error.message : String(error), platform: Platform.OS }, 'TrackPlayer');
-        // Don't throw the error, just log it to prevent app crash
       }
     };
 
@@ -119,16 +93,14 @@ export default function RootLayout() {
     return () => {
       try {
         if (TrackPlayer && Platform.OS !== 'web') {
-          // TrackPlayer doesn't have a destroy method, so we'll just log the cleanup
           logger.info('TrackPlayer cleanup', { platform: Platform.OS }, 'TrackPlayer');
         }
-        // Unregister background fetch on cleanup
         unregisterBackgroundFetch();
       } catch (error) {
         logger.error('Error during TrackPlayer cleanup', { error: error instanceof Error ? error.message : String(error), platform: Platform.OS }, 'TrackPlayer');
       }
     };
-  }, [loaded]); // Add loaded as dependency
+  }, [loaded]);
 
   if (!loaded) {
     logger.debug('App not loaded yet, waiting for fonts', null, 'AppLayout');

@@ -1,7 +1,7 @@
 {
   "name": "bkgonestopshop",
-  "main": "expo-router/entry",
-  "version": "1.0.0",
+  "main": "index.js",
+  "version": "1.6.0",
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -25,7 +25,7 @@
     "doctor": {
       "reactNativeDirectoryCheck": {
         "exclude": [
-          "react-native-track-player",
+          "@rntp/player",
           "react-native-snap-carousel",
           "react-native-swiper",
           "cors",
@@ -51,6 +51,7 @@
     "@react-native-firebase/messaging": "^19.0.1",
     "@react-navigation/drawer": "^7.3.9",
     "@react-navigation/native": "^7.0.0",
+    "@rntp/player": "^5.9.2",
     "@types/axios": "^0.14.0",
     "axios": "^1.6.7",
     "cors": "^2.8.5",
@@ -78,8 +79,8 @@
     "firebase": "^10.8.0",
     "lodash": "^4.17.21",
     "metro": "^0.82.0",
-    "postinstall-postinstall": "^2.1.0",
     "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0",
     "react": "19.0.1",
     "react-dom": "19.0.1",
     "react-native": "0.79.5",
@@ -94,13 +95,12 @@
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "15.11.2",
     "react-native-swiper": "^1.6.0",
-    "react-native-track-player": "^4.1.2",
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "^0.20.0",
     "react-native-web-webview": "^1.0.2",
     "react-native-webview": "13.13.5",
-    "react-native-youtube-iframe": "^2.3.0",
     "react-native-worklets": "0.3.0",
+    "react-native-youtube-iframe": "^2.3.0",
     "shaka-player": "^4.16.9"
   },
   "devDependencies": {

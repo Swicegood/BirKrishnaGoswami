@@ -2,7 +2,8 @@
   "expo": {
     "name": "Bir Krishna Goswami",
     "slug": "bir-krishna-goswami",
-    "version": "1.5.5",
+    "newArchEnabled": true,
+    "version": "1.6.0",
     "orientation": "default",
     "icon": "./assets/images/bkgsquare.png",
     "scheme": "myapp",
@@ -27,11 +28,11 @@
         ],
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "40",
+      "buildNumber": "41",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "versionCode": 34,
+      "versionCode": 35,
       "userInterfaceStyle": "light",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/bkgsquare.png",
@@ -54,8 +55,8 @@
         {
           "ios": {
             "buildReactNativeFromSource": false,
-            "deploymentTarget": "15.1",
-            "newArchEnabled": false,
+            "deploymentTarget": "16.0",
+            "newArchEnabled": true,
             "useModularHeaders": true,
             "useFrameworks": "static",
             "podfileProperties": {
@@ -70,7 +71,10 @@
             }
           },
           "android": {
-            "newArchEnabled": false
+            "newArchEnabled": true,
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0"
           }
         }
       ],

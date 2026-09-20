@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AppState, Platform } from 'react-native';
-import TrackPlayer, { State, Event, useTrackPlayerEvents, useProgress, Capability } from 'react-native-track-player';
+import TrackPlayer, {
+  Event,
+  PlaybackState,
+  PlayerCommand,
+  useProgress,
+} from '@rntp/player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import logger from '../utils/logger';
@@ -12,13 +17,11 @@ const LOG_SCOPE = 'useTrackPlayer';
 
 const useTrackPlayer = (onTrackLoaded) => {
   const isWeb = Platform.OS === 'web';
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [playlist, setPlaylist] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Web-only audio backing state
   const webAudioRef = useRef(null);
   const [webPosition, setWebPosition] = useState(0);
   const [webDuration, setWebDuration] = useState(0);
@@ -39,9 +42,8 @@ const useTrackPlayer = (onTrackLoaded) => {
   const pendingPlaybackCleanupTimeoutRef = useRef(null);
   const pendingPlaybackRef = useRef(null);
   const activePlaylistLoadIdRef = useRef(null);
-  
-  // Define diagnostics logger early to avoid temporal dead zone when referenced in hooks
-  // (moved earlier)
+  const goToNextTrackRef = useRef(null);
+
   const logPlaybackDiagnostics = useCallback(async (contextLabel = 'diagnostics', extraFields = {}) => {
     if (isWeb) {
       logger.debug('Skipping TrackPlayer diagnostics on web', { context: contextLabel, ...extraFields }, LOG_SCOPE);
@@ -50,14 +52,10 @@ const useTrackPlayer = (onTrackLoaded) => {
     diagnosticsRunCounterRef.current += 1;
     const runId = diagnosticsRunCounterRef.current;
     try {
-      const [state, queue, currentIdx] = await Promise.all([
-        TrackPlayer.getState(),
-        TrackPlayer.getQueue(),
-        TrackPlayer.getCurrentTrack(),
-      ]);
-      const activeTrack = typeof currentIdx === 'number'
-        ? await TrackPlayer.getTrack(currentIdx)
-        : null;
+      const state = TrackPlayer.getPlaybackState();
+      const queue = TrackPlayer.getQueue();
+      const currentIdx = TrackPlayer.getActiveMediaItemIndex();
+      const activeTrack = TrackPlayer.getActiveMediaItem();
       const pendingSnapshot = pendingPlaybackRef.current
         ? {
             pendingPlaylistLoadId: pendingPlaybackRef.current.playlistLoadId,
@@ -79,6 +77,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         context: contextLabel,
         runId,
         state,
+        isPlaying: TrackPlayer.isPlaying(),
         queueLength: queue.length,
         currentIndex: currentIdx,
         currentTrackTitle: activeTrack?.title || null,
@@ -108,23 +107,22 @@ const useTrackPlayer = (onTrackLoaded) => {
         ? track.duration
         : typeof track.estimatedDuration === 'number' && track.estimatedDuration > 0
           ? track.estimatedDuration
-          : 1;
+          : undefined;
     
     return {
-      id: track.id ?? `track-${index}-${track.url}`,
+      mediaId: String(track.id ?? `track-${index}-${track.url}`),
       url: track.url,
       title: track.title ?? `Track ${index + 1}`,
       artist: track.artist ?? DEFAULT_ARTIST,
-      album: track.album ?? DEFAULT_ALBUM,
+      albumTitle: track.album ?? track.albumTitle ?? DEFAULT_ALBUM,
       genre: track.genre ?? DEFAULT_GENRE,
       duration: normalizedDuration,
-      artwork: track.artwork,
+      artworkUrl: track.artwork ?? track.artworkUrl,
     };
   };
   
   const { position, duration } = useProgress();
 
-  // Log hook initialization
   useEffect(() => {
     logger.info('useTrackPlayer hook initialized', {
       hasOnTrackLoaded: !!onTrackLoaded,
@@ -132,23 +130,18 @@ const useTrackPlayer = (onTrackLoaded) => {
     }, 'useTrackPlayer');
   }, []);
 
-  const configureRemoteCapabilities = useCallback(async () => {
+  const configureRemoteCapabilities = useCallback(() => {
+    if (isWeb) {
+      return;
+    }
     try {
-      await TrackPlayer.updateOptions({
+      TrackPlayer.setCommands({
         capabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-          Capability.SeekTo,
+          PlayerCommand.PlayPause,
+          PlayerCommand.Next,
+          PlayerCommand.Previous,
+          PlayerCommand.Seek,
         ],
-        compactCapabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-        ],
-        progressUpdateEventInterval: 1,
       });
       logger.info('Reapplied remote capabilities', {}, LOG_SCOPE);
     } catch (error) {
@@ -156,7 +149,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         error: error instanceof Error ? error.message : String(error)
       }, LOG_SCOPE);
     }
-  }, []);
+  }, [isWeb]);
 
   const ensureAudioSessionActive = useCallback(async () => {
     logger.info('Ensuring audio session is active', {}, 'useTrackPlayer');
@@ -184,20 +177,20 @@ const useTrackPlayer = (onTrackLoaded) => {
     }
     logger.info('Starting playback watchdog', {}, 'useTrackPlayer');
     
-    // Clear any existing watchdog first
     if (watchdogIntervalRef.current) {
       clearInterval(watchdogIntervalRef.current);
     }
     
-    watchdogIntervalRef.current = setInterval(async () => {
+    watchdogIntervalRef.current = setInterval(() => {
       try {
-        const playerState = await TrackPlayer.getState();
-        if (playerState === State.Ready && !hasAutoPlayedOnce.current) {
+        const playerState = TrackPlayer.getPlaybackState();
+        const playing = TrackPlayer.isPlaying();
+        if (playerState === PlaybackState.Ready && !playing && !hasAutoPlayedOnce.current) {
           logger.info('Player ready but not playing, attempting to resume (first load only)', {}, 'useTrackPlayer');
-          await ensureAudioSessionActive();
-          await TrackPlayer.play();
+          ensureAudioSessionActive();
+          TrackPlayer.play();
           hasAutoPlayedOnce.current = true;
-        } else if (playerState === State.Ready) {
+        } else if (playerState === PlaybackState.Ready && !playing) {
           logger.info('Player ready but not auto-resuming (not first load)', {}, 'useTrackPlayer');
         }
       } catch (error) {
@@ -205,10 +198,10 @@ const useTrackPlayer = (onTrackLoaded) => {
           error: error instanceof Error ? error.message : String(error) 
         }, 'useTrackPlayer');
       }
-    }, 5000); // Check every 5 seconds
+    }, 5000);
     
     return watchdogIntervalRef.current;
-  }, [ensureAudioSessionActive]);
+  }, [ensureAudioSessionActive, isWeb]);
 
   const logPendingPlaybackState = useCallback((contextLabel = 'pending-playback', extraFields = {}) => {
     const snapshot = pendingPlaybackRef.current;
@@ -258,14 +251,11 @@ const useTrackPlayer = (onTrackLoaded) => {
     const setupAudioAndWatchdog = async () => {
       logger.info('Setting up audio session and watchdog', {}, 'useTrackPlayer');
       await ensureAudioSessionActive();
-      
-      // Start the watchdog
       watchdogIntervalRef.current = startPlaybackWatchdog();
     };
 
     setupAudioAndWatchdog();
 
-    // Clean up function
     return () => {
       logger.info('Cleaning up useTrackPlayer watchdog', {}, 'useTrackPlayer');
       if (watchdogIntervalRef.current) {
@@ -275,12 +265,11 @@ const useTrackPlayer = (onTrackLoaded) => {
   }, [ensureAudioSessionActive, startPlaybackWatchdog]);
 
   useEffect(() => {
-    // Reset duration cache whenever the active track changes
     lastMetadataDurationRef.current = 0;
-  }, [currentTrack?.id]);
+  }, [currentTrack?.mediaId, currentTrack?.id, currentTrack?.url]);
 
   useEffect(() => {
-    if (!currentTrack) {
+    if (isWeb || !currentTrack) {
       return;
     }
     if (typeof duration !== 'number' || duration <= 1) {
@@ -294,45 +283,34 @@ const useTrackPlayer = (onTrackLoaded) => {
 
     lastMetadataDurationRef.current = roundedDuration;
 
-    // On Android, updateMetadataForTrack expects a numeric index, not a string ID
-    const trackIdentifier = typeof currentIndex === 'number' 
-      ? currentIndex 
-      : (typeof currentTrack?.id === 'number' ? currentTrack.id : null);
-
+    const trackIdentifier = typeof currentIndex === 'number' ? currentIndex : null;
     if (trackIdentifier === null) {
       logger.warn('Cannot update metadata - no valid numeric track identifier', {
         currentIndex,
-        trackId: currentTrack?.id,
+        trackId: currentTrack?.mediaId ?? currentTrack?.id,
       }, LOG_SCOPE);
       return;
     }
 
-    (async () => {
-      try {
-        // Ensure we have all required metadata fields
-        const metadataUpdate = {
-          ...currentTrack,
-          duration: roundedDuration,
-          // Ensure required fields are present
-          title: currentTrack?.title || 'Unknown Track',
-          artist: currentTrack?.artist || DEFAULT_ARTIST,
-          album: currentTrack?.album || DEFAULT_ALBUM,
-          genre: currentTrack?.genre || DEFAULT_GENRE,
-        };
-        await TrackPlayer.updateMetadataForTrack(trackIdentifier, metadataUpdate);
-        logger.info('Updated now playing metadata with measured duration', {
-          trackIndex: trackIdentifier,
-          duration: roundedDuration,
-          title: metadataUpdate.title,
-        }, LOG_SCOPE);
-      } catch (metadataError) {
-        logger.warn('Failed to update metadata with measured duration', {
-          error: metadataError instanceof Error ? metadataError.message : String(metadataError),
-          trackIndex: trackIdentifier,
-        }, LOG_SCOPE);
-      }
-    })();
-  }, [currentTrack, currentIndex, duration]);
+    try {
+      TrackPlayer.updateMetadata(trackIdentifier, {
+        title: currentTrack?.title || 'Unknown Track',
+        artist: currentTrack?.artist || DEFAULT_ARTIST,
+        albumTitle: currentTrack?.albumTitle || currentTrack?.album || DEFAULT_ALBUM,
+        artworkUrl: currentTrack?.artworkUrl || currentTrack?.artwork,
+      });
+      logger.info('Updated now playing metadata with measured duration', {
+        trackIndex: trackIdentifier,
+        duration: roundedDuration,
+        title: currentTrack?.title,
+      }, LOG_SCOPE);
+    } catch (metadataError) {
+      logger.warn('Failed to update metadata with measured duration', {
+        error: metadataError instanceof Error ? metadataError.message : String(metadataError),
+        trackIndex: trackIdentifier,
+      }, LOG_SCOPE);
+    }
+  }, [currentTrack, currentIndex, duration, isWeb]);
 
   useEffect(() => {
     logPlaybackDiagnostics('hook-mounted').catch(() => {});
@@ -354,8 +332,7 @@ const useTrackPlayer = (onTrackLoaded) => {
           clearInterval(watchdogIntervalRef.current);
         }
         watchdogIntervalRef.current = startPlaybackWatchdog();
-        // Re-apply capabilities when returning to foreground (AOD -> active)
-        await configureRemoteCapabilities();
+        configureRemoteCapabilities();
         logPendingPlaybackState('appstate-active', { transitionId });
         logPlaybackDiagnostics('appstate-active', { transitionId }).catch(() => {});
       } else if (appState.current === 'active' && nextAppState.match(/inactive|background/)) {
@@ -383,89 +360,99 @@ const useTrackPlayer = (onTrackLoaded) => {
     };
   }, []);
 
-  // Re-apply capabilities any time playlist size changes (ensures Skip commands visible)
   useEffect(() => {
     configureRemoteCapabilities();
   }, [playlist?.length, configureRemoteCapabilities]);
 
-  useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackState, Event.PlaybackError, Event.PlaybackQueueEnded], async (event) => {
+  useEffect(() => {
     if (isWeb) {
-      // Skip handling native TrackPlayer events on web
       return;
     }
-    logger.debug('TrackPlayer event received', { 
-      type: event.type, 
-      state: event.state,
-      nextTrack: event.nextTrack,
-      error: event.error,
-      activePlaylistLoadId: activePlaylistLoadIdRef.current,
-    }, 'useTrackPlayer');
-    
-    if (event.type === Event.PlaybackError) {
-      logger.error('Playback error occurred', { 
-        error: event.error 
+
+    const mediaItemSub = TrackPlayer.addEventListener(Event.MediaItemTransition, ({ item, index }) => {
+      logger.debug('TrackPlayer event received', {
+        type: Event.MediaItemTransition,
+        index,
+        title: item?.title,
+        activePlaylistLoadId: activePlaylistLoadIdRef.current,
       }, 'useTrackPlayer');
-      await goToNextTrack();
-    } else if (event.type === Event.PlaybackTrackChanged && event.nextTrack !== null) {
-      try {
-      const track = await TrackPlayer.getTrack(event.nextTrack);
-      if (track) {
-        logger.info('Track changed', { 
-          track: track.title,
-          trackIndex: event.nextTrack
+
+      if (item) {
+        logger.info('Track changed', {
+          track: item.title,
+          trackIndex: index,
         }, 'useTrackPlayer');
-        setCurrentTrack(track);
+        setCurrentTrack(item);
         onTrackLoaded?.(true);
-        }
-      } catch (error) {
-        logger.error('Error retrieving track after change', { 
-          error: error instanceof Error ? error.message : String(error) 
-        }, 'useTrackPlayer');
       }
-      
-      try {
-        const activeIndex = await TrackPlayer.getCurrentTrack();
-        if (typeof activeIndex === 'number') {
-          setCurrentIndex(activeIndex);
-          await AsyncStorage.setItem('currentIndex', activeIndex.toString());
-        }
-      } catch (error) {
-        logger.error('Error updating current index after track change', { 
-          error: error instanceof Error ? error.message : String(error) 
-        }, 'useTrackPlayer');
+
+      if (typeof index === 'number') {
+        setCurrentIndex(index);
+        AsyncStorage.setItem('currentIndex', index.toString()).catch((error) => {
+          logger.error('Error updating current index after track change', {
+            error: error instanceof Error ? error.message : String(error),
+          }, 'useTrackPlayer');
+        });
       }
-    } else if (event.type === Event.PlaybackQueueEnded) {
-      logger.info('Playback queue ended', {
-        currentIndex,
-        playlistLength: playlist.length
+    });
+
+    const playbackStateSub = TrackPlayer.addEventListener(Event.PlaybackStateChanged, ({ state }) => {
+      logger.debug('TrackPlayer event received', {
+        type: Event.PlaybackStateChanged,
+        state,
+        activePlaylistLoadId: activePlaylistLoadIdRef.current,
       }, 'useTrackPlayer');
-    } else if (event.type === Event.PlaybackState) {
-      const wasPlaying = isPlaying;
-      const nowPlaying = event.state === State.Playing;
-      setIsPlaying(nowPlaying);
+
       if (pendingPlaybackRef.current && pendingPlaybackRef.current.playlistLoadId === activePlaylistLoadIdRef.current) {
-        pendingPlaybackRef.current.lastKnownState = event.state;
+        pendingPlaybackRef.current.lastKnownState = state;
         pendingPlaybackRef.current.lastStateAt = Date.now();
-        if (event.state === State.Playing) {
+      }
+
+      if (state === PlaybackState.Ended) {
+        logger.info('Playback queue ended', {
+          currentIndex,
+          playlistLength: playlist.length,
+        }, 'useTrackPlayer');
+      }
+    });
+
+    const isPlayingSub = TrackPlayer.addEventListener(Event.IsPlayingChanged, ({ playing }) => {
+      setIsPlaying((wasPlaying) => {
+        if (wasPlaying !== playing) {
+          logger.info('Playback state changed', {
+            from: wasPlaying ? 'playing' : 'paused',
+            to: playing ? 'playing' : 'paused',
+          }, 'useTrackPlayer');
+        }
+        return playing;
+      });
+
+      if (pendingPlaybackRef.current && pendingPlaybackRef.current.playlistLoadId === activePlaylistLoadIdRef.current) {
+        pendingPlaybackRef.current.lastKnownState = playing ? 'playing' : 'not-playing';
+        pendingPlaybackRef.current.lastStateAt = Date.now();
+        if (playing) {
           pendingPlaybackRef.current.stage = 'state-playing';
           pendingPlaybackRef.current.playbackConfirmedAt = Date.now();
           logPendingPlaybackState('state-playing', { playlistLoadId: pendingPlaybackRef.current.playlistLoadId });
         }
       }
-      
-      // Only log significant state changes
-      if (wasPlaying !== nowPlaying) {
-        logger.info('Playback state changed', { 
-          from: wasPlaying ? 'playing' : 'paused',
-          to: nowPlaying ? 'playing' : 'paused'
-        }, 'useTrackPlayer');
-      }
-      
-      if (event.state === State.Stopped) {
-        logger.info('Track stopped', {}, 'useTrackPlayer');
-      }
-    }
-  });
+    });
+
+    const errorSub = TrackPlayer.addEventListener(Event.PlaybackError, async ({ code, message }) => {
+      logger.error('Playback error occurred', {
+        error: message,
+        code,
+      }, 'useTrackPlayer');
+      await goToNextTrackRef.current?.();
+    });
+
+    return () => {
+      mediaItemSub.remove();
+      playbackStateSub.remove();
+      isPlayingSub.remove();
+      errorSub.remove();
+    };
+  }, [isWeb, onTrackLoaded, currentIndex, playlist.length, logPendingPlaybackState]);
 
   
   const loadPlaylist = useCallback(async (playlistData, startIndex = 0, savedPosition = 0, shouldPlay = true) => {
@@ -520,7 +507,7 @@ const useTrackPlayer = (onTrackLoaded) => {
     activePlaylistLoadIdRef.current = playlistLoadId;
     pendingPlaybackRef.current = {
       playlistLoadId,
-      trackId: selectedTrack.id,
+      trackId: selectedTrack.mediaId,
       trackTitle: selectedTrack.title,
       stage: shouldPlay ? 'initializing-playback' : 'initialized-no-play',
       requestedAt: Date.now(),
@@ -536,7 +523,6 @@ const useTrackPlayer = (onTrackLoaded) => {
     };
     logPendingPlaybackState('playlist-load-start', { playlistLoadId });
 
-    // Acquire mutex
     trackLoadMutex.current = true;
     isLoadingNewFile.current = true;
     setIsLoading(true);
@@ -571,9 +557,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       }
 
       if (isWeb) {
-        // Web shim: use HTMLAudioElement for playback
         try {
-          // Cleanup any existing audio
           if (webAudioRef.current) {
             try {
               webAudioRef.current.pause();
@@ -600,13 +584,11 @@ const useTrackPlayer = (onTrackLoaded) => {
             logger.error('Web audio error', { error: `${audio.error?.code ?? 'unknown'}`, playlistLoadId }, LOG_SCOPE);
           };
           webAudioRef.current = audio;
-          // Apply saved position if provided
           if (savedPosition > 0) {
             audio.currentTime = savedPosition;
             setWebPosition(savedPosition);
             logger.info('Web audio seeked to saved position', { savedPosition, playlistLoadId }, LOG_SCOPE);
           }
-          // Autoplay if requested
           if (shouldPlay) {
             try {
               await audio.play();
@@ -630,16 +612,13 @@ const useTrackPlayer = (onTrackLoaded) => {
         return;
       }
 
-      await logPlaybackDiagnostics('pre-reset', { playlistLoadId, startIndex: safeStartIndex, trackCount: normalizedQueue.length });
-      await TrackPlayer.reset();
-      await logPlaybackDiagnostics('post-reset', { playlistLoadId });
-      await TrackPlayer.add(normalizedQueue);
-      await logPlaybackDiagnostics('post-add', { playlistLoadId, queueLength: normalizedQueue.length });
-      // Ensure remote command capabilities are applied after queue is ready
-      await configureRemoteCapabilities();
+      await logPlaybackDiagnostics('pre-set-media-items', { playlistLoadId, startIndex: safeStartIndex, trackCount: normalizedQueue.length });
+      TrackPlayer.setMediaItems(normalizedQueue, safeStartIndex);
+      await logPlaybackDiagnostics('post-set-media-items', { playlistLoadId, queueLength: normalizedQueue.length });
+      configureRemoteCapabilities();
 
       try {
-        const queueSnapshot = await TrackPlayer.getQueue();
+        const queueSnapshot = TrackPlayer.getQueue();
         logger.info('TrackPlayer queue hydrated', {
           queueLength: queueSnapshot.length,
           firstTrack: queueSnapshot[0]?.title,
@@ -654,15 +633,13 @@ const useTrackPlayer = (onTrackLoaded) => {
         }, LOG_SCOPE);
       }
 
-      // Prefer skipping by numeric index to avoid any potential mismatches with track ids
-      await TrackPlayer.skip(safeStartIndex);
       if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
         pendingPlaybackRef.current.stage = 'track-selected';
       }
-      logPendingPlaybackState('post-skip', { playlistLoadId });
+      logPendingPlaybackState('post-set-media-items', { playlistLoadId });
       try {
-        const activeIndexAfterSkip = await TrackPlayer.getCurrentTrack();
-        logger.info('Verified current track after skip', {
+        const activeIndexAfterSkip = TrackPlayer.getActiveMediaItemIndex();
+        logger.info('Verified current track after queue load', {
           requestedIndex: safeStartIndex,
           activeIndexAfterSkip,
           requestedTitle: selectedTrack.title,
@@ -672,11 +649,14 @@ const useTrackPlayer = (onTrackLoaded) => {
       await logPlaybackDiagnostics('post-skip', { playlistLoadId, selectedTrackIndex: safeStartIndex });
 
       try {
-        // Use the normalized track entry which has all required metadata fields
         const normalizedTrack = normalizedQueue[safeStartIndex];
         if (normalizedTrack) {
-          // On Android, updateMetadataForTrack expects a numeric index
-          await TrackPlayer.updateMetadataForTrack(safeStartIndex, normalizedTrack);
+          TrackPlayer.updateMetadata(safeStartIndex, {
+            title: normalizedTrack.title,
+            artist: normalizedTrack.artist,
+            albumTitle: normalizedTrack.albumTitle,
+            artworkUrl: normalizedTrack.artworkUrl,
+          });
           if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
             pendingPlaybackRef.current.stage = 'metadata-primed';
             pendingPlaybackRef.current.metadataPrimedAt = Date.now();
@@ -685,7 +665,7 @@ const useTrackPlayer = (onTrackLoaded) => {
             trackIndex: safeStartIndex,
             title: normalizedTrack.title,
             artist: normalizedTrack.artist,
-            album: normalizedTrack.album,
+            album: normalizedTrack.albumTitle,
             playlistLoadId,
           }, LOG_SCOPE);
         }
@@ -700,7 +680,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       await logPlaybackDiagnostics('post-metadata', { playlistLoadId, selectedTrackIndex: safeStartIndex });
       
       if (savedPosition > 0) {
-        await TrackPlayer.seekTo(savedPosition);
+        TrackPlayer.seekTo(savedPosition);
         logger.info('Playlist seeked to saved position', { 
           startTrack: selectedTrack.title, 
           savedPosition,
@@ -719,7 +699,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         }
         logPendingPlaybackState('pre-play', { playlistLoadId });
         await ensureAudioSessionActive();
-        await TrackPlayer.play();
+        TrackPlayer.play();
         if (pendingPlaybackRef.current?.playlistLoadId === playlistLoadId) {
           pendingPlaybackRef.current.stage = 'play-resolved';
           pendingPlaybackRef.current.playResolvedAt = Date.now();
@@ -738,7 +718,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         pendingPlaybackCleanupTimeoutRef.current = setTimeout(() => {
           clearPendingPlaybackContext('post-play-auto-clean', { playlistLoadId });
         }, 20000);
-        await logPlaybackDiagnostics('post-play', { playlistLoadId, selectedTrackId: selectedTrack.id });
+        await logPlaybackDiagnostics('post-play', { playlistLoadId, selectedTrackId: selectedTrack.mediaId });
       } else {
         setIsPlaying(false);
         logger.info('Playlist loaded without playback', { startTrack: selectedTrack.title, playlistLoadId }, 'useTrackPlayer');
@@ -766,7 +746,7 @@ const useTrackPlayer = (onTrackLoaded) => {
       trackLoadMutex.current = false;
       isLoadingNewFile.current = false;
     }
-  }, [ensureAudioSessionActive, onTrackLoaded, logPlaybackDiagnostics, logPendingPlaybackState, clearPendingPlaybackContext]);
+  }, [ensureAudioSessionActive, onTrackLoaded, logPlaybackDiagnostics, logPendingPlaybackState, clearPendingPlaybackContext, configureRemoteCapabilities, isWeb]);
 
   const loadTrack = useCallback(async (trackUrl, trackTitle, shouldPlay = true, startPosition = 0) => {
     if (!trackUrl) {
@@ -802,11 +782,11 @@ const useTrackPlayer = (onTrackLoaded) => {
     global.setManualNavigation?.(true);
     
     try {
-      await TrackPlayer.skipToNext();
+      TrackPlayer.skipToNext();
       await ensureAudioSessionActive();
-      await TrackPlayer.play();
+      TrackPlayer.play();
       
-      const nextIndex = await TrackPlayer.getCurrentTrack();
+      const nextIndex = TrackPlayer.getActiveMediaItemIndex();
       if (typeof nextIndex === 'number') {
         setCurrentIndex(nextIndex);
         try {
@@ -818,7 +798,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         }
         
         try {
-          const track = await TrackPlayer.getTrack(nextIndex);
+          const track = TrackPlayer.getActiveMediaItem() ?? TrackPlayer.getQueue()[nextIndex];
           if (track) {
             setCurrentTrack(track);
           } else if (playlist[nextIndex]) {
@@ -845,6 +825,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         }, 3000);
     }
   };
+  goToNextTrackRef.current = goToNextTrack;
 
   const goToPreviousTrack = async () => {
     if (isWeb) {
@@ -860,11 +841,16 @@ const useTrackPlayer = (onTrackLoaded) => {
       global.setManualNavigation?.(true);
       
       try {
-      await TrackPlayer.skipToPrevious();
+      const activeIndex = TrackPlayer.getActiveMediaItemIndex();
+      if (typeof activeIndex === 'number' && activeIndex > 0) {
+        TrackPlayer.skipToIndex(activeIndex - 1);
+      } else {
+        TrackPlayer.skipToPrevious();
+      }
       await ensureAudioSessionActive();
-      await TrackPlayer.play();
+      TrackPlayer.play();
       
-      const prevIndex = await TrackPlayer.getCurrentTrack();
+      const prevIndex = TrackPlayer.getActiveMediaItemIndex();
       if (typeof prevIndex === 'number') {
         setCurrentIndex(prevIndex);
         try {
@@ -876,7 +862,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         }
         
         try {
-          const track = await TrackPlayer.getTrack(prevIndex);
+          const track = TrackPlayer.getActiveMediaItem() ?? TrackPlayer.getQueue()[prevIndex];
           if (track) {
             setCurrentTrack(track);
           } else if (playlist[prevIndex]) {
@@ -912,7 +898,6 @@ const useTrackPlayer = (onTrackLoaded) => {
     try {
       if (isWeb) {
         let audio = webAudioRef.current;
-        // Lazily create audio element if none exists but we have a track to play
         if (!audio && (currentTrack?.url || playlist[currentIndex]?.url)) {
           const selected = currentTrack ?? playlist[currentIndex];
           const WebAudioCtor = (typeof window !== 'undefined' && window.Audio) ? window.Audio : (typeof globalThis !== 'undefined' ? globalThis.Audio : null);
@@ -957,11 +942,11 @@ const useTrackPlayer = (onTrackLoaded) => {
         return;
       }
       if (isPlaying) {
-        await TrackPlayer.pause();
+        TrackPlayer.pause();
         setIsPlaying(false);
         logger.info('Playback paused', {}, 'useTrackPlayer');
       } else {
-        await TrackPlayer.play();
+        TrackPlayer.play();
         setIsPlaying(true);
         logger.info('Playback started', {}, 'useTrackPlayer');
       }
@@ -984,7 +969,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         setWebPosition(newPos);
         return;
       }
-      await TrackPlayer.seekTo(position);
+      TrackPlayer.seekTo(position);
       logger.info('Seek completed', { position }, 'useTrackPlayer');
     } catch (error) {
       logger.error('Error seeking to position', { 
@@ -1005,14 +990,8 @@ const useTrackPlayer = (onTrackLoaded) => {
         setWebPosition(next);
         return;
       }
-      const currentPosition = await TrackPlayer.getPosition();
-      const newPosition = Math.min(currentPosition + seconds, duration);
-      await TrackPlayer.seekTo(newPosition);
-      logger.info('Seek forward completed', { 
-        from: currentPosition, 
-        to: newPosition, 
-        seconds 
-      }, 'useTrackPlayer');
+      TrackPlayer.seekBy(seconds);
+      logger.info('Seek forward completed', { seconds }, 'useTrackPlayer');
     } catch (error) {
       logger.error('Error seeking forward', { 
         error: error instanceof Error ? error.message : String(error),
@@ -1032,14 +1011,8 @@ const useTrackPlayer = (onTrackLoaded) => {
         setWebPosition(prev);
         return;
       }
-      const currentPosition = await TrackPlayer.getPosition();
-      const newPosition = Math.max(currentPosition - seconds, 0);
-      await TrackPlayer.seekTo(newPosition);
-      logger.info('Seek backward completed', { 
-        from: currentPosition, 
-        to: newPosition, 
-        seconds 
-      }, 'useTrackPlayer');
+      TrackPlayer.seekBy(-seconds);
+      logger.info('Seek backward completed', { seconds }, 'useTrackPlayer');
     } catch (error) {
       logger.error('Error seeking backward', { 
         error: error instanceof Error ? error.message : String(error),
@@ -1059,7 +1032,7 @@ const useTrackPlayer = (onTrackLoaded) => {
         }
         return;
       }
-      await TrackPlayer.stop();
+      TrackPlayer.stop();
       setIsPlaying(false);
       logger.info('Playback stopped', {}, 'useTrackPlayer');
     } catch (error) {
@@ -1072,7 +1045,6 @@ const useTrackPlayer = (onTrackLoaded) => {
   const cleanup = async () => {
     logger.info('Cleaning up TrackPlayer', {}, 'useTrackPlayer');
     try {
-      // Clear all intervals
       if (watchdogIntervalRef.current) {
         clearInterval(watchdogIntervalRef.current);
       }
@@ -1080,16 +1052,14 @@ const useTrackPlayer = (onTrackLoaded) => {
         clearInterval(progressIntervalRef.current);
       }
       
-      // Reset all flags
       trackLoadMutex.current = false;
       isTransitioning.current = false;
       isLoadingNewFile.current = false;
 
       if (!isWeb) {
-        await TrackPlayer.destroy();
+        TrackPlayer.destroy();
         logger.info('TrackPlayer cleanup completed', {}, 'useTrackPlayer');
       } else {
-        // Cleanup web audio element
         const audio = webAudioRef.current;
         if (audio) {
           try { audio.pause(); } catch (_) {}
@@ -1108,7 +1078,6 @@ const useTrackPlayer = (onTrackLoaded) => {
   };
 
   return {
-    // State
     isPlaying,
     isLoading,
     currentTrack,
@@ -1118,7 +1087,6 @@ const useTrackPlayer = (onTrackLoaded) => {
     duration: isWeb ? webDuration : duration,
     appStateVisible,
     
-    // Actions
     loadTrack,
     loadPlaylist,
     goToNextTrack,
@@ -1130,7 +1098,6 @@ const useTrackPlayer = (onTrackLoaded) => {
     stopPlayback,
     cleanup,
     
-    // Utilities
     ensureAudioSessionActive,
   };
 };
